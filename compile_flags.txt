@@ -1,4 +1,4 @@
--I./inc
+-I./include
 -Wall
 -Werror
 -Wextra
