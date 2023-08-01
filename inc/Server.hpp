@@ -8,6 +8,9 @@
 class Server {
 
   public:
+    Server();
+    ~Server();
+
     typedef enum { GET, POST, DELETE } METHODS;
 
   private:
@@ -17,6 +20,8 @@ class Server {
     std::string                   _root;
     std::string                   _index;
     std::vector<Server::METHODS>  _allowedMethods;
+
+    // Config                     _config;
 
 };
 

@@ -20,6 +20,7 @@ SRC_MAIN	= main.cpp
 MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 
 SRC				= $(MAIN) 	\
+						$(SERVER)
 
 OBJ 			= $(SRC:.cpp=.o)
 

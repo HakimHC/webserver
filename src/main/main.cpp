@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "Server.hpp"
+
 int main() {
-  std::cout << "Hello, Webserver!" << std::endl;
+  Server serv;
 }
