@@ -7,7 +7,7 @@ CXXFLAGS 	+= -Wshadow -Wpedantic
 CXXFLAGS 	+= -g3
 CXXFLAGS 	+= -I $(INC)
 
-INC				= inc
+INC				= include
 
 SRCDIR 		= src
 
