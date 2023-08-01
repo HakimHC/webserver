@@ -10,7 +10,8 @@
 
 Server::~Server() {}
 Server::Server()
-  : _port(8080), _name("server1"), _root("www"), _index("index.html") {
+  : _port(8080), _name("server1"), _root("www"), _index("index.html"),
+    _maxClientBodySize(4096), _defaultFileDirectory("") {
 
     this->_allowedMethods.push_back(GET);
 

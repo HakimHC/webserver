@@ -24,8 +24,11 @@ class Server {
     std::string                   _root;
     std::string                   _index;
     std::vector<Server::METHODS>  _allowedMethods;
+    size_t                        _maxClientBodySize;
+    std::string                   _defaultFileDirectory;
 
-    // Config                     _config;
+    // ErrorPages                 _defaultErrorPages;
+    // Redirection*               _redirections;
 
 };
 
