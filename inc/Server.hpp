@@ -5,11 +5,15 @@
 # include <string>
 # include <vector>
 
+# define _NUM_ALLOWED_METHODS 3
+
 class Server {
 
   public:
     Server();
     ~Server();
+
+    void  print() const;
 
     typedef enum { GET, POST, DELETE } METHODS;
 

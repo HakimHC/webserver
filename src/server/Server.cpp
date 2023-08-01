@@ -8,8 +8,9 @@
 
 #define _BACKLOG 5
 
+Server::~Server() {}
 Server::Server()
-  : _port(8181), _name("server1"), _root("www"), _index("index.html") {
+  : _port(8080), _name("server1"), _root("www"), _index("index.html") {
 
     this->_allowedMethods.push_back(GET);
 
@@ -25,10 +26,35 @@ Server::Server()
     if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
       throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:8181" << std::endl;
+    std::cout << "Server listening on 127.0.0.1:8080" << std::endl;
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
 }
 
-Server::~Server() {}
+void Server::print() const {
+  std::cout << "== " << this->_name << " ==" << std::endl;
+  std::cout << "Port: " << this->_port << std::endl;
+  std::cout << "SockFD: " << this->_socketFd << std::endl;
+  std::cout << "Root: " << this->_root << std::endl;
+  std::cout << "Index: " << this->_index << std::endl;
+  std::cout << "Allowed methods: ";
+
+  std::vector<Server::METHODS>::const_iterator it = this->_allowedMethods.begin();
+  std::vector<Server::METHODS>::const_iterator ite = this->_allowedMethods.end();
+
+  for (; it != ite; it++) {
+    switch (*it) {
+      case GET:
+        std::cout << "GET ";
+        break;
+      case POST:
+        std::cout << "POST ";
+        break;
+      case DELETE:
+        std::cout << "DELETE ";
+        break;
+    }
+  }
+  std::cout << std::endl;
+}
