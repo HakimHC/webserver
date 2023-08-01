@@ -3,5 +3,8 @@
 #include "Server.hpp"
 
 int main() {
-  Server serv;
+  Server* server = new Server();
+
+  server->print();
+  delete server;
 }
