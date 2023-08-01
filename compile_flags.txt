@@ -1,0 +1,6 @@
+-I./inc
+-Wall
+-Werror
+-Wextra
+-Wpedantic
+-Wshadow
