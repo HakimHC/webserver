@@ -76,14 +76,14 @@ build:
 	@echo "CONFIG FILE: " $(CONF_FILE)
 	docker build -t $(IMG_NAME) --build-arg CONFIG_FILE=$(CONF_FILE) $(DF_DIR)
 
-run: down
+run:
 	docker run -p 8080:80 --name $(CONTAINER) $(IMG_NAME)
 
-run_detach: down
+run_detach:
 	docker run -d -p 8080:80 --name $(CONTAINER) $(IMG_NAME)
 
 down:
-	docker stop -f $(CONTAINER) 2>/dev/null
-	docker rm $(CONTAINER) 2>/dev/null
+	docker container stop $(CONTAINER)
+	docker container rm $(CONTAINER)
 
 .PHONY: all clean fclean re build run down
