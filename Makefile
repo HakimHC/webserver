@@ -1,11 +1,18 @@
 NAME 			= webserv
 
+OS				= $(shell uname -s)
+
 CXX				= g++
 
 CXXFLAGS 	= -Wall -Werror -Wextra
-CXXFLAGS 	+= -Wshadow -Wpedantic
+CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
 CXXFLAGS 	+= -g3
 CXXFLAGS 	+= -I $(INC)
+
+ifeq ($(OS), Linux)
+	CXXFLAGS += -fsanitize=leak
+	LDFLAGS += -fsanitize=leak
+endif
 
 INC				= include
 
@@ -27,7 +34,7 @@ OBJ 			= $(SRC:.cpp=.o)
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CXX) $(CXXFLAGS) $(OBJ) -o $@
+	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
 
 clean:
 	$(RM) $(OBJ)
@@ -37,5 +44,9 @@ fclean: clean
 
 re:: fclean
 re:: all
+
+asan: CXXFLAGS += -fsanitize=address
+asan: LDFLAGS += -fsanitize=address
+asan: re
 
 .PHONY: all clean fclean re
