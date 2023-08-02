@@ -1,0 +1,5 @@
+# Name of the executable
+webserv
+
+# Object files
+**/*.o
