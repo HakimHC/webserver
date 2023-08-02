@@ -30,12 +30,17 @@ SERVERDIR	= $(addprefix $(SRCDIR)/,server)
 SRC_SERVER= Server.cpp
 SERVER 		= $(addprefix $(SERVERDIR)/,$(SRC_SERVER))
 
+CLIENT 		= $(addprefix $(CLIENTDIR)/,$(SRC_CLIENT))
+SRC_CLIENT= Client.cpp
+CLIENTDIR	= $(addprefix $(SRCDIR)/,client)
+
 MAINDIR		= $(addprefix $(SRCDIR)/,main)
 SRC_MAIN	= main.cpp
 MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 
 SRC				= $(MAIN) 	\
-						$(SERVER)
+						$(SERVER) \
+						$(CLIENT)
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)
