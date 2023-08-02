@@ -36,10 +36,10 @@ class Server {
     size_t                        _maxClientBodySize;
     std::string                   _defaultFileDirectory;
 
+    /* Parallel vectors for the clients and their respective pollfds. */
     std::vector<Client>           _clients;
     std::vector<struct pollfd>    _pollFds;
 
-    // Polling stuff (pollfd vectors)
     // ErrorPages                 _defaultErrorPages;
     // Redirection*               _redirections;
 

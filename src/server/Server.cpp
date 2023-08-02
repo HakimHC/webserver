@@ -34,6 +34,9 @@ Server::Server()
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
+
+    /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
+    this->_clients.push_back(Client(-1));
 }
 
 Server::Server(uint16_t port)
@@ -58,6 +61,9 @@ Server::Server(uint16_t port)
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
+
+    /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
+    this->_clients.push_back(Client(-1));
 }
 
 void Server::print() const {
@@ -105,6 +111,7 @@ void Server::acceptClient() {
   clientPollFd.events = POLLIN;
 
   this->_pollFds.push_back(clientPollFd);
+  this->_clients.push_back(client);
 }
 
 void Server::readClientData(const size_t& clientIndex) {
@@ -121,8 +128,9 @@ void Server::readClientData(const size_t& clientIndex) {
     std::cout << "error: cannot read clients buffer, ending connection" << std::endl;
     close(this->_pollFds[clientIndex].fd);
   }
-  else
+  else {
     printf("%s\n", buf);
+  }
 }
 
 void Server::operate() {
