@@ -26,26 +26,31 @@ INC				= include
 SRCDIR 		= src
 
 # Source code subdirectories and source files
+SERVER 		= $(addprefix $(SERVERDIR)/,$(SRC_SERVER))
 SERVERDIR	= $(addprefix $(SRCDIR)/,server)
 SRC_SERVER= Server.cpp
-SERVER 		= $(addprefix $(SERVERDIR)/,$(SRC_SERVER))
 
 CLIENT 		= $(addprefix $(CLIENTDIR)/,$(SRC_CLIENT))
-SRC_CLIENT= Client.cpp
 CLIENTDIR	= $(addprefix $(SRCDIR)/,client)
+SRC_CLIENT= Client.cpp
 
 REQUEST 		= $(addprefix $(REQUESTDIR)/,$(SRC_REQUEST))
-SRC_REQUEST	= Request.cpp
 REQUESTDIR	= $(addprefix $(SRCDIR)/,request)
+SRC_REQUEST	= Request.cpp
 
+UTILS 		= $(addprefix $(UTILSDIR)/,$(SRC_UTILS))
+UTILSDIR	= $(addprefix $(SRCDIR)/,utils)
+SRC_UTILS	= crlf.cpp \
+
+MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 MAINDIR		= $(addprefix $(SRCDIR)/,main)
 SRC_MAIN	= main.cpp
-MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 
 SRC				= $(MAIN) 	\
 						$(SERVER) \
 						$(CLIENT) \
 						$(REQUEST) \
+						$(UTILS) \
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)
