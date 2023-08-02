@@ -30,7 +30,7 @@ Server::Server()
     if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
       throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:" << this->_port << std::endl;
+    std::cout << "Server listening on 127.0.0.1:" << this->_port << "..." << std::endl;
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
@@ -54,14 +54,16 @@ Server::Server(uint16_t port)
     if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
       throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:" << this->_port << std::endl;
+    std::cout << "Server listening on 127.0.0.1:" << this->_port << "..." << std::endl;
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
 }
 
 void Server::print() const {
+  std::cout << std::endl;
   std::cout << "======= " << this->_name << " =======" << std::endl;
+  std::cout << std::endl;
   std::cout << "Port: " << this->_port << std::endl;
   std::cout << "SockFD: " << this->_socketFd << std::endl;
   std::cout << "Root: " << this->_root << std::endl;
@@ -84,6 +86,9 @@ void Server::print() const {
         break;
     }
   }
+  std::cout << std::endl;
+  std::cout << std::endl;
+  std::cout << "=======================" << std::endl;
   std::cout << std::endl;
 }
 
@@ -108,12 +113,21 @@ void Server::readClientData(const size_t& clientIndex) {
 
   ssize_t r = recv(this->_pollFds[clientIndex].fd, buf, sizeof(buf), 0);
 
-  if       (r == 0 )  close(this->_pollFds[clientIndex].fd);
-  else if  (r == -1 ) close(this->_pollFds[clientIndex].fd);
-  else                printf("%s\n", buf);
+  if (r == 0) {
+    std::cout << "Client disconnected" << std::endl;
+    close(this->_pollFds[clientIndex].fd);
+  }
+  else if  (r == -1) {
+    std::cout << "error: cannot read clients buffer, ending connection" << std::endl;
+    close(this->_pollFds[clientIndex].fd);
+  }
+  else
+    printf("%s\n", buf);
 }
 
 void Server::operate() {
+  fcntl(this->_socketFd, F_SETFL, O_NONBLOCK);
+
   /* Add the passive socket (server socket) to the poll-fd vector */
   struct pollfd serverPollFd;
   serverPollFd.fd = this->_socketFd;
