@@ -8,6 +8,9 @@ class Request {
     Request();
     ~Request();
 
+    void parse(const std::string&);
+    void getRequestLine(const std::string&);
+
   private:
     std::string   _method;
     std::string   _uri;

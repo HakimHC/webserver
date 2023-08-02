@@ -3,3 +3,7 @@ webserv
 
 # Object files
 **/*.o
+
+# Stderr logs (AddressSanitizer, etc)
+
+error_log
