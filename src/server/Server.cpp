@@ -1,8 +1,11 @@
-#include <cstring>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <stdexcept>
 #include <iostream>
+
+#include <cstring>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
 
 #include "Server.hpp"
 
@@ -27,7 +30,7 @@ Server::Server()
     if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
       throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:8080" << std::endl;
+    std::cout << "Server listening on 127.0.0.1:" << this->_port << std::endl;
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
@@ -51,14 +54,14 @@ Server::Server(uint16_t port)
     if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
       throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:8080" << std::endl;
+    std::cout << "Server listening on 127.0.0.1:" << this->_port << std::endl;
 
     if (listen(this->_socketFd, _BACKLOG) < 0)
       throw std::runtime_error("fatal: socket cannot listen");
 }
 
 void Server::print() const {
-  std::cout << "== " << this->_name << " ==" << std::endl;
+  std::cout << "======= " << this->_name << " =======" << std::endl;
   std::cout << "Port: " << this->_port << std::endl;
   std::cout << "SockFD: " << this->_socketFd << std::endl;
   std::cout << "Root: " << this->_root << std::endl;
@@ -82,4 +85,56 @@ void Server::print() const {
     }
   }
   std::cout << std::endl;
+}
+
+void Server::acceptClient() {
+  /* Construct client object with the file descriptor returned by accept */
+  Client client ( accept(this->_socketFd, NULL, NULL) );
+
+  if (client.getSocketfd() == -1) {
+    std::cerr << "error: cannot accept client's connection" << std::endl;
+    return;
+  }
+  struct pollfd clientPollFd;
+  clientPollFd.fd = client.getSocketfd();
+  clientPollFd.events = POLLIN;
+
+  this->_pollFds.push_back(clientPollFd);
+}
+
+void Server::readClientData(const size_t& clientIndex) {
+  char buf[_MAX_BUFFER_SIZE];
+  memset(buf, 0, sizeof(buf));
+
+  ssize_t r = recv(this->_pollFds[clientIndex].fd, buf, sizeof(buf), 0);
+
+  if       (r == 0 )  close(this->_pollFds[clientIndex].fd);
+  else if  (r == -1 ) close(this->_pollFds[clientIndex].fd);
+  else                printf("%s\n", buf);
+}
+
+void Server::operate() {
+  /* Add the passive socket (server socket) to the poll-fd vector */
+  struct pollfd serverPollFd;
+  serverPollFd.fd = this->_socketFd;
+  serverPollFd.events = POLLIN;
+  this->_pollFds.push_back(serverPollFd);
+
+  while (true) {
+    if (poll(this->_pollFds.data(), this->_pollFds.size(), 0) < 0)
+      throw std::runtime_error("fatal: poll() syscall failed, shutting down server...");
+    
+    for (size_t i = 0; i < this->_pollFds.size(); i++) {
+      if (this->_pollFds[i].revents & POLLIN) {
+        if (this->_pollFds[i].fd == this->_socketFd) {
+          std::cout << "Incoming connection..." << std::endl;
+          this->acceptClient();
+        }
+        else {
+          std::cout << "Recieved data:" << std::endl;
+          this->readClientData(i);
+        }
+      }
+    }
+  }
 }

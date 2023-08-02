@@ -4,15 +4,16 @@
 #include "Client.hpp"
 
 int main() {
-  Server* server = new Server(8080);
-  Server* server2 = new Server(8181);
+  Server *s1 = NULL;
+  try {
+    s1 = new Server(8181);
+  }
+  catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
 
-  server->print();
-  server2->print();
-  delete server;
-  delete server2;
-
-  Client* client = new Client(5);
-  std::cout << client->getSocketfd() << std::endl;
-  delete client;
+  s1->print();
+  s1->operate();
+  delete s1;
 }
