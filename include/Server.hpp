@@ -11,6 +11,7 @@ class Server {
 
   public:
     Server();
+    Server(uint16_t port);
     ~Server();
 
     void  print() const;
@@ -27,6 +28,7 @@ class Server {
     size_t                        _maxClientBodySize;
     std::string                   _defaultFileDirectory;
 
+    // Polling stuff (pollfd vectors)
     // ErrorPages                 _defaultErrorPages;
     // Redirection*               _redirections;
 
