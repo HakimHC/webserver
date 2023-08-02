@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 
 #include "Server.hpp"
+#include "Request.hpp"
 #include "utils.hpp"
 
 #define _BACKLOG 5
@@ -17,7 +18,7 @@ Server::Server()
   : _port(8080), _name("server1"), _root("www"), _index("index.html"),
     _maxClientBodySize(4096), _defaultFileDirectory("") {
 
-    this->_allowedMethods.push_back(GET);
+    this->_allowedMethods.push_back("GET");
 
     this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->_socketFd < 0) throw std::runtime_error("fatal: cannot create socket + (" + this->_name + ")");
@@ -38,13 +39,14 @@ Server::Server()
 
     /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
     this->_clients.push_back(Client(-1));
+    this->_clientBuffer.push_back("");
 }
 
 Server::Server(uint16_t port)
   : _port(port), _name("server1"), _root("www"), _index("index.html"),
     _maxClientBodySize(4096), _defaultFileDirectory("") {
 
-    this->_allowedMethods.push_back(GET);
+    this->_allowedMethods.push_back("GET");
 
     this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
     if (this->_socketFd < 0) throw std::runtime_error("fatal: cannot create socket + (" + this->_name + ")");
@@ -65,6 +67,7 @@ Server::Server(uint16_t port)
 
     /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
     this->_clients.push_back(Client(-1));
+    this->_clientBuffer.push_back("");
 }
 
 void Server::print() const {
@@ -77,21 +80,11 @@ void Server::print() const {
   std::cout << "Index: " << this->_index << std::endl;
   std::cout << "Allowed methods: ";
 
-  std::vector<Server::METHODS>::const_iterator it = this->_allowedMethods.begin();
-  std::vector<Server::METHODS>::const_iterator ite = this->_allowedMethods.end();
+  std::vector<Server::HTTPMethods>::const_iterator it = this->_allowedMethods.begin();
+  std::vector<Server::HTTPMethods>::const_iterator ite = this->_allowedMethods.end();
 
   for (; it != ite; it++) {
-    switch (*it) {
-      case GET:
-        std::cout << "GET ";
-        break;
-      case POST:
-        std::cout << "POST ";
-        break;
-      case DELETE:
-        std::cout << "DELETE ";
-        break;
-    }
+    std::cout << *it << " ";
   }
   std::cout << std::endl;
   std::cout << std::endl;
@@ -130,8 +123,8 @@ void Server::readClientData(const size_t& clientIndex) {
     close(this->_pollFds[clientIndex].fd);
   }
   else {
-    printf("%s\n", buf);
-    if (utils::isCrLf(buf)) std::cout << "IS ONLY CRLF" << std::endl;
+    this->_clientBuffer[clientIndex].append(buf, sizeof(buf));
+    std::cout << this->_clientBuffer[clientIndex];
   }
 }
 

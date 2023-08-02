@@ -21,23 +21,25 @@ class Server {
 
     void  print() const;
     void  operate();
+
+    typedef std::string HTTPMethods;
+
+  private:
     void  acceptClient();
     void  readClientData(const size_t&);
 
-    typedef enum { GET, POST, DELETE } METHODS;
-
-  private:
-    uint16_t                      _port;
-    int                           _socketFd;
-    std::string                   _name;
-    std::string                   _root;
-    std::string                   _index;
-    std::vector<Server::METHODS>  _allowedMethods;
-    size_t                        _maxClientBodySize;
-    std::string                   _defaultFileDirectory;
+    uint16_t                          _port;
+    int                               _socketFd;
+    std::string                       _name;
+    std::string                       _root;
+    std::string                       _index;
+    std::vector<Server::HTTPMethods>  _allowedMethods;
+    size_t                            _maxClientBodySize;
+    std::string                       _defaultFileDirectory;
 
     /* Parallel vectors for the clients and their respective pollfds. */
     std::vector<Client>           _clients;
+    std::vector<std::string>      _clientBuffer;
     std::vector<struct pollfd>    _pollFds;
 
     // ErrorPages                 _defaultErrorPages;
