@@ -5,7 +5,12 @@
 # include <string>
 # include <vector>
 
-# define _NUM_ALLOWED_METHODS 3
+# include <poll.h>
+
+# include "Client.hpp"
+
+# define _NUM_ALLOWED_METHODS   3
+# define _MAX_BUFFER_SIZE       2048
 
 class Server {
 
@@ -15,6 +20,9 @@ class Server {
     ~Server();
 
     void  print() const;
+    void  operate();
+    void  acceptClient();
+    void  readClientData(const size_t&);
 
     typedef enum { GET, POST, DELETE } METHODS;
 
@@ -27,6 +35,9 @@ class Server {
     std::vector<Server::METHODS>  _allowedMethods;
     size_t                        _maxClientBodySize;
     std::string                   _defaultFileDirectory;
+
+    std::vector<Client>           _clients;
+    std::vector<struct pollfd>    _pollFds;
 
     // Polling stuff (pollfd vectors)
     // ErrorPages                 _defaultErrorPages;
