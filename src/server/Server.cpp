@@ -8,6 +8,7 @@
 #include <netinet/in.h>
 
 #include "Server.hpp"
+#include "utils.hpp"
 
 #define _BACKLOG 5
 
@@ -130,6 +131,7 @@ void Server::readClientData(const size_t& clientIndex) {
   }
   else {
     printf("%s\n", buf);
+    if (utils::isCrLf(buf)) std::cout << "IS ONLY CRLF" << std::endl;
   }
 }
 
