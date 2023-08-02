@@ -41,14 +41,15 @@ SRC				= $(MAIN) 	\
 OBJ 			= $(SRC:.cpp=.o)
 
 # NGINX container variables for educational / debugging / testing purposes.
+DF_DIR		= nginx
 IMG_NAME	= nginx-webserv-img
 
-CONF_FILE	= ./container/nginx.conf
+CONF_FILE	:= nginx.conf
 
 CONTAINER	= nginx-webserv
 
-ifeq ($(conf),)
-	CONF_FILE = $(conf)
+ifneq ($(conf),)
+	CONF_FILE := $(conf)
 endif
 
 # C++ related rules
@@ -72,13 +73,17 @@ asan: re
 
 # NGINX container related rules
 build:
-	docker build -t $(IMG_NAME) --build-arg CONFIG_FILE=$(CONF_FILE) .
+	@echo "CONFIG FILE: " $(CONF_FILE)
+	docker build -t $(IMG_NAME) --build-arg CONFIG_FILE=$(CONF_FILE) $(DF_DIR)
 
-run:
+run: down
 	docker run -p 8080:80 --name $(CONTAINER) $(IMG_NAME)
 
+run_detach: down
+	docker run -d -p 8080:80 --name $(CONTAINER) $(IMG_NAME)
+
 down:
-	docker stop $(CONTAINER)
-	docker rm $(CONTAINER)
+	docker stop -f $(CONTAINER) 2>/dev/null
+	docker rm $(CONTAINER) 2>/dev/null
 
 .PHONY: all clean fclean re build run down
