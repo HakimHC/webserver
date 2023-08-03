@@ -1,0 +1,7 @@
+-I./include
+-Wall
+-Werror
+-Wextra
+-pedantic
+-Wshadow
+-Wconversion

@@ -1,0 +1,26 @@
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==7322==ERROR: AddressSanitizer: BUS on unknown address (pc 0x7fd19f22b0be bp 0x10000fffffff4 sp 0x7ffdfbbc6730 T0)
+==7322==The signal is caused by a READ memory access.
+==7322==Hint: this fault was caused by a dereference of a high value address (see register values below).  Disassemble the provided pc to learn which register was used.
+    #0 0x7fd19f22b0be in bool __sanitizer::atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>(__sanitizer::atomic_uint8_t volatile*, __sanitizer::atomic_uint8_t::Type*, __sanitizer::atomic_uint8_t::Type, __sanitizer::memory_order) /usr/src/debug/gcc/gcc/libsanitizer/sanitizer_common/sanitizer_atomic_clang.h:81
+    #1 0x7fd19f22b0be in __asan::Allocator::AtomicallySetQuarantineFlagIfAllocated(__asan::AsanChunk*, void*, __sanitizer::BufferedStackTrace*) /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_allocator.cpp:610
+    #2 0x7fd19f22b0be in __asan::Allocator::Deallocate(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_allocator.cpp:685
+    #3 0x7fd19f22b0be in __asan::asan_delete(void*, unsigned long, unsigned long, __sanitizer::BufferedStackTrace*, __asan::AllocType) /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_allocator.cpp:949
+    #4 0x7fd19f2e2b5a in operator delete(void*) /usr/src/debug/gcc/gcc/libsanitizer/asan/asan_new_delete.cpp:152
+    #5 0x7fd19ef59756 in std::__new_allocator<char>::deallocate(char*, unsigned long) /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/new_allocator.h:168
+    #6 0x7fd19ef59756 in std::allocator_traits<std::allocator<char> >::deallocate(std::allocator<char>&, char*, unsigned long) /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/alloc_traits.h:516
+    #7 0x7fd19ef59756 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_destroy(unsigned long) /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/basic_string.h:302
+    #8 0x7fd19ef59756 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_dispose() /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/basic_string.h:296
+    #9 0x7fd19ef59756 in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_mutate(unsigned long, unsigned long, char const*, unsigned long) /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/basic_string.tcc:338
+    #10 0x7fd19ef5a87b in std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >::_M_replace(unsigned long, unsigned long, char const*, unsigned long) /usr/src/debug/gcc/gcc-build/x86_64-pc-linux-gnu/libstdc++-v3/include/bits/basic_string.tcc:545
+    #11 0x55c0f555afeb in Server::readClientData(unsigned long const&) src/server/Server.cpp:103
+    #12 0x55c0f555b58c in Server::operate() src/server/Server.cpp:132
+    #13 0x55c0f55596e2 in main src/main/main.cpp:17
+    #14 0x7fd19ec3984f  (/usr/lib/libc.so.6+0x2384f) (BuildId: 2f005a79cd1a8e385972f5a102f16adba414d75e)
+    #15 0x7fd19ec39909 in __libc_start_main (/usr/lib/libc.so.6+0x23909) (BuildId: 2f005a79cd1a8e385972f5a102f16adba414d75e)
+    #16 0x55c0f55595b4 in _start (/home/hakim/dev/common_core/webserver/webserv+0x45b4) (BuildId: ad07125f6e7c5b88bc4f6552a976175265e7fc80)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: BUS /usr/src/debug/gcc/gcc/libsanitizer/sanitizer_common/sanitizer_atomic_clang.h:81 in bool __sanitizer::atomic_compare_exchange_strong<__sanitizer::atomic_uint8_t>(__sanitizer::atomic_uint8_t volatile*, __sanitizer::atomic_uint8_t::Type*, __sanitizer::atomic_uint8_t::Type, __sanitizer::memory_order)
+==7322==ABORTING
