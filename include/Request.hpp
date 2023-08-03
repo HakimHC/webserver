@@ -10,8 +10,10 @@ class Request {
 
     void parse(const std::string&);
     void getRequestLine(const std::string&);
+    void print() const;
 
   private:
+    void          parseUri(const std::string&);
     std::string   _method;
     std::string   _uri;
     std::string   _httpVersion;

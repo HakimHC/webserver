@@ -103,6 +103,7 @@ void Server::readClientData(const size_t& clientIndex) {
     /* std::cout << this->_clientBuffer[clientIndex]; */
     Request req;
     req.parse(this->_clientBuffer[clientIndex]);
+    req.print();
   }
 }
 
