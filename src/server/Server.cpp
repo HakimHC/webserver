@@ -14,60 +14,36 @@
 #define _BACKLOG 5
 
 Server::~Server() {}
-Server::Server()
-  : _port(8080), _name("server1"), _root("www"), _index("index.html"),
-    _maxClientBodySize(4096), _defaultFileDirectory("") {
+Server::Server() {}
 
-    this->_allowedMethods.push_back("GET");
+void Server::initialize() {
+  this->_port = 8181;
+  this->_name = "server1";
+  this->_root = "www";
+  this->_maxClientBodySize = 4096;
+  this->_defaultFileDirectory = "";
+  this->_allowedMethods.push_back("GET");
 
-    this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->_socketFd < 0) throw std::runtime_error("fatal: cannot create socket + (" + this->_name + ")");
+  this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (this->_socketFd < 0) throw std::runtime_error("fatal: cannot create socket + (" + this->_name + ")");
 
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(this->_port);
-    addr.sin_addr.s_addr = INADDR_ANY;
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(this->_port);
+  addr.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
-      throw std::runtime_error("fatal: cannot bind socket");
+  if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+    throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:" << this->_port << "..." << std::endl;
+  std::cout << "Server listening on 127.0.0.1:" << this->_port << "..." << std::endl;
 
-    if (listen(this->_socketFd, _BACKLOG) < 0)
-      throw std::runtime_error("fatal: socket cannot listen");
+  if (listen(this->_socketFd, _BACKLOG) < 0)
+    throw std::runtime_error("fatal: socket cannot listen");
 
-    /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
-    this->_clients.push_back(Client(-1));
-    this->_clientBuffer.push_back("");
-}
-
-Server::Server(uint16_t port)
-  : _port(port), _name("server1"), _root("www"), _index("index.html"),
-    _maxClientBodySize(4096), _defaultFileDirectory("") {
-
-    this->_allowedMethods.push_back("GET");
-
-    this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->_socketFd < 0) throw std::runtime_error("fatal: cannot create socket + (" + this->_name + ")");
-
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(this->_port);
-    addr.sin_addr.s_addr = INADDR_ANY;
-
-    if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
-      throw std::runtime_error("fatal: cannot bind socket");
-
-    std::cout << "Server listening on 127.0.0.1:" << this->_port << "..." << std::endl;
-
-    if (listen(this->_socketFd, _BACKLOG) < 0)
-      throw std::runtime_error("fatal: socket cannot listen");
-
-    /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
-    this->_clients.push_back(Client(-1));
-    this->_clientBuffer.push_back("");
+  /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
+  this->_clients.push_back(Client(-1));
+  this->_clientBuffer.push_back("");
 }
 
 void Server::print() const {
