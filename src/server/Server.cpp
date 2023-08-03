@@ -17,7 +17,7 @@ Server::~Server() {}
 Server::Server() {}
 
 void Server::initialize() {
-  this->_port = 8181;
+  this->_port = 8282;
   this->_name = "server1";
   this->_root = "www";
   this->_maxClientBodySize = 4096;
@@ -82,6 +82,7 @@ void Server::acceptClient() {
 
   this->_pollFds.push_back(clientPollFd);
   this->_clients.push_back(client);
+  this->_clientBuffer.push_back("");
 }
 
 void Server::readClientData(const size_t& clientIndex) {
@@ -99,9 +100,10 @@ void Server::readClientData(const size_t& clientIndex) {
     close(this->_pollFds[clientIndex].fd);
   }
   else {
-    this->_clientBuffer[clientIndex].append(buf, sizeof(buf));
-    /* std::cout << this->_clientBuffer[clientIndex]; */
+    this->_clientBuffer[clientIndex] = buf;
+    std::cout << this->_clientBuffer[clientIndex];
     Request req;
+    /* req.parse(buf); */
     req.parse(this->_clientBuffer[clientIndex]);
     req.print();
   }
