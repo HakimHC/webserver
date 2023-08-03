@@ -1,3 +1,4 @@
+#include <exception>
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
@@ -14,7 +15,12 @@ Request::Request() {}
 Request::~Request() {}
 
 void Request::parse(std::string const& buffer) {
-  this->getRequestLine(buffer);
+  try {
+    this->getRequestLine(buffer);
+  }
+  catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+  }
 }
 
 void Request::getRequestLine(std::string const& buffer) {
@@ -43,13 +49,19 @@ void Request::getRequestLine(std::string const& buffer) {
 }
 
 void Request::parseUri(const std::string& uri) {
-  this->_uri = uri;
+  size_t queryPos = uri.find("?");
+  if (queryPos == std::string::npos) this->_uri = uri;
+  else {
+    this->_uri = uri.substr(0, queryPos);
+    this->_queryString = uri.substr(queryPos + 1, uri.size());
+  }
 }
 
 void Request::print() const {
   std::cout << "======== REQUEST ========" << std::endl;
   std::cout << "Method: " << this->_method << std::endl;
   std::cout << "URI: " << this->_uri << std::endl;
+  std::cout << "Query String: " << this->_queryString << std::endl;
   std::cout << "Version: " << this->_httpVersion << std::endl;
   std::cout << "=========================" << std::endl;
 }
