@@ -1,6 +1,0 @@
--I./include
--Wall
--Werror
--Wextra
--Wpedantic
--Wshadow

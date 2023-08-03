@@ -5,8 +5,10 @@ webserv
 **/*.o
 
 # Stderr logs (AddressSanitizer, etc)
-
 error_log
 
 # Nginx test container directory
 nginx
+
+# Clangd compile flags
+compile_flags.txt
