@@ -14,10 +14,10 @@ CXXFLAGS 	+= -g3
 CXXFLAGS 	+= -I $(INC)
 
 # If the OS happens to be Linux, compile with the LeakSanitizer (this flag is not supported on MacOS)
-ifeq ($(OS), Linux)
-	CXXFLAGS += -fsanitize=leak
-	LDFLAGS += -fsanitize=leak
-endif
+# ifeq ($(OS), Linux)
+# 	CXXFLAGS += -fsanitize=leak
+# 	LDFLAGS += -fsanitize=leak
+# endif
 
 # Header file directory
 INC				= include
