@@ -16,10 +16,10 @@ class Server {
 
   public:
     Server();
-    Server(uint16_t port);
     ~Server();
 
     void  print() const;
+    void  initialize();
     void  operate();
 
     typedef std::string HTTPMethods;
