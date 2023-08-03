@@ -100,7 +100,9 @@ void Server::readClientData(const size_t& clientIndex) {
   }
   else {
     this->_clientBuffer[clientIndex].append(buf, sizeof(buf));
-    std::cout << this->_clientBuffer[clientIndex];
+    /* std::cout << this->_clientBuffer[clientIndex]; */
+    Request req;
+    req.parse(this->_clientBuffer[clientIndex]);
   }
 }
 
