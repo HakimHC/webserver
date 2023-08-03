@@ -7,3 +7,6 @@ webserv
 # Stderr logs (AddressSanitizer, etc)
 
 error_log
+
+# Nginx test container directory
+nginx
