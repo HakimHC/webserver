@@ -4,7 +4,7 @@
 #include <string>
 
 class Request {
-public:
+ public:
   Request();
   ~Request();
 
@@ -12,7 +12,7 @@ public:
   void getRequestLine(const std::string &);
   void print() const;
 
-private:
+ private:
   void parseUri(const std::string &);
   std::string _method;
   std::string _uri;
@@ -20,4 +20,4 @@ private:
   std::string _queryString;
 };
 
-#endif // __REQUEST_HPP__
+#endif  // __REQUEST_HPP__

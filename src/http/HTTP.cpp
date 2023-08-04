@@ -1,11 +1,9 @@
 #include "HTTP.hpp"
 
-HTTP::HTTP() {};
-HTTP::~HTTP() {};
+HTTP::HTTP(){};
+HTTP::~HTTP(){};
 
-void HTTP::addServer(Server& server) {
-  this->_servers.push_back(server);
-}
+void HTTP::addServer(Server& server) { this->_servers.push_back(server); }
 
 void HTTP::start() {
   while (true) {
