@@ -13,7 +13,7 @@
 #define _MAX_BUFFER_SIZE 2048
 
 class Server {
-public:
+ public:
   Server();
   ~Server();
 
@@ -23,7 +23,7 @@ public:
 
   typedef std::string HTTPMethods;
 
-private:
+ private:
   void initPoll();
   void acceptClient();
   void readClientData(const size_t &);
@@ -45,4 +45,4 @@ private:
   // Redirection*               _redirections;
 };
 
-#endif // __SERVER_HPP__
+#endif  // __SERVER_HPP__

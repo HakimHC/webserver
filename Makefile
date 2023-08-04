@@ -11,7 +11,7 @@ CXX				= g++
 CXXFLAGS 	= -Wall -Werror -Wextra
 CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
 CXXFLAGS 	+= -g3
-CXXFLAGS 	+= -I $(INC)
+CXXFLAGS 	+= $(INC)
 
 # If the OS happens to be Linux, compile with the LeakSanitizer (this flag is not supported on MacOS)
 # ifeq ($(OS), Linux)
@@ -20,7 +20,12 @@ CXXFLAGS 	+= -I $(INC)
 # endif
 
 # Header file directory
-INC				= include
+INC				= -I $(SERVERDIR)
+INC				+= -I $(MAINDIR)
+INC				+= -I $(REQUESTDIR)
+INC				+= -I $(CLIENTDIR)
+INC				+= -I $(UTILSDIR)
+INC				+= -I $(HTTPDIR)
 
 # Source code directory
 SRCDIR 		= src

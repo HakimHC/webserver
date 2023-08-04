@@ -30,14 +30,14 @@ void Request::getRequestLine(std::string const &buffer) {
   while (std::getline(tokenizer, token, ' ')) {
     if (!token.empty()) {
       switch (i) {
-      case HTTP_METHOD:
-        this->_method = token;
-        break;
-      case URI:
-        this->parseUri(token);
-        break;
-      case HTTP_VERSION:
-        this->_httpVersion = token;
+        case HTTP_METHOD:
+          this->_method = token;
+          break;
+        case URI:
+          this->parseUri(token);
+          break;
+        case HTTP_VERSION:
+          this->_httpVersion = token;
       }
       ++i;
     }

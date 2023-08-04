@@ -4,7 +4,7 @@
 #include <string>
 
 class Client {
-public:
+ public:
   Client(int);
   ~Client();
 
@@ -13,9 +13,9 @@ public:
   const int &getSocketfd() const;
   const std::string &getRequestBuffer() const;
 
-private:
+ private:
   int _fd;
   std::string _requestBuffer;
 };
 
-#endif // __CLIENT_HPP__
+#endif  // __CLIENT_HPP__
