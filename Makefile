@@ -55,19 +55,7 @@ SRC				= $(MAIN) 	\
 # Object files
 OBJ 			= $(SRC:.cpp=.o)
 
-# NGINX container variables for educational / debugging / testing purposes.
-DF_DIR		= nginx
-IMG_NAME	= nginx-webserv-img
-
-CONF_FILE	:= nginx.conf
-
-CONTAINER	= nginx-webserv
-
-ifneq ($(conf),)
-	CONF_FILE := $(conf)
-endif
-
-# C++ related rules
+# Rules
 all: $(NAME)
 
 $(NAME): $(OBJ)
@@ -82,23 +70,7 @@ fclean: clean
 re:: fclean
 re:: all
 
+# ASan rule (AddressSanitizer)
 asan: CXXFLAGS += -fsanitize=address
 asan: LDFLAGS += -fsanitize=address
 asan: re
-
-# NGINX container related rules
-build:
-	@echo "CONFIG FILE: " $(CONF_FILE)
-	docker build -t $(IMG_NAME) --build-arg CONFIG_FILE=$(CONF_FILE) $(DF_DIR)
-
-run:
-	docker run -p 8080:80 --name $(CONTAINER) $(IMG_NAME)
-
-run_detach:
-	docker run -d -p 8080:80 --name $(CONTAINER) $(IMG_NAME)
-
-down:
-	docker container stop $(CONTAINER)
-	docker container rm $(CONTAINER)
-
-.PHONY: all clean fclean re build run down
