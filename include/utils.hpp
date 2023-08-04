@@ -1,10 +1,10 @@
 #ifndef __UTILS_HPP__
-# define __UTILS_HPP__
+#define __UTILS_HPP__
 
-# include <string>
+#include <string>
 
 namespace utils {
-  bool isCrLf(std::string const& s);
+bool isCrLf(std::string const& s);
 }
 
-#endif // __UTILS_HPP__
+#endif  // __UTILS_HPP__
