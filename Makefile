@@ -42,6 +42,10 @@ UTILS 		= $(addprefix $(UTILSDIR)/,$(SRC_UTILS))
 UTILSDIR	= $(addprefix $(SRCDIR)/,utils)
 SRC_UTILS	= crlf.cpp \
 
+HTTP 		= $(addprefix $(HTTPDIR)/,$(SRC_HTTP))
+HTTPDIR	= $(addprefix $(SRCDIR)/,http)
+SRC_HTTP	= HTTP.cpp \
+
 MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 MAINDIR		= $(addprefix $(SRCDIR)/,main)
 SRC_MAIN	= main.cpp
@@ -51,6 +55,7 @@ SRC				= $(MAIN) 	\
 						$(CLIENT) \
 						$(REQUEST) \
 						$(UTILS) \
+						$(HTTP) \
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)

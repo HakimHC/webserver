@@ -18,12 +18,13 @@ public:
   ~Server();
 
   void print() const;
-  void initialize();
+  void initialize(uint16_t);
   void operate();
 
   typedef std::string HTTPMethods;
 
 private:
+  void initPoll();
   void acceptClient();
   void readClientData(const size_t &);
 
