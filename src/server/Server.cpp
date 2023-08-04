@@ -100,10 +100,10 @@ void Server::readClientData(const size_t& clientIndex) {
     close(this->_pollFds[clientIndex].fd);
   }
   else {
+    std::cout << "Recieved data:" << std::endl;
     this->_clientBuffer[clientIndex] = buf;
     std::cout << this->_clientBuffer[clientIndex];
     Request req;
-    /* req.parse(buf); */
     req.parse(this->_clientBuffer[clientIndex]);
     req.print();
   }
@@ -129,7 +129,6 @@ void Server::operate() {
           this->acceptClient();
         }
         else {
-          std::cout << "Recieved data:" << std::endl;
           this->readClientData(i);
         }
       }
