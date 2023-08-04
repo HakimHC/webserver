@@ -10,15 +10,15 @@ enum requestLine { HTTP_METHOD, URI, HTTP_VERSION };
 Request::Request() {}
 Request::~Request() {}
 
-void Request::parse(std::string const& buffer) {
+void Request::parse(std::string const &buffer) {
   try {
     this->getRequestLine(buffer);
-  } catch (std::exception& e) {
+  } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
   }
 }
 
-void Request::getRequestLine(std::string const& buffer) {
+void Request::getRequestLine(std::string const &buffer) {
   size_t crLfPosition = buffer.find("\r\n");
   if (crLfPosition == std::string::npos)
     throw std::runtime_error("400 bad request (no crlf)");
@@ -30,21 +30,21 @@ void Request::getRequestLine(std::string const& buffer) {
   while (std::getline(tokenizer, token, ' ')) {
     if (!token.empty()) {
       switch (i) {
-        case HTTP_METHOD:
-          this->_method = token;
-          break;
-        case URI:
-          this->parseUri(token);
-          break;
-        case HTTP_VERSION:
-          this->_httpVersion = token;
+      case HTTP_METHOD:
+        this->_method = token;
+        break;
+      case URI:
+        this->parseUri(token);
+        break;
+      case HTTP_VERSION:
+        this->_httpVersion = token;
       }
       ++i;
     }
   }
 }
 
-void Request::parseUri(const std::string& uri) {
+void Request::parseUri(const std::string &uri) {
   size_t queryPos = uri.find("?");
   if (queryPos == std::string::npos)
     this->_uri = uri;

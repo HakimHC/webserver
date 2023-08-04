@@ -1,16 +1,21 @@
 #ifndef __CLIENT_HPP__
 #define __CLIENT_HPP__
 
+#include <string>
+
 class Client {
- public:
+public:
   Client(int);
   ~Client();
 
-  void setSocketFd(const int&);
-  const int& getSocketfd() const;
+  void setSocketFd(const int &);
+  void setRequestBuffer(const std::string &);
+  const int &getSocketfd() const;
+  const std::string &getRequestBuffer() const;
 
- private:
+private:
   int _fd;
+  std::string _requestBuffer;
 };
 
-#endif  // __CLIENT_HPP__
+#endif // __CLIENT_HPP__
