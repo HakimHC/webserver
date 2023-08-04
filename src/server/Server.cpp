@@ -1,13 +1,14 @@
-#include <stdexcept>
-#include <iostream>
+#include "Server.hpp"
+
+#include <fcntl.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 #include <cstring>
-#include <unistd.h>
-#include <fcntl.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
+#include <iostream>
+#include <stdexcept>
 
-#include "Server.hpp"
 #include "Request.hpp"
 #include "utils.hpp"
 
@@ -25,7 +26,9 @@ void Server::initialize() {
   this->_allowedMethods.push_back("GET");
 
   this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
-  if (this->_socketFd < 0) throw std::runtime_error("fatal: cannot create socket + (" + this->_name + ")");
+  if (this->_socketFd < 0)
+    throw std::runtime_error("fatal: cannot create socket + (" + this->_name +
+                             ")");
 
   struct sockaddr_in addr;
   memset(&addr, 0, sizeof(addr));
@@ -33,15 +36,17 @@ void Server::initialize() {
   addr.sin_port = htons(this->_port);
   addr.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(this->_socketFd, (struct sockaddr*) &addr, sizeof(addr)) < 0)
+  if (bind(this->_socketFd, (struct sockaddr*)&addr, sizeof(addr)) < 0)
     throw std::runtime_error("fatal: cannot bind socket");
 
-  std::cout << "Server listening on 127.0.0.1:" << this->_port << "..." << std::endl;
+  std::cout << "Server listening on 127.0.0.1:" << this->_port << "..."
+            << std::endl;
 
   if (listen(this->_socketFd, _BACKLOG) < 0)
     throw std::runtime_error("fatal: socket cannot listen");
 
-  /* Auxiliaty client, the first element in our pollfd vector will always be the servers fd, this is to make it parallel. */
+  /* Auxiliaty client, the first element in our pollfd vector will always be the
+   * servers fd, this is to make it parallel. */
   this->_clients.push_back(Client(-1));
   this->_clientBuffer.push_back("");
 }
@@ -56,8 +61,10 @@ void Server::print() const {
   std::cout << "Index: " << this->_index << std::endl;
   std::cout << "Allowed methods: ";
 
-  std::vector<Server::HTTPMethods>::const_iterator it = this->_allowedMethods.begin();
-  std::vector<Server::HTTPMethods>::const_iterator ite = this->_allowedMethods.end();
+  std::vector<Server::HTTPMethods>::const_iterator it =
+      this->_allowedMethods.begin();
+  std::vector<Server::HTTPMethods>::const_iterator ite =
+      this->_allowedMethods.end();
 
   for (; it != ite; it++) {
     std::cout << *it << " ";
@@ -70,7 +77,7 @@ void Server::print() const {
 
 void Server::acceptClient() {
   /* Construct client object with the file descriptor returned by accept */
-  Client client ( accept(this->_socketFd, NULL, NULL) );
+  Client client(accept(this->_socketFd, NULL, NULL));
 
   if (client.getSocketfd() == -1) {
     std::cerr << "error: cannot accept client's connection" << std::endl;
@@ -94,16 +101,15 @@ void Server::readClientData(const size_t& clientIndex) {
   if (r == 0) {
     std::cout << "Client disconnected" << std::endl;
     close(this->_pollFds[clientIndex].fd);
-  }
-  else if  (r == -1) {
-    std::cout << "error: cannot read clients buffer, ending connection" << std::endl;
+  } else if (r == -1) {
+    std::cout << "error: cannot read clients buffer, ending connection"
+              << std::endl;
     close(this->_pollFds[clientIndex].fd);
-  }
-  else {
+  } else {
+    std::cout << "Recieved data:" << std::endl;
     this->_clientBuffer[clientIndex] = buf;
     std::cout << this->_clientBuffer[clientIndex];
     Request req;
-    /* req.parse(buf); */
     req.parse(this->_clientBuffer[clientIndex]);
     req.print();
   }
@@ -120,16 +126,15 @@ void Server::operate() {
 
   while (true) {
     if (poll(this->_pollFds.data(), this->_pollFds.size(), 0) < 0)
-      throw std::runtime_error("fatal: poll() syscall failed, shutting down server...");
-    
+      throw std::runtime_error(
+          "fatal: poll() syscall failed, shutting down server...");
+
     for (size_t i = 0; i < this->_pollFds.size(); i++) {
       if (this->_pollFds[i].revents & POLLIN) {
         if (this->_pollFds[i].fd == this->_socketFd) {
           std::cout << "Incoming connection..." << std::endl;
           this->acceptClient();
-        }
-        else {
-          std::cout << "Recieved data:" << std::endl;
+        } else {
           this->readClientData(i);
         }
       }
