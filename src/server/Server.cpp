@@ -36,7 +36,7 @@ void Server::initialize() {
   addr.sin_port = htons(this->_port);
   addr.sin_addr.s_addr = INADDR_ANY;
 
-  if (bind(this->_socketFd, (struct sockaddr*)&addr, sizeof(addr)) < 0)
+  if (bind(this->_socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
     throw std::runtime_error("fatal: cannot bind socket");
 
   std::cout << "Server listening on 127.0.0.1:" << this->_port << "..."
@@ -48,7 +48,6 @@ void Server::initialize() {
   /* Auxiliaty client, the first element in our pollfd vector will always be the
    * servers fd, this is to make it parallel. */
   this->_clients.push_back(Client(-1));
-  this->_clientBuffer.push_back("");
 }
 
 void Server::print() const {
@@ -89,10 +88,9 @@ void Server::acceptClient() {
 
   this->_pollFds.push_back(clientPollFd);
   this->_clients.push_back(client);
-  this->_clientBuffer.push_back("");
 }
 
-void Server::readClientData(const size_t& clientIndex) {
+void Server::readClientData(const size_t &clientIndex) {
   char buf[_MAX_BUFFER_SIZE];
   memset(buf, 0, sizeof(buf));
 
@@ -107,10 +105,10 @@ void Server::readClientData(const size_t& clientIndex) {
     close(this->_pollFds[clientIndex].fd);
   } else {
     std::cout << "Recieved data:" << std::endl;
-    this->_clientBuffer[clientIndex] = buf;
-    std::cout << this->_clientBuffer[clientIndex];
+    this->_clients[clientIndex].setRequestBuffer(buf);
+    std::cout << this->_clients[clientIndex].getRequestBuffer();
     Request req;
-    req.parse(this->_clientBuffer[clientIndex]);
+    req.parse(this->_clients[clientIndex].getRequestBuffer());
     req.print();
   }
 }

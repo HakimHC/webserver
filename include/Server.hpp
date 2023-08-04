@@ -13,7 +13,7 @@
 #define _MAX_BUFFER_SIZE 2048
 
 class Server {
- public:
+public:
   Server();
   ~Server();
 
@@ -23,9 +23,9 @@ class Server {
 
   typedef std::string HTTPMethods;
 
- private:
+private:
   void acceptClient();
-  void readClientData(const size_t&);
+  void readClientData(const size_t &);
 
   uint16_t _port;
   int _socketFd;
@@ -38,11 +38,10 @@ class Server {
 
   /* Parallel vectors for the clients and their respective pollfds. */
   std::vector<Client> _clients;
-  std::vector<std::string> _clientBuffer;
   std::vector<struct pollfd> _pollFds;
 
   // ErrorPages                 _defaultErrorPages;
   // Redirection*               _redirections;
 };
 
-#endif  // __SERVER_HPP__
+#endif // __SERVER_HPP__
