@@ -1,18 +1,20 @@
 #include <iostream>
 
 #include "Client.hpp"
+#include "HTTP.hpp"
 #include "Server.hpp"
 
 int main() {
-  Server *s1 = NULL;
-  try {
-    s1 = new Server();
-  } catch (std::exception &e) {
-    std::cerr << e.what() << std::endl;
-    return 1;
-  }
-  s1->initialize();
-  s1->print();
-  s1->operate();
-  delete s1;
+  HTTP http;
+
+  Server s1;
+  Server s2;
+
+  s1.initialize(8080);
+  s2.initialize(8181);
+  http.addServer(s1);
+  http.addServer(s2);
+
+  http.start();
+  return 0;
 }

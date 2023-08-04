@@ -17,8 +17,8 @@
 Server::~Server() {}
 Server::Server() {}
 
-void Server::initialize() {
-  this->_port = 8282;
+void Server::initialize(uint16_t port) {
+  this->_port = port;
   this->_name = "server1";
   this->_root = "www";
   this->_maxClientBodySize = 4096;
@@ -48,6 +48,16 @@ void Server::initialize() {
   /* Auxiliaty client, the first element in our pollfd vector will always be the
    * servers fd, this is to make it parallel. */
   this->_clients.push_back(Client(-1));
+
+  this->initPoll();
+}
+
+void Server::initPoll() {
+  fcntl(this->_socketFd, F_SETFL, O_NONBLOCK);
+  struct pollfd serverPollFd;
+  serverPollFd.fd = this->_socketFd;
+  serverPollFd.events = POLLIN;
+  this->_pollFds.push_back(serverPollFd);
 }
 
 void Server::print() const {
@@ -114,27 +124,17 @@ void Server::readClientData(const size_t &clientIndex) {
 }
 
 void Server::operate() {
-  fcntl(this->_socketFd, F_SETFL, O_NONBLOCK);
+  if (poll(this->_pollFds.data(), this->_pollFds.size(), 0) < 0)
+    throw std::runtime_error(
+        "fatal: poll() syscall failed, shutting down server...");
 
-  /* Add the passive socket (server socket) to the poll-fd vector */
-  struct pollfd serverPollFd;
-  serverPollFd.fd = this->_socketFd;
-  serverPollFd.events = POLLIN;
-  this->_pollFds.push_back(serverPollFd);
-
-  while (true) {
-    if (poll(this->_pollFds.data(), this->_pollFds.size(), 0) < 0)
-      throw std::runtime_error(
-          "fatal: poll() syscall failed, shutting down server...");
-
-    for (size_t i = 0; i < this->_pollFds.size(); i++) {
-      if (this->_pollFds[i].revents & POLLIN) {
-        if (this->_pollFds[i].fd == this->_socketFd) {
-          std::cout << "Incoming connection..." << std::endl;
-          this->acceptClient();
-        } else {
-          this->readClientData(i);
-        }
+  for (size_t i = 0; i < this->_pollFds.size(); i++) {
+    if (this->_pollFds[i].revents & POLLIN) {
+      if (this->_pollFds[i].fd == this->_socketFd) {
+        std::cout << "Incoming connection..." << std::endl;
+        this->acceptClient();
+      } else {
+        this->readClientData(i);
       }
     }
   }
