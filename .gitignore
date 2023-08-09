@@ -12,3 +12,4 @@ nginx
 
 # Clangd compile flags
 compile_flags.txt
+compile_commands.json
