@@ -33,7 +33,8 @@ SRCDIR 		= src
 # Source code subdirectories and source files
 SERVER 		= $(addprefix $(SERVERDIR)/,$(SRC_SERVER))
 SERVERDIR	= $(addprefix $(SRCDIR)/,server)
-SRC_SERVER= Server.cpp
+SRC_SERVER= Server.cpp \
+						Location.cpp
 
 CLIENT 		= $(addprefix $(CLIENTDIR)/,$(SRC_CLIENT))
 CLIENTDIR	= $(addprefix $(SRCDIR)/,client)
