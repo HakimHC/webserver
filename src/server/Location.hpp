@@ -12,6 +12,8 @@ class Location {
  public:
    Location();
    ~Location();
+   Location(std::string &text, std::string &uri);
+
 
   /* Getters */
   const std::string&                getUri() const;
@@ -33,6 +35,8 @@ class Location {
   void                              setRedirect(const std::string&);
   void                              setListing(const bool&);
 
+ static void 						removeTrailing(std::string &);		
+
  private:
   std::string                _uri;
   std::string                _root;
@@ -42,7 +46,7 @@ class Location {
   std::string                _defaultFileDirectory;
   std::string                _redirect;
   bool                       _listing;
-
+  void						 _setPriv(std::string line);
 };
 
 #endif // __LOCATION_HPP__

@@ -1,5 +1,7 @@
 # Name of the executable
 NAME 			= webserv
+TESTNAME		= test
+
 
 # Operating System
 OS				= $(shell uname -s)
@@ -62,6 +64,9 @@ SRC				= $(MAIN) 	\
 						$(REQUEST) \
 						$(UTILS) \
 						$(HTTP) \
+
+
+TESTSRC = src/main/testmain.cpp
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)

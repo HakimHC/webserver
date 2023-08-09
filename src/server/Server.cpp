@@ -8,14 +8,54 @@
 #include <cstring>
 #include <iostream>
 #include <stdexcept>
+#include <fstream>
+#include <sstream>
 
 #include "Request.hpp"
 #include "utils.hpp"
+#include "Location.hpp"
 
 #define _BACKLOG 5
 
 Server::~Server() {}
 Server::Server() {}
+
+Server::Server(std::string &serverString){
+	std::istringstream iss(serverString);
+		
+	std::string line, s1, s2;
+	while (std::getline(iss, line)) {
+		Location::removeTrailing(line);
+		if (find(line.begin(), line.end(), '{') != line.end()){
+			std::istringstream iss2(line);
+			std::getline(iss2, s1, ' ');
+			if (s1 != "location")
+				std::runtime_error("Unidentified object in server body");
+			std::getline(iss2, s2, ' ');
+			std::getline(iss, line, '}');
+			Location temp(line, s2);
+			_locations[temp.getUri()] = temp;
+			continue ;
+		}
+		std::istringstream iss2(line);
+		std::getline(iss2, s1, ' ');
+		std::getline(iss2, s2, ';' ) ;
+		if (s1 == "host"){
+			this->_host = s2; 
+		}
+		if (s1 == "listen"){
+			uint16_t	temp;
+			std::istringstream iss3(s2);
+			iss3 >> temp;
+			if (iss3.fail())
+				std::runtime_error("Incorrect parameter for listen.");
+			this->_listen = temp;  
+		}
+		if (s1 == "server_name"){
+			this->_serverName = s2; 
+		}
+	}
+}
 
 void Server::initialize(uint16_t port) {
   this->_port = port;
