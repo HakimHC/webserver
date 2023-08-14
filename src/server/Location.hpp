@@ -34,7 +34,7 @@ class Location {
   void                              setDefaultFileDirectory(const std::string&);
   void                              setRedirect(const std::string&);
   void                              setListing(const bool&);
-
+  void                              print() const;
  static void 						removeTrailing(std::string &);		
 
  private:
@@ -45,6 +45,10 @@ class Location {
   size_t                     _maxClientBodySize;
   std::string                _defaultFileDirectory;
   std::string                _redirect;
+  std::string                _alias;
+  std::string                _saveFile;
+  bool                       _autoIndex;
+  std::string               _return;
   bool                       _listing;
   void						 _setPriv(std::string line);
 };

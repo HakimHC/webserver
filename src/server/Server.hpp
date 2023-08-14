@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Client.hpp"
+//#include "Client.hpp"
 #include "Location.hpp"
 
 
@@ -21,9 +21,9 @@ class Server {
 	Server (std::string &serverString);
 	//Server (const std::Map<std::string, std::string> &source);
 
-    void  print() const;
-    void  initialize();
-    void  operate();
+  void  print() const;
+    // void  initialize();
+    // void  operate();
 
     typedef std::string HTTPMethods;
 
@@ -31,15 +31,17 @@ class Server {
     void  acceptClient();
     void  readClientData(const size_t&);
 
+    std::string						_host;
     uint16_t                          _listen;
-	std::string						_host;
+    uint16_t                          _clientMaxBodySize;
+	  
     std::string                      	_serverName;
-	std::map< std::string, Location>	_locations; //key = _uri
-	std::map <std::string, std::string> _errorPage; //Meter valores por defecto
+	  std::map< std::string, Location>	_locations; //key = _uri
+	  std::map <std::string, std::string> _errorPage; //Meter valores por defecto
 
     /* Parallel vectors for the clients and their respective pollfds. */
     int                           _socketFd;
-    std::vector<Client>           _clients;
+   // std::vector<Client>           _clients;
     std::vector<std::string>      _clientBuffer;
     std::vector<struct pollfd>    _pollFds;
 
