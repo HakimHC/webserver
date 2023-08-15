@@ -6,43 +6,48 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <map>
+//#include "Client.hpp"
+#include "Location.hpp"
 
-#include "Client.hpp"
 
 #define _NUM_ALLOWED_METHODS 3
 #define _MAX_BUFFER_SIZE 2048
 
 class Server {
- public:
-  Server();
-  ~Server();
+  public:
+    Server();
+    ~Server();
+	Server (std::string &serverString);
+	//Server (const std::Map<std::string, std::string> &source);
 
-  void print() const;
-  void initialize(uint16_t);
-  void operate();
+  void  print() const;
+    // void  initialize();
+    // void  operate();
 
-  typedef std::string HTTPMethods;
+    typedef std::string HTTPMethods;
 
- private:
-  void initPoll();
-  void acceptClient();
-  void readClientData(const size_t &);
+  private:
+    void  acceptClient();
+    void  readClientData(const size_t&);
 
-  uint16_t _port;
-  int _socketFd;
-  std::string _name;
-  std::string _root;
-  std::string _index;
-  std::vector<Server::HTTPMethods> _allowedMethods;
-  size_t _maxClientBodySize;
-  std::string _defaultFileDirectory;
+    std::string						_host;
+    uint16_t                          _listen;
+    uint16_t                          _clientMaxBodySize;
+	  
+    std::string                      	_serverName;
+	  std::map< std::string, Location>	_locations; //key = _uri
+	  std::map <std::string, std::string> _errorPage; //Meter valores por defecto
 
-  /* Parallel vectors for the clients and their respective pollfds. */
-  std::vector<Client> _clients;
-  std::vector<struct pollfd> _pollFds;
+    /* Parallel vectors for the clients and their respective pollfds. */
+    int                           _socketFd;
+   // std::vector<Client>           _clients;
+    std::vector<std::string>      _clientBuffer;
+    std::vector<struct pollfd>    _pollFds;
 
-  // ErrorPages                 _defaultErrorPages;
-  // Redirection*               _redirections;
+    // ErrorPages                 _defaultErrorPages;
+    // Redirection*               _redirections;
+
 };
 
 #endif  // __SERVER_HPP__

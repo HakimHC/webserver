@@ -8,11 +8,12 @@
 class HTTP {
  public:
   HTTP();
+  HTTP(std::string confFile);
   ~HTTP();
 
-  void addServer(Server&);
-
-  void start();
+  void addServer(Server);
+  void  print() const;
+  // void start();
 
  private:
   std::vector<Server> _servers;

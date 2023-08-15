@@ -1,5 +1,6 @@
 # Name of the executable
 NAME 			= webserv
+TESTNAME		= testd
 
 # Operating System
 OS				= $(shell uname -s)
@@ -63,6 +64,10 @@ SRC				= $(MAIN) 	\
 						$(UTILS) \
 						$(HTTP) \
 
+
+TESTSRC = src/main/testmain.cpp src/server/Location.cpp src/server/Server.cpp \
+	src/http/HTTP.cpp
+
 # Object files
 OBJ 			= $(SRC:.cpp=.o)
 
@@ -72,11 +77,16 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
 
+$(TESTNAME): $(TESTSRC)
+	$(CXX) $(CXXFLAGS) $(TESTSRC) $(LDFLAGS) -g3 -o  $@
+
 clean:
 	$(RM) $(OBJ)
 
 fclean: clean
 	$(RM) $(NAME)
+
+test: $(TESTNAME)
 
 re:: fclean
 re:: all

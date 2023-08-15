@@ -1,0 +1,28 @@
+server {
+	max_body_size 42;
+
+	host 0.0.0.0;
+	listen 80;
+	server_name www.example.com;
+
+	# Error pages
+	error_page 404 /404.html;
+	error_page 500 502 503 504 /50x.html;
+
+	# Location blocks for specific URL patterns
+	location / {
+		allowed_methods POST GET;
+		redirect	/other;
+		listing		1;
+		root /var/www/otherexample.com;
+		index index.html;
+	}
+
+}
+
+# Additional server block for another domain
+server {
+	listen 80;
+	server_name www.otherexample.com;
+	# ... other configurations ...
+}
