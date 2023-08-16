@@ -35,7 +35,8 @@ SRCDIR 		= src
 SERVER 		= $(addprefix $(SERVERDIR)/,$(SRC_SERVER))
 SERVERDIR	= $(addprefix $(SRCDIR)/,server)
 SRC_SERVER= Server.cpp \
-						Location.cpp
+						Location.cpp \
+						Listener.cpp
 
 CLIENT 		= $(addprefix $(CLIENTDIR)/,$(SRC_CLIENT))
 CLIENTDIR	= $(addprefix $(SRCDIR)/,client)
@@ -66,7 +67,7 @@ SRC				= $(MAIN) 	\
 
 
 TESTSRC = src/main/testmain.cpp src/server/Location.cpp src/server/Server.cpp \
-	src/http/HTTP.cpp
+	src/http/HTTP.cpp src/server/Listener.cpp src/client/Client.cpp
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)
@@ -85,6 +86,7 @@ clean:
 
 fclean: clean
 	$(RM) $(NAME)
+	$(RM) $(TESTNAME)
 
 test: $(TESTNAME)
 

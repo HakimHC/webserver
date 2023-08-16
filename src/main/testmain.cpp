@@ -6,7 +6,8 @@
 #include "Server.hpp"
 
 int main() {
-  HTTP http("config.cnf2");
+  HTTP http("webserv.conf");
   http.print();
+  http.start();
   return 0;
 }

@@ -1,7 +1,9 @@
 #include "HTTP.hpp"
+#include <list>
 #include <unistd.h>
 #include <sstream>
 #include <fstream>
+#include "Listener.hpp"
 #include "Location.hpp"
 #include <algorithm>
 #include <iostream>
@@ -9,7 +11,17 @@
 HTTP::HTTP(){};
 HTTP::~HTTP(){};
 
-void HTTP::addServer(Server server) { this->_servers.push_back(server); }
+void HTTP::addServer(Server server) {
+  for (size_t i = 0; i < this->_listeners.size(); i++) {
+    if (this->_listeners[i]->port() == server.port()) {
+      this->_listeners[i]->addServer(server);
+      return;
+    }
+  }
+  Listener* listener = new Listener(server.port());
+  listener->addServer(server);
+  this->_listeners.push_back(listener);
+}
 
 HTTP::HTTP(std::string file){
   std::ifstream inputFile(file);
@@ -40,20 +52,18 @@ HTTP::HTTP(std::string file){
 
 }
 
-
-// void HTTP::start() {
-//   while (true) {
-//     for (size_t i = 0; i < this->_servers.size(); i++) {
-//       this->_servers[i].operate();
-//       usleep(100);
-//     }
-//   }
-// }
-
+void HTTP::start() {
+  while (true) {
+    for (size_t i = 0; i < this->_listeners.size(); i++) {
+      this->_listeners[i]->_listen();
+      usleep(100);
+    }
+  }
+}
 
 void HTTP::print() const{
-  for (unsigned int i = 0; i < _servers.size(); i++){
-    std::cout << "HTTP: Servers\n";
-    _servers[i].print();
+  for (unsigned int i = 0; i < _listeners.size(); i++) {
+    /* std::cout << "HTTP: Servers\n"; */
+    _listeners[i]->print();
   }
 }

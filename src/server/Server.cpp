@@ -156,6 +156,10 @@ void Server::print() const {
   std::cout << std::endl;
 }
 
+const uint16_t& Server::port() const {
+  return this->_listen;
+}
+
 // void Server::acceptClient() {
 //   /* Construct client object with the file descriptor returned by accept */
 //   Client client(accept(this->_socketFd, NULL, NULL));

@@ -22,6 +22,7 @@ class Server {
 	//Server (const std::Map<std::string, std::string> &source);
 
   void  print() const;
+  const uint16_t& port() const;
     // void  initialize();
     // void  operate();
 
@@ -31,7 +32,7 @@ class Server {
     void  acceptClient();
     void  readClientData(const size_t&);
 
-    std::string						_host;
+    std::string						            _host;
     uint16_t                          _listen;
     uint16_t                          _clientMaxBodySize;
 	  
