@@ -3,6 +3,7 @@
 
 #include <vector>
 
+#include "Listener.hpp"
 #include "Server.hpp"
 
 class HTTP {
@@ -13,10 +14,11 @@ class HTTP {
 
   void addServer(Server);
   void  print() const;
-  // void start();
+  void start();
 
  private:
-  std::vector<Server> _servers;
+  /* std::vector<Server> _servers; */
+  std::vector<Listener*> _listeners;
 };
 
 #endif  // __HTTP_HPP__
