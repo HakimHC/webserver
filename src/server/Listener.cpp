@@ -10,6 +10,7 @@
 
 #include "Listener.hpp"
 #include "Request.hpp"
+#include "defaults.hpp"
 
 Listener::Listener(uint16_t port) 
   :_port(port) {
@@ -95,9 +96,9 @@ void Listener::readClientData(const size_t &clientIndex) {
     std::cout << "Recieved data:" << std::endl;
     this->_clients[clientIndex].setRequestBuffer(buf);
     std::cout << this->_clients[clientIndex].getRequestBuffer();
-    /* Request req; */
-    /* req.parse(this->_clients[clientIndex].getRequestBuffer()); */
-    /* req.print(); */
+    Request req;
+    req.parseLegacy(this->_clients[clientIndex].getRequestBuffer());
+    this->sendRequestToServer(req);
   }
 }
 
@@ -115,5 +116,17 @@ void Listener::_listen() {
         this->readClientData(i);
       }
     }
+ }
+}
+
+void Listener::sendRequestToServer(Request& req) {
+  std::map<std::string, std::string> headers = req.headers();
+  const std::string host = headers["Host"];
+  for (size_t i = 0; i < this->_servers.size(); i++) {
+    if (this->_servers[i].serverName() == host) {
+      this->_servers[i].generateResponse(req);
+      return;
+    }
   }
+  this->_servers[DEFAULT_SERVER].generateResponse(req);
 }

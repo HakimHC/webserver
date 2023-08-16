@@ -10,18 +10,15 @@ enum requestLine { HTTP_METHOD, URI, HTTP_VERSION };
 Request::Request() {}
 Request::~Request() {}
 
-void Request::parse(std::string const &buffer) {
-  try {
-    this->getRequestLine(buffer);
-  } catch (std::exception &e) {
-    std::cerr << e.what() << std::endl;
-  }
+void Request::parseLegacy(std::string const &buffer) {
+  std::string tmp = this->getRequestLineLegacy(buffer);
+  tmp = this->getRequestHeadersLegacy(tmp);
 }
 
-void Request::getRequestLine(std::string const &buffer) {
+std::string Request::getRequestLineLegacy(std::string const &buffer) {
   size_t crLfPosition = buffer.find("\r\n");
-  if (crLfPosition == std::string::npos)
-    throw std::runtime_error("400 bad request (no crlf)");
+  if (crLfPosition == std::string::npos || buffer[0] == ' ')
+    throw std::runtime_error("400");
 
   std::string line = buffer.substr(0, crLfPosition);
   std::stringstream tokenizer(line);
@@ -42,6 +39,22 @@ void Request::getRequestLine(std::string const &buffer) {
       ++i;
     }
   }
+  return buffer.substr(crLfPosition + 2, buffer.size());
+}
+
+std::string Request::getRequestHeadersLegacy(const std::string& buffer) {
+  size_t crLfPosition = buffer.find("\r\n");
+  if (crLfPosition == std::string::npos) throw std::runtime_error("400");
+  size_t currPos = 0;
+  std::string tmp;
+  while (true) {
+    tmp = buffer.substr(currPos, crLfPosition - currPos);
+    if (tmp.empty() || tmp == "\r\n") break;
+    this->_headers[tmp.substr(0, tmp.find(":"))] = tmp.substr(tmp.find(":") + 2, tmp.find("\r\n"));
+    currPos = crLfPosition + 2;
+    crLfPosition = buffer.find("\r\n", currPos);
+  }
+  return tmp;
 }
 
 void Request::parseUri(const std::string &uri) {
@@ -52,6 +65,10 @@ void Request::parseUri(const std::string &uri) {
     this->_uri = uri.substr(0, queryPos);
     this->_queryString = uri.substr(queryPos + 1, uri.size());
   }
+}
+
+const std::map<std::string, std::string>& Request::headers() const {
+  return this->_headers;
 }
 
 void Request::print() const {

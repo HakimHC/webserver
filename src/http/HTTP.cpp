@@ -63,7 +63,6 @@ void HTTP::start() {
 
 void HTTP::print() const{
   for (unsigned int i = 0; i < _listeners.size(); i++) {
-    /* std::cout << "HTTP: Servers\n"; */
     _listeners[i]->print();
   }
 }

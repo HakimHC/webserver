@@ -7,6 +7,7 @@
 # include <poll.h>
 
 # include "Client.hpp"
+#include "Request.hpp"
 # include "Server.hpp"
 
 class Listener {
@@ -18,6 +19,7 @@ class Listener {
     const uint16_t& port() const;
     void print() const;
     void _listen();
+    void sendRequestToServer(Request&);
 
   private:
     uint16_t                    _port;
