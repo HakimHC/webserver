@@ -21,12 +21,15 @@ CXXFLAGS 	+= $(INC)
 # endif
 
 # Header file directory
+INC_DIR		= include
+
 INC				= -I $(SERVERDIR)
 INC				+= -I $(MAINDIR)
 INC				+= -I $(REQUESTDIR)
 INC				+= -I $(CLIENTDIR)
 INC				+= -I $(UTILSDIR)
 INC				+= -I $(HTTPDIR)
+INC				+= -I $(INC_DIR)
 
 # Source code directory
 SRCDIR 		= src

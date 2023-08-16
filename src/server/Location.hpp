@@ -5,9 +5,6 @@
 # include <string>
 # include <vector>
 
-# define DEFAULT_ROOT "www"
-# define DEFAULT_INDEX "index.html"
-
 class Location {
  public:
    Location();
@@ -21,7 +18,6 @@ class Location {
   const std::string&                getIndex() const;
   const std::vector<std::string>&   getAllowedMethods() const;
   const size_t&                     getMaxClientBodySize() const;
-  const std::string&                getDefaultFileDirectory() const;
   const std::string&                getRedirect() const;
   const bool&                       getListing() const;
 
@@ -31,11 +27,10 @@ class Location {
   void                              setIndex(const std::string&);
   void                              setAllowedMethods(const std::vector<std::string>&);
   void                              setMaxClientBodySize(const size_t&);
-  void                              setDefaultFileDirectory(const std::string&);
   void                              setRedirect(const std::string&);
   void                              setListing(const bool&);
   void                              print() const;
- static void 						removeTrailing(std::string &);		
+  static void 						          removeTrailing(std::string &);		
 
  private:
   std::string                _uri;
@@ -43,13 +38,11 @@ class Location {
   std::string                _index;
   std::vector<std::string>   _allowedMethods;
   size_t                     _maxClientBodySize;
-  std::string                _defaultFileDirectory;
   std::string                _redirect;
   std::string                _alias;
   std::string                _saveFile;
   bool                       _autoIndex;
-  std::string               _return;
-  bool                       _listing;
+  std::string                _return;
   void						 _setPriv(std::string line);
 };
 
