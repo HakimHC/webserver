@@ -116,3 +116,12 @@ void Server::print() const {
 const uint16_t& Server::port() const {
   return this->_listen;
 }
+
+const std::string& Server::serverName() const {
+  return this->_serverName;
+}
+
+void Server::generateResponse(Request& req) {
+  (void) req;
+  std::cout << this->_serverName << " is generating a response.." << std::endl;
+}

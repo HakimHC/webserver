@@ -8,6 +8,6 @@
 int main() {
   HTTP webServer = HTTP("webserv.conf");
 
-  webServer.print();
-  /* webServer.start(); */
+  /* webServer.print(); */
+  webServer.start();
 }
