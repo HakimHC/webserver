@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include <map>
-//#include "Client.hpp"
 #include "Location.hpp"
 
 
@@ -18,13 +17,10 @@ class Server {
   public:
     Server();
     ~Server();
-	Server (std::string &serverString);
-	//Server (const std::Map<std::string, std::string> &source);
+	  Server (std::string &serverString);
 
-  void  print() const;
-  const uint16_t& port() const;
-    // void  initialize();
-    // void  operate();
+    void  print() const;
+    const uint16_t& port() const;
 
     typedef std::string HTTPMethods;
 
@@ -32,23 +28,13 @@ class Server {
     void  acceptClient();
     void  readClientData(const size_t&);
 
-    std::string						            _host;
-    uint16_t                          _listen;
-    uint16_t                          _clientMaxBodySize;
+    std::string						              _host;
+    uint16_t                            _listen;
+    uint16_t                            _clientMaxBodySize;
 	  
-    std::string                      	_serverName;
-	  std::map< std::string, Location>	_locations; //key = _uri
-	  std::map <std::string, std::string> _errorPage; //Meter valores por defecto
-
-    /* Parallel vectors for the clients and their respective pollfds. */
-    int                           _socketFd;
-   // std::vector<Client>           _clients;
-    std::vector<std::string>      _clientBuffer;
-    std::vector<struct pollfd>    _pollFds;
-
-    // ErrorPages                 _defaultErrorPages;
-    // Redirection*               _redirections;
-
+    std::string                      	  _serverName;
+	  std::map< std::string, Location>	  _locations; //key = _uri
+	  std::map <std::string, std::string> _errorPages; //Meter valores por defecto
 };
 
 #endif  // __SERVER_HPP__

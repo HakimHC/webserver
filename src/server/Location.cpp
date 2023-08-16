@@ -1,13 +1,12 @@
-#include "Location.hpp"
 #include <algorithm>
 #include <sstream>
 #include <iostream>
 
+#include "Location.hpp"
+#include "defaults.hpp"
+
 Location::~Location() {}
-Location::Location() {
-  this->_index = DEFAULT_INDEX;
-  this->_root = DEFAULT_ROOT;
-}
+Location::Location():_root(DEFAULT_ROOT), _index(DEFAULT_INDEX) {}
 
 const std::string& Location::getUri() const {
   return this->_uri;
@@ -24,14 +23,8 @@ const std::vector<std::string>& Location::getAllowedMethods() const {
 const size_t& Location::getMaxClientBodySize() const {
   return this->_maxClientBodySize;
 }
-const std::string& Location::getDefaultFileDirectory() const {
-  return this->_defaultFileDirectory;
-}
 const std::string& Location::getRedirect() const {
   return this->_redirect;
-}
-const bool& Location::getListing() const {
-  return this->_listing;
 }
 void Location::setUri(const std::string& s) {
   this->_uri = s;
@@ -48,16 +41,9 @@ void Location::setAllowedMethods(const std::vector<std::string>& s) {
 void Location::setMaxClientBodySize(const size_t& s) {
   this->_maxClientBodySize = s;
 }
-void Location::setDefaultFileDirectory(const std::string& s) {
-  this->_defaultFileDirectory = s;
-}
 void Location::setRedirect(const std::string& s) {
   this->_redirect = s;
 }
-void Location::setListing(const bool& s) {
-  this->_listing = s;
-}
-
 bool NotSpace(char c){
 	return (!std::isspace(static_cast<unsigned char>(c)));
 }
@@ -74,9 +60,9 @@ void Location::removeTrailing (std::string &str){
 }
 
 
-Location::Location(std::string &text, std::string &uri): _uri(uri), _root(""),
-	_index(""), _maxClientBodySize(0), _defaultFileDirectory(""), _redirect(""),
-	_alias(""), _saveFile(""), _autoIndex(0), _return(""), _listing(0){
+Location::Location(std::string &text, std::string &uri): _uri(uri), _root(DEFAULT_ROOT),
+	_index(DEFAULT_INDEX), _maxClientBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE),
+  _redirect(""), _alias(""), _saveFile(""), _autoIndex(false), _return("") {
 	std::istringstream iss(text);
 	std::string line, s1, s2;
 	while (std::getline(iss, line)){
@@ -105,13 +91,6 @@ void Location::_setPriv(std::string line){
 	if (s1 == "redirect"){
 		std::getline(iss3, st1);
 		_redirect = st1;
-	}
-	if (s1 == "listing"){
-		bool temp;
-		iss3 >> temp;
-		if (iss3.fail())
-			std::runtime_error("Incorrect parameter for listing.");
-		this->_listing = temp; 
 	}
 	if (s1 == "root"){
 		std::getline(iss3, st1);
@@ -145,13 +124,11 @@ void Location::print() const{
 	std::cout << "root:" << _root << std::endl;
 	std::cout << "index:" << _index << std::endl;
 	std::cout << "maxClientBodySize:" << _maxClientBodySize << std::endl;
-	std::cout << "defaultFileDirectory:" << _defaultFileDirectory << std::endl;
 	std::cout << "redirect:" << _redirect << std::endl;
 	std::cout << "alias:" << _alias << std::endl;
 	std::cout << "saveFile:" << _saveFile << std::endl;
 	std::cout << "autoIndex:" << _autoIndex << std::endl;
 	std::cout << "return:" << _return << std::endl;
-	std::cout << "listing:" << _listing << std::endl;
 	for (unsigned int i = 0; i < _allowedMethods.size(); i++){
 		std::cout << "allowed method:" << _allowedMethods[i] << std::endl;
 	}

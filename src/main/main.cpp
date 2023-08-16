@@ -6,16 +6,8 @@
 #include "Server.hpp"
 
 int main() {
-  HTTP http;
+  HTTP webServer = HTTP("webserv.conf");
 
-  Server s1;
-  Server s2;
-
-  s1.initialize(8080);
-  s2.initialize(8181);
-  http.addServer(s1);
-  http.addServer(s2);
-
-  http.start();
-  return 0;
+  webServer.print();
+  /* webServer.start(); */
 }
