@@ -27,7 +27,7 @@ HTTP::HTTP(std::string file){
   std::ifstream inputFile(file);
     
     if (!inputFile.is_open()){
-      throw (std::runtime_error("Error could not open file.\n"));
+      throw (std::runtime_error("Error could not open file."));
     }
     std::string line;
     while (std::getline(inputFile,line)){

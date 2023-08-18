@@ -4,15 +4,32 @@
 # include <string>
 # include <map>
 
+# define HTTP_VERSION "HTTP/1.1"
+
 class Response {
  public:
    Response();
+   Response(int);
    ~Response();
+
+   const std::string& getData() const;
+   void setBody(const std::string&);
+
+   void addHeader(const std::string& key, const std::string& value);
+   void initHeaders();
+   void generateResponseData();
+   void setResponseStatusCode(const int&);
+
  private:
    void initStatusCodes();
-   std::string                        _statusLine;
+   int                                _responseStatusCode;
+   std::map<int, std::string>         _statusCodesMap;
    std::map<std::string, std::string> _headers;
-   std::map<int, std::string>         _statusCodes;
+   std::string                        _body;
+
+   std::string                        _allData;
+
+   void generateCurrentDateTime();
 };
 
 #endif // __RESPONSE_HPP__

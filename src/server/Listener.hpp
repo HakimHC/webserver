@@ -19,7 +19,8 @@ class Listener {
     const uint16_t& port() const;
     void print() const;
     void _listen();
-    void sendRequestToServer(Request&);
+    Response* sendRequestToServer(Request&);
+    void respond(Client&);
 
   private:
     uint16_t                    _port;
@@ -28,9 +29,10 @@ class Listener {
     std::vector<struct pollfd>  _pollFds;
     std::vector<Server>         _servers;
 
-    void initPoll();
+    void  initPoll();
     void  acceptClient();
     void  readClientData(const size_t&);
+    void  closeConnection(Client&);
 
 };
 

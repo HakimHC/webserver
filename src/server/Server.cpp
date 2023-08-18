@@ -17,6 +17,8 @@
 #include "utils.hpp"
 #include "Location.hpp"
 #include "defaults.hpp"
+#include "logging.hpp"
+#include "Response.hpp"
 
 #define _BACKLOG 5
 
@@ -121,7 +123,29 @@ const std::string& Server::serverName() const {
   return this->_serverName;
 }
 
-void Server::generateResponse(Request& req) {
-  (void) req;
-  std::cout << this->_serverName << " is generating a response.." << std::endl;
+Response* Server::generateResponse(Request& req) {
+  std::string uri = req.getUri();
+  std::string location = uri.substr(0, uri.find("/", 1) - 1);
+  std::string resource = this->_locations[location].getRoot() + uri;
+  log("resource: " << resource);
+  std::ifstream index(resource);
+  if (index.is_open()) {
+    std::string line;
+    std::string all;
+    while (std::getline(index, line))
+      all += line;
+    index.close();
+    Response* response = new Response();
+    response->setBody(all);
+    response->setResponseStatusCode(200);
+    response->initHeaders();
+    response->generateResponseData();
+    std::cout << this->_serverName << " is generating a response.." << std::endl;
+    return response;
+  }
+  else {
+    Response* response = new Response(404);
+    return response;
+  }
+  return NULL;
 }
