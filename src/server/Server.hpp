@@ -9,6 +9,7 @@
 #include <map>
 #include "Location.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 
 
 #define _NUM_ALLOWED_METHODS 3
@@ -23,7 +24,7 @@ class Server {
     void  print() const;
     const uint16_t& port() const;
     const std::string& serverName() const;
-    void  generateResponse(Request&);
+    Response*  generateResponse(Request&);
 
     typedef std::string HTTPMethods;
 

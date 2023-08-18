@@ -16,3 +16,6 @@ compile_commands.json
 
 # Clang cache
 .cache
+
+# personal TODO file
+TODO

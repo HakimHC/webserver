@@ -30,6 +30,7 @@ INC				+= -I $(CLIENTDIR)
 INC				+= -I $(UTILSDIR)
 INC				+= -I $(HTTPDIR)
 INC				+= -I $(INC_DIR)
+INC				+= -I $(RESPONSEDIR)
 
 # Source code directory
 SRCDIR 		= src
@@ -49,6 +50,10 @@ REQUEST 		= $(addprefix $(REQUESTDIR)/,$(SRC_REQUEST))
 REQUESTDIR	= $(addprefix $(SRCDIR)/,request)
 SRC_REQUEST	= Request.cpp
 
+RESPONSE 		= $(addprefix $(RESPONSEDIR)/,$(SRC_RESPONSE))
+RESPONSEDIR	= $(addprefix $(SRCDIR)/,response)
+SRC_RESPONSE	= Response.cpp
+
 UTILS 		= $(addprefix $(UTILSDIR)/,$(SRC_UTILS))
 UTILSDIR	= $(addprefix $(SRCDIR)/,utils)
 SRC_UTILS	= crlf.cpp \
@@ -65,6 +70,7 @@ SRC				= $(MAIN) 	\
 						$(SERVER) \
 						$(CLIENT) \
 						$(REQUEST) \
+						$(RESPONSE) \
 						$(UTILS) \
 						$(HTTP) \
 

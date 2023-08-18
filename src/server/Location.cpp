@@ -116,6 +116,9 @@ void Location::_setPriv(std::string line){
 		std::getline(iss3, st1);
 		_return = st1;
 	}
+
+  /* Hakim */ 
+  /* if (this->_alias.empty() && this->_root.empty()) this->_alias = DEFAULT_ALIAS; */
 }
 
 

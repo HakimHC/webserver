@@ -7,13 +7,27 @@
 class Request {
  public:
   Request();
+  Request(const std::string&);
   ~Request();
 
-  void parseLegacy(const std::string &);
 
   void print() const;
 
   const std::map<std::string, std::string>& headers() const;
+
+  const std::string&                           getMethod() const;
+  const std::string&                           getUri() const;
+  const std::string&                           getHttpVersion() const;
+  const std::string&                           getQueryString() const;
+  const std::string&                           getBody() const;
+  const std::map<std::string, std::string>&    getHeaders() const;
+
+  void                           setMethod(const std::string&);
+  void                           setUri(const std::string&);
+  void                           setHttpVersion(const std::string&);
+  void                           setQueryString(const std::string&);
+  void                           setBody(const std::string&);
+  void                           setHeaders(const std::map<std::string, std::string>&);
 
  private:
   void parseUri(const std::string &);
@@ -26,6 +40,9 @@ class Request {
 
   std::string getRequestLineLegacy(const std::string &);
   std::string getRequestHeadersLegacy(const std::string &);
+  void        getRequestBodyLegacy(const std::string&);
+  void parseLegacy(const std::string &);
+  void printHeaders() const;
 };
 
 #endif  // __REQUEST_HPP__

@@ -10,7 +10,9 @@
 
 #include "Listener.hpp"
 #include "Request.hpp"
+#include "Response.hpp"
 #include "defaults.hpp"
+#include "logging.hpp"
 
 Listener::Listener(uint16_t port) 
   :_port(port) {
@@ -95,10 +97,9 @@ void Listener::readClientData(const size_t &clientIndex) {
   } else {
     std::cout << "Recieved data:" << std::endl;
     this->_clients[clientIndex].setRequestBuffer(buf);
-    std::cout << this->_clients[clientIndex].getRequestBuffer();
-    Request req;
-    req.parseLegacy(this->_clients[clientIndex].getRequestBuffer());
-    this->sendRequestToServer(req);
+    log(this->_clients[clientIndex].getRequestBuffer());
+  
+    this->respond(this->_clients[clientIndex]);
   }
 }
 
@@ -119,14 +120,47 @@ void Listener::_listen() {
  }
 }
 
-void Listener::sendRequestToServer(Request& req) {
+Response* Listener::sendRequestToServer(Request& req) {
   std::map<std::string, std::string> headers = req.headers();
   const std::string host = headers["Host"];
+  if (host.empty()) throw std::runtime_error("400 Bad Request");
   for (size_t i = 0; i < this->_servers.size(); i++) {
     if (this->_servers[i].serverName() == host) {
-      this->_servers[i].generateResponse(req);
-      return;
+      return this->_servers[i].generateResponse(req);
     }
   }
-  this->_servers[DEFAULT_SERVER].generateResponse(req);
+  return this->_servers[DEFAULT_SERVER].generateResponse(req);
+}
+
+void Listener::respond(Client& client) {
+  try {
+    Request req = Request(client.getRequestBuffer());
+    req.print();
+    Response* r = this->sendRequestToServer(req);
+    log(r->getData());
+    send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+    this->closeConnection(client);
+  }
+  catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    Response badRequest(400);
+    send(client.getSocketfd(), badRequest.getData().data(), badRequest.getData().size(), 0);
+    this->closeConnection(client);
+  }
+}
+
+void Listener::closeConnection(Client& client) {
+  std::vector<Client>::iterator it = this->_clients.begin();
+  std::vector<struct pollfd>::iterator itPoll = this->_pollFds.begin();
+  std::vector<Client>::iterator ite = this->_clients.end();
+
+  for (; it != ite; it++) {
+    if ((*it).getSocketfd() == client.getSocketfd()) {
+      close(client.getSocketfd());
+      this->_clients.erase(it);
+      this->_pollFds.erase(itPoll);
+      return;
+    }
+    itPoll++;
+  }
 }
