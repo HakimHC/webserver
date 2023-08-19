@@ -7,13 +7,12 @@ Response::~Response() {}
 Response::Response() {
   this->initStatusCodes();
   this->generateCurrentDateTime();
-  this->_headers["Server"] = "adrgonza-warriors-server";
+  this->initHeaders();
 }
 
 Response::Response(int sc): _responseStatusCode(sc) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
-  this->_headers["Server"] = "adrgonza-warriors-server";
   std::stringstream statusCodeString;
   statusCodeString << this->_responseStatusCode;
   this->_body += "<html><head><title>" + statusCodeString.str() + " " + this->_statusCodesMap[sc];
@@ -23,6 +22,62 @@ Response::Response(int sc): _responseStatusCode(sc) {
   ss << this->_body.size();
   this->_headers["Content-Length"] = ss.str();
   this->_headers["Content-Type"] = "text/html";
+  this->generateResponseData();
+}
+
+// Response::Response(const std::vector< std::string >& dirContents) {
+//   this->initStatusCodes();
+//   this->generateCurrentDateTime();
+//   this->_responseStatusCode = 200;
+//   this->_body += "<html><head><title>Index of " + dirContents[0] + "</title></head>";
+//   this->_body += "<body><h1>Index of " + dirContents[0] + "</h1><hr><pre><a href=\"../\">../</a>\n";
+//   for (size_t i = 1; i < dirContents.size(); i++) {
+//     this->_body += "<a href=\"" + dirContents[i] + "\">" + dirContents[i] + "</a>\n";
+//   }
+//   this->_body += "<pre><hr></body></html>";
+//   this->initHeaders();
+//   this->generateResponseData();
+// }
+
+Response::Response(const std::vector< std::string >& dirContents) {
+  this->initStatusCodes();
+  this->generateCurrentDateTime();
+  this->_responseStatusCode = 200;
+  
+  std::string encodedDirectoryName = dirContents[0];
+
+  this->_body += "<html><head><title>Index of " + encodedDirectoryName + "</title></head>";
+  this->_body += "<body><h1>Index of " + encodedDirectoryName + "</h1><hr><pre><a href=\"../\">../</a>\n";
+  for (size_t i = 0; i < encodedDirectoryName.length(); i++) {
+      if (encodedDirectoryName[i] == '<') {
+          encodedDirectoryName.replace(i, 1, "%3C");
+          i += 2;
+      } else if (encodedDirectoryName[i] == '>') {
+          encodedDirectoryName.replace(i, 1, "%3E");
+          i += 2;
+      } else if (encodedDirectoryName[i] == '/') {
+          encodedDirectoryName.replace(i, 1, "%2F");
+          i += 2;
+      }
+  }
+  for (size_t i = 1; i < dirContents.size(); i++) {
+    std::string encodedFileName = dirContents[i];
+    for (size_t j = 0; j < encodedFileName.length(); j++) {
+        if (encodedFileName[j] == '<') {
+            encodedFileName.replace(j, 1, "%3C");
+            j += 2;
+        } else if (encodedFileName[j] == '>') {
+            encodedFileName.replace(j, 1, "%3E");
+            j += 2;
+        } else if (encodedFileName[j] == '/') {
+            encodedFileName.replace(j, 1, "%2F");
+            j += 2;
+        }
+    }
+    this->_body += "<a href=\"" + encodedFileName + "\">" + encodedFileName + "</a>\n";
+  }
+  this->_body += "<pre><hr></body></html>";
+  this->initHeaders();
   this->generateResponseData();
 }
 
@@ -54,6 +109,7 @@ void Response::initHeaders() {
   ss << this->_body.size();
   this->_headers["Content-Length"] = ss.str();
   this->_headers["Content-Type"] = "text/html";
+  this->_headers["Server"] = "adrgonza-warriors-server";
 }
 
 void Response::generateCurrentDateTime() {
@@ -120,4 +176,8 @@ void Response::initStatusCodes() {
 
 void Response::addHeader(const std::string& key, const std::string& value) {
   this->_headers[key] = value;
+}
+
+void Response::setErrorPageFile(const int& key, const std::string& value) {
+  this->_errorPageFiles[key] = value;
 }

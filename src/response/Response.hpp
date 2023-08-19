@@ -3,6 +3,7 @@
 
 # include <string>
 # include <map>
+# include <vector>
 
 # define HTTP_VERSION "HTTP/1.1"
 
@@ -10,6 +11,7 @@ class Response {
  public:
    Response();
    Response(int);
+   Response(const std::vector< std::string >&); // For generating autoindexes;
    ~Response();
 
    const std::string& getData() const;
@@ -20,6 +22,8 @@ class Response {
    void generateResponseData();
    void setResponseStatusCode(const int&);
 
+   void setErrorPageFile(const int&, const std::string&);
+
  private:
    void initStatusCodes();
    int                                _responseStatusCode;
@@ -28,6 +32,7 @@ class Response {
    std::string                        _body;
 
    std::string                        _allData;
+   std::map<int, std::string>         _errorPageFiles;
 
    void generateCurrentDateTime();
 };

@@ -105,7 +105,6 @@ void Request::printHeaders() const {
 }
 
 requestType Request::convertRequestType(std::string const& method) {
-  log("converting.... METHOD: " << method);
   if (method == "GET") return GET;
   if (method == "POST") return POST;
   if (method == "DELETE") return DELETE;

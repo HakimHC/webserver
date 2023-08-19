@@ -15,6 +15,7 @@ class Location {
   /* Getters */
   const std::string&                getUri() const;
   const std::string&                getRoot() const;
+  const std::string&                getAlias() const;
   const std::string&                getIndex() const;
   const std::vector<std::string>&   getAllowedMethods() const;
   const size_t&                     getMaxClientBodySize() const;

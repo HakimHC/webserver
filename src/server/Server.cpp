@@ -1,6 +1,7 @@
 #include "Server.hpp"
 
 #include <fcntl.h>
+#include <dirent.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -8,6 +9,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <algorithm>
 #include <stdexcept>
 #include <fstream>
 #include <sstream>
@@ -125,18 +127,49 @@ const std::string& Server::serverName() const {
   return this->_serverName;
 }
 
+bool Server::isMethodAllowed(const Request& req) {
+  bool existingLocation = false;
+  if (this->_locations.find(req.getLocation()) != this->_locations.end()) existingLocation = true;
+
+  if (!existingLocation && req.getMethod() != "GET") return false;
+  else if (existingLocation) {
+    std::vector<std::string> allowedMethod = this->_locations[req.getLocation()].getAllowedMethods();
+    if (std::find(allowedMethod.begin(), allowedMethod.end(), req.getMethod()) == allowedMethod.end()) return false;
+  }
+  return true;
+}
+
+std::string Server::concatWithRootOrAlias(const Request& req) {
+  bool existingLocation = false;
+  std::string resource;
+  if (this->_locations.find(req.getLocation()) != this->_locations.end()) existingLocation = true;
+
+  // if (existingLocation) log("EXISTING"); else log("NON EXISTS");
+
+  if (!existingLocation) {
+    resource = DEFAULT_ROOT + req.getUri();
+  }
+  else if (this->_locations[req.getLocation()].getAlias().empty()) {
+    resource = this->_locations[req.getLocation()].getRoot() + req.getUri();
+  }
+  else {
+    std::string alias = this->_locations[req.getLocation()].getAlias();
+    std::string uri = req.getUri();
+    resource = uri.replace(1, req.getUri().find("/", 1) - 1, alias).substr(1, uri.size());
+    // log("AFTER ALIAS: " << resource);
+  }
+  return resource;
+}
+
 Response* Server::generateResponse(Request& req) {
   if (req.getBody().size() > this->_clientMaxBodySize) return new Response(413);
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
-  // Check location allowed methods TODO TODO TODO
-  std::string resource;
-  if (this->_locations.find(location) != this->_locations.end())
-    resource = this->_locations[location].getRoot() + uri;
-  else
-    resource = DEFAULT_ROOT + uri;
-  req.setResource(resource);
+  log("location: " << location);
   req.setLocation(location);
+  req.setResource(this->concatWithRootOrAlias(req));
+
+  if (!this->isMethodAllowed(req)) return new Response(405);
 
   Response* response;
 
@@ -155,7 +188,6 @@ Response* Server::generateResponse(Request& req) {
       response = handleGetRequest(req);
       break;
   }
-
   return response;
 }
 
@@ -169,14 +201,18 @@ Response* Server::handleGetRequest(Request& req) {
     return response;
   }
   else if (Server::isDirectory(req.getResource().substr(0, req.getResource().size() - 1))) {
-    // req.setResource(req.getResource() + "/" + this->_locations[req.getLocation()].getIndex());
-    req.setResource(req.getResource() + this->_locations[req.getLocation()].getIndex());
+    std::string index;
+    std::string noindex = req.getResource();
+    if (this->_locations.find(req.getLocation()) != this->_locations.end()) index = this->_locations[req.getLocation()].getIndex();
+    else index = DEFAULT_INDEX;
+    req.setResource(req.getResource() + index);
     bool autoindex = false;
     if (this->_locations.find(req.getLocation()) != this->_locations.end())
       autoindex = this->_locations[req.getLocation()].getAutoIndex();
     if (access(req.getResource().c_str(), F_OK ) == EXIT_SUCCESS)
       return this->returnIndexFile(req.getResource());
-    else if (autoindex == true) return new Response(501);
+    // else if (autoindex == true) return new Response(501);
+    else if (autoindex == true) return this->generateAutoIndex(noindex);
     else return new Response(403);
   }
   else return this->returnIndexFile(req.getResource());
@@ -216,4 +252,37 @@ bool Server::isDirectory(std::string const& path) {
   if (stat(path.c_str(), &fileInfo)) return false;
 
   return S_ISDIR(fileInfo.st_mode);
+}
+
+std::vector<std::string>* Server::readDirectoryContent(const std::string& path) const {
+  std::vector<std::string>* res = new std::vector<std::string>;
+
+  DIR* dir;
+  struct dirent* entry;
+
+  if ((dir = opendir(path.c_str())) == NULL) throw std::runtime_error("error: unable to open directory");
+
+  while ((entry = readdir(dir))) {
+    std::string curr = entry->d_name;
+    if (curr != "." && curr != "..") {
+      res->push_back(curr);
+    }
+  }
+  closedir(dir);
+  return res;
+}
+
+Response* Server::generateAutoIndex(const std::string& s) {
+  std::vector<std::string>* contents;
+  try {
+    contents = this->readDirectoryContent(s);
+  } catch(...) {return new Response(403);}
+  contents->insert(contents->begin(), s);
+  Response* r = new Response(*contents);
+  delete contents;
+  return r;
+}
+
+void Server::setResponseErrorPages(const Request& req) {
+ static_cast<void>(req);
 }

@@ -142,6 +142,7 @@ void Listener::respond(Client& client) {
     send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
     log("===================");
     this->closeConnection(client);
+    delete r;
   }
   catch (std::exception& e) {
     std::cerr << e.what() << std::endl;

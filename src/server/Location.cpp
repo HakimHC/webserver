@@ -14,6 +14,9 @@ const std::string& Location::getUri() const {
 const std::string& Location::getRoot() const {
   return this->_root;
 }
+const std::string& Location::getAlias() const {
+  return this->_alias;
+}
 const bool& Location::getAutoIndex() const {
   return this->_autoIndex;
 }
@@ -75,6 +78,7 @@ Location::Location(std::string &text, std::string &uri): _uri(uri), _root(DEFAUL
 		removeTrailing(line);
 		_setPriv(line);
 	}
+	if (this->_allowedMethods.size() == 0) this->_allowedMethods.push_back("GET");
 }
 
 void Location::_setPriv(std::string line){
@@ -91,8 +95,9 @@ void Location::_setPriv(std::string line){
 		this->_maxClientBodySize = temp; 
 	}
 	if (s1 == "allowed_methods" || s1 == "allow"){
-		while (std::getline(iss3, st1))
-			_allowedMethods.push_back(st1);
+		while (std::getline(iss3, st1, ' ')) {
+			if (!st1.empty()) _allowedMethods.push_back(st1);
+		}
 	}
 	if (s1 == "redirect"){
 		std::getline(iss3, st1);

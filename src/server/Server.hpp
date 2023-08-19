@@ -32,6 +32,7 @@ class Server {
     Response* handleGetRequest(Request&);
 
     Response* returnIndexFile(const std::string&);
+    bool isMethodAllowed(const Request&);
 
   private:
     void  acceptClient();
@@ -44,6 +45,13 @@ class Server {
     std::string                      	  _serverName;
 	  std::map< std::string, Location>	  _locations; //key = _uri
 	  std::map <std::string, std::string> _errorPages; //Meter valores por defecto
+
+    std::vector<std::string>* readDirectoryContent(const std::string&) const;
+    Response* generateAutoIndex(const std::string& s);
+
+    void setResponseErrorPages(const Request&);
+
+    std::string concatWithRootOrAlias(const Request&);
 };
 
 #endif  // __SERVER_HPP__
