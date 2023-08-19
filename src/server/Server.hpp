@@ -11,7 +11,6 @@
 #include "Request.hpp"
 #include "Response.hpp"
 
-
 #define _NUM_ALLOWED_METHODS 3
 #define _MAX_BUFFER_SIZE 2048
 
@@ -27,6 +26,12 @@ class Server {
     Response*  generateResponse(Request&);
 
     typedef std::string HTTPMethods;
+
+    static bool isDirectory(std::string const&);
+
+    Response* handleGetRequest(Request&);
+
+    Response* returnIndexFile(const std::string&);
 
   private:
     void  acceptClient();

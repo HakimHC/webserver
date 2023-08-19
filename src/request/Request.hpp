@@ -4,6 +4,13 @@
 #include <string>
 #include <map>
 
+enum requestType {
+  GET,
+  POST,
+  DELETE,
+  UNKNOWN
+};
+
 class Request {
  public:
   Request();
@@ -20,6 +27,8 @@ class Request {
   const std::string&                           getHttpVersion() const;
   const std::string&                           getQueryString() const;
   const std::string&                           getBody() const;
+  const std::string&                           getResource() const;
+  const std::string&                           getLocation() const;
   const std::map<std::string, std::string>&    getHeaders() const;
 
   void                           setMethod(const std::string&);
@@ -27,7 +36,11 @@ class Request {
   void                           setHttpVersion(const std::string&);
   void                           setQueryString(const std::string&);
   void                           setBody(const std::string&);
+  void                           setResource(const std::string&);
+  void                           setLocation(const std::string&);
   void                           setHeaders(const std::map<std::string, std::string>&);
+
+  static requestType                    convertRequestType(std::string const&);
 
  private:
   void parseUri(const std::string &);
@@ -37,6 +50,10 @@ class Request {
   std::string                           _queryString;
   std::string                           _body;
   std::map<std::string, std::string>    _headers;
+
+  // These variables are not meant to be parsed during the parsing of the Request, this is handled during response generation.
+  std::string                           _resource;
+  std::string                           _location;
 
   std::string getRequestLineLegacy(const std::string &);
   std::string getRequestHeadersLegacy(const std::string &);

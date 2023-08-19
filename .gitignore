@@ -19,3 +19,10 @@ compile_commands.json
 
 # personal TODO file
 TODO
+
+# VIM swap files
+**/*.swp
+**/*.swo
+
+#log files
+log

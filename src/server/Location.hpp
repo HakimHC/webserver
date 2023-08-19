@@ -19,7 +19,7 @@ class Location {
   const std::vector<std::string>&   getAllowedMethods() const;
   const size_t&                     getMaxClientBodySize() const;
   const std::string&                getRedirect() const;
-  const bool&                       getListing() const;
+  const bool&                       getAutoIndex() const;
 
   /* Setters */
   void                              setUri(const std::string&);
@@ -28,7 +28,7 @@ class Location {
   void                              setAllowedMethods(const std::vector<std::string>&);
   void                              setMaxClientBodySize(const size_t&);
   void                              setRedirect(const std::string&);
-  void                              setListing(const bool&);
+  void                              setAutoIndex(const bool&);
   void                              print() const;
   static void 						          removeTrailing(std::string &);		
 

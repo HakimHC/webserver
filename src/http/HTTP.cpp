@@ -8,8 +8,8 @@
 #include <algorithm>
 #include <iostream>
 
-HTTP::HTTP(){};
-HTTP::~HTTP(){};
+HTTP::HTTP(){}
+HTTP::~HTTP(){}
 
 void HTTP::addServer(Server server) {
   for (size_t i = 0; i < this->_listeners.size(); i++) {

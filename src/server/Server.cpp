@@ -3,6 +3,7 @@
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <sys/stat.h>
 #include <unistd.h>
 
 #include <cstring>
@@ -41,6 +42,7 @@ Server::Server(std::string &serverString): _host(DEFAULT_HOST), _listen(0),
 			std::getline(iss, line, '}');
 			Location temp(line, s2);
 			_locations[temp.getUri()] = temp;
+      temp.print();
 			continue ;
 		}
 		std::istringstream iss2(line);
@@ -124,10 +126,65 @@ const std::string& Server::serverName() const {
 }
 
 Response* Server::generateResponse(Request& req) {
+  if (req.getBody().size() > this->_clientMaxBodySize) return new Response(413);
   std::string uri = req.getUri();
-  std::string location = uri.substr(0, uri.find("/", 1) - 1);
-  std::string resource = this->_locations[location].getRoot() + uri;
-  log("resource: " << resource);
+  std::string location = uri.substr(0, uri.find("/", 1));
+  // Check location allowed methods TODO TODO TODO
+  std::string resource;
+  if (this->_locations.find(location) != this->_locations.end())
+    resource = this->_locations[location].getRoot() + uri;
+  else
+    resource = DEFAULT_ROOT + uri;
+  req.setResource(resource);
+  req.setLocation(location);
+
+  Response* response;
+
+  switch (Request::convertRequestType(req.getMethod())) {
+    case GET:
+      response = handleGetRequest(req);
+      break;
+    case POST:
+      response = new Response(501);
+      break;
+    case DELETE:
+      response = new Response(501);
+      break;
+    default:
+      // response = new Response(405);
+      response = handleGetRequest(req);
+      break;
+  }
+
+  return response;
+}
+
+Response* Server::handleGetRequest(Request& req) {
+  if (Server::isDirectory(req.getResource()) && req.getUri()[req.getUri().size() - 1] != '/') {
+    Response* response = new Response(301);
+    std::stringstream ss;
+    ss << this->_listen;
+    response->addHeader("Location", "http://localhost:" + ss.str() + req.getUri() + "/");
+    response->generateResponseData();
+    return response;
+  }
+  else if (Server::isDirectory(req.getResource().substr(0, req.getResource().size() - 1))) {
+    // req.setResource(req.getResource() + "/" + this->_locations[req.getLocation()].getIndex());
+    req.setResource(req.getResource() + this->_locations[req.getLocation()].getIndex());
+    bool autoindex = false;
+    if (this->_locations.find(req.getLocation()) != this->_locations.end())
+      autoindex = this->_locations[req.getLocation()].getAutoIndex();
+    if (access(req.getResource().c_str(), F_OK ) == EXIT_SUCCESS)
+      return this->returnIndexFile(req.getResource());
+    else if (autoindex == true) return new Response(501);
+    else return new Response(403);
+  }
+  else return this->returnIndexFile(req.getResource());
+}
+
+Response* Server::returnIndexFile(const std::string& resource) {
+  std::cout << this->_serverName << " is generating a response.." << std::endl;
+  errno = 0;
   std::ifstream index(resource);
   if (index.is_open()) {
     std::string line;
@@ -135,17 +192,28 @@ Response* Server::generateResponse(Request& req) {
     while (std::getline(index, line))
       all += line;
     index.close();
-    Response* response = new Response();
+    Response *response = new Response();
     response->setBody(all);
     response->setResponseStatusCode(200);
     response->initHeaders();
     response->generateResponseData();
-    std::cout << this->_serverName << " is generating a response.." << std::endl;
     return response;
   }
   else {
-    Response* response = new Response(404);
+    log("open() failed [" << resource << "] (" << strerror(errno) << ")");
+    Response* response;
+    if (errno == ENOENT)
+      response = new Response(404);
+    else
+      response = new Response(403);
     return response;
   }
-  return NULL;
+}
+
+bool Server::isDirectory(std::string const& path) {
+  struct stat fileInfo;
+
+  if (stat(path.c_str(), &fileInfo)) return false;
+
+  return S_ISDIR(fileInfo.st_mode);
 }

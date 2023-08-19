@@ -3,6 +3,7 @@
 #include "Response.hpp"
 #include "logging.hpp"
 
+Response::~Response() {}
 Response::Response() {
   this->initStatusCodes();
   this->generateCurrentDateTime();
@@ -26,6 +27,7 @@ Response::Response(int sc): _responseStatusCode(sc) {
 }
 
 void Response::generateResponseData() {
+  this->_allData = "";
   std::stringstream ss;
   ss << this->_responseStatusCode;
   this->_allData += std::string(HTTP_VERSION) + " " + ss.str() + " " + this->_statusCodesMap[this->_responseStatusCode] + "\r\n";
@@ -33,6 +35,8 @@ void Response::generateResponseData() {
   this->_allData += "Content-Length: " + this->_headers["Content-Length"] + "\r\n";
   this->_allData += "Content-Type: " + this->_headers["Content-Type"] + "\r\n";
   this->_allData += "Date: " + this->_headers["Date"] + "\r\n";
+  if (this->_headers.find("Location") != this->_headers.end())
+    this->_allData += "Location: " + this->_headers["Location"] + "\r\n";
   this->_allData += "\r\n";
   this->_allData += this->_body;
 }
@@ -70,7 +74,6 @@ void Response::setBody(const std::string& s) {
   this->_body = s;
 }
 
-Response::~Response() {};
 
 void Response::initStatusCodes() {
   _statusCodesMap[100] = "Continue";
@@ -113,4 +116,8 @@ void Response::initStatusCodes() {
   _statusCodesMap[503] = "Service Unavailable";
   _statusCodesMap[504] = "Gateway Time-out";
   _statusCodesMap[505] = "HTTP Version not supported";
+}
+
+void Response::addHeader(const std::string& key, const std::string& value) {
+  this->_headers[key] = value;
 }

@@ -14,6 +14,9 @@ const std::string& Location::getUri() const {
 const std::string& Location::getRoot() const {
   return this->_root;
 }
+const bool& Location::getAutoIndex() const {
+  return this->_autoIndex;
+}
 const std::string& Location::getIndex() const {
   return this->_index;
 }
@@ -28,6 +31,9 @@ const std::string& Location::getRedirect() const {
 }
 void Location::setUri(const std::string& s) {
   this->_uri = s;
+}
+void Location::setAutoIndex(const bool& s) {
+  this->_autoIndex = s;
 }
 void Location::setRoot(const std::string& s) {
   this->_root = s;

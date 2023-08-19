@@ -1,4 +1,5 @@
 #include "Request.hpp"
+#include "logging.hpp"
 
 #include <exception>
 #include <iostream>
@@ -103,11 +104,21 @@ void Request::printHeaders() const {
   for (; it != ite; it++) std::cout << it->first << ": " << it->second << std::endl;
 }
 
+requestType Request::convertRequestType(std::string const& method) {
+  log("converting.... METHOD: " << method);
+  if (method == "GET") return GET;
+  if (method == "POST") return POST;
+  if (method == "DELETE") return DELETE;
+  return UNKNOWN;
+}
+
 const std::string& Request::getMethod() const { return this->_method; }
 const std::string& Request::getUri() const { return this->_uri; }
 const std::string& Request::getHttpVersion() const { return this->_httpVersion;}
 const std::string& Request::getQueryString() const { return this->_queryString; }
 const std::string& Request::getBody() const { return this->_body; }
+const std::string& Request::getResource() const { return this->_resource; }
+const std::string& Request::getLocation() const { return this->_location; }
 const std::map<std::string, std::string>& Request::getHeaders() const { return this->_headers; }
 
 void Request::setMethod(const std::string& s) { this->_method = s;}
@@ -115,4 +126,6 @@ void Request::setUri(const std::string& s) { this->_uri = s;}
 void Request::setHttpVersion(const std::string& s) { this->_httpVersion = s;}
 void Request::setQueryString(const std::string& s) { this->_queryString = s;}
 void Request::setBody(const std::string& s) { this->_body = s;}
+void Request::setResource(const std::string& s) { this->_resource = s;}
+void Request::setLocation(const std::string& s) { this->_location = s;}
 void Request::setHeaders(const std::map<std::string, std::string>& s) { this->_headers = s; }

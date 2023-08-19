@@ -104,7 +104,7 @@ void Listener::readClientData(const size_t &clientIndex) {
 }
 
 void Listener::_listen() {
-  if (poll(this->_pollFds.data(), this->_pollFds.size(), 0) < 0)
+  if (poll(this->_pollFds.data(), static_cast<unsigned int>(this->_pollFds.size()), 0) < 0)
     throw std::runtime_error(
         "fatal: poll() syscall failed, shutting down server...");
 
@@ -137,8 +137,10 @@ void Listener::respond(Client& client) {
     Request req = Request(client.getRequestBuffer());
     req.print();
     Response* r = this->sendRequestToServer(req);
+    log("===== RESPONSE ====");
     log(r->getData());
     send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+    log("===================");
     this->closeConnection(client);
   }
   catch (std::exception& e) {
