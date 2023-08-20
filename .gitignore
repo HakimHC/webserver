@@ -26,3 +26,7 @@ TODO
 
 #log files
 log
+
+# Project related files && testers
+mime_types
+tester

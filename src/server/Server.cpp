@@ -131,12 +131,8 @@ return this->_serverName;
 bool Server::isMethodAllowed(const Request& req) {
 bool existingLocation = locationExists(req);
 
-log("LOCATION: " << req.getLocation());
-log("EXISTS: " << (existingLocation ? "YES" : "NO"));
-
 if (!existingLocation && req.getMethod() != "GET") return false;
 else if (existingLocation) {
-  log("entra aqui en puto serio");
   std::vector<std::string> allowedMethod = this->_locations[req.getLocation()].getAllowedMethods();
   if (std::find(allowedMethod.begin(), allowedMethod.end(), req.getMethod()) == allowedMethod.end()) return false;
 }
@@ -146,8 +142,6 @@ return true;
 std::string Server::concatWithRootOrAlias(const Request& req) {
 bool existingLocation = locationExists(req);
 std::string resource;
-
-// if (existingLocation) log("EXISTING"); else log("NON EXISTS");
 
 if (!existingLocation) {
   resource = DEFAULT_ROOT + req.getUri();
@@ -159,7 +153,6 @@ else {
   std::string alias = this->_locations[req.getLocation()].getAlias();
   std::string uri = req.getUri();
   resource = uri.replace(1, req.getUri().find("/", 1) - 1, alias).substr(1, uri.size());
-  // log("AFTER ALIAS: " << resource);
 }
 return resource;
 }
@@ -167,9 +160,10 @@ return resource;
 Response* Server::generateResponse(Request& req) {
   if (req.getBody().size() > this->_clientMaxBodySize)
     return new Response(413);
+  if (req.getHttpVersion() != "HTTP/1.1")
+    return new Response(505);
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
-  log("location: " << location);
   req.setLocation(location);
   // _locations[req.getLocation()].print();
   req.setResource(this->concatWithRootOrAlias(req));
@@ -187,10 +181,12 @@ Response* Server::generateResponse(Request& req) {
     response = handleGetRequest(req);
     break;
   case POST:
-    response = new Response(501);
+    response = handleGetRequest(req);
+    // response = new Response(501);
     break;
   case DELETE:
-    response = new Response(501);
+    response = handleGetRequest(req);
+    // response = new Response(501);
     break;
   default:
     // response = new Response(405);
@@ -213,7 +209,6 @@ Response* Server::handleGetRequest(Request& req) {
     std::cout << "This location exists: " << locationExists(req) << std::endl;
     if (locationExists(req))
       autoindex = this->_locations[req.getLocation()].getAutoIndex();
-    log("autoindex: " << autoindex);
     if (access(req.getResource().c_str(), F_OK ) == EXIT_SUCCESS)
       return this->returnIndexFile(req.getResource());
     // else if (autoindex == true) return new Response(501);
@@ -234,6 +229,7 @@ Response* Server::returnIndexFile(const std::string& resource) {
       all += line;
     index.close();
     Response *response = new Response();
+    response->setExtension(resource.substr(resource.find("."), resource.size()));
     response->setBody(all);
     response->setResponseStatusCode(200);
     response->initHeaders();
@@ -279,7 +275,6 @@ std::vector<std::string>* Server::readDirectoryContent(const std::string& path) 
 
 Response* Server::generateAutoIndex(const std::string& s) {
   std::vector<std::string>* contents;
-  log("trying to generate autoindex stuff");
   try {
     contents = this->readDirectoryContent(s);
   } catch(...) {return new Response(403);}
@@ -309,7 +304,6 @@ Response* Server::returnRedirection(const Request& req, int statusCode) {
   // this->_locations[req.getLocation()].parseRedirection();
   const Redirection& redir = this->_locations[req.getLocation()].getRedirect();
   std::string url;
-  log("REdir location sdadsa: " << redir.redirLocation);
   if (redir.redirLocation[0] == '/') {
     std::stringstream port;
     port << this->_listen;
