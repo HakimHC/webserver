@@ -177,7 +177,7 @@ Response *Server::generateResponse(Request &req) {
     response = handleGetRequest(req);
     break;
   case POST:
-    response = handleGetRequest(req);
+    response = handlePostRequest(req);
     // response = new Response(501);
     break;
   case DELETE:
@@ -322,4 +322,20 @@ Response *Server::returnRedirection(const Request &req, int statusCode) {
   response->addHeader("Location", url);
   response->generateResponseData();
   return response;
+}
+
+Response* Server::handlePostRequest(Request& req) {
+  const Location& loc = this->_locations[req.getLocation()];
+  std::string uploadDirectory = (loc.getAlias().empty() ? loc.getRoot() : loc.getAlias()) + "/" + loc.getSaveFile();
+  log("Save file directory: " << uploadDirectory);
+  log("Resource: " << req.getResource());
+  std::string resource = req.getResource();
+  std::string outfileName = resource.substr(resource.find_last_of("/") + 1, resource.size());
+  log("Final file name: " << outfileName);
+  std::ofstream uploadedFile(uploadDirectory + "/" + outfileName);
+  if (!uploadedFile.is_open())
+    return new Response(403);
+  uploadedFile << req.getBody();
+  uploadedFile.close();
+  return new Response(201);
 }

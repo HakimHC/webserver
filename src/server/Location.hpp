@@ -19,6 +19,7 @@ public:
   const std::string &getAlias() const;
   const std::string &getIndex() const;
   const std::string &getReturn() const;
+  const std::string &getSaveFile() const;
   const std::vector<std::string> &getAllowedMethods() const;
   const size_t &getMaxClientBodySize() const;
   const Redirection &getRedirect() const;
