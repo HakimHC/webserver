@@ -3,8 +3,8 @@
 #include <iostream>
 
 #include "Client.hpp"
-#include "Location.hpp"
 #include "HTTP.hpp"
+#include "Location.hpp"
 #include "Server.hpp"
 #include "defaults.hpp"
 #include "logging.hpp"
@@ -16,17 +16,16 @@ int errUsage() {
 }
 
 int main(int argc, char *argv[]) {
-  if (argc > 2) return errUsage();
+  if (argc > 2)
+    return errUsage();
 
   std::string configFile = (argv[1] ? argv[1] : DEFAULT_CONFIG_FILE);
-
 
   /* webServer.print(); */
   try {
     HTTP webServer = HTTP(configFile);
     webServer.start();
-  }
-  catch (std::exception& e) {
+  } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
   }

@@ -7,4 +7,4 @@ namespace utils {
 bool isCrLf(std::string const &s);
 }
 
-#endif  // __UTILS_HPP__
+#endif // __UTILS_HPP__
