@@ -341,6 +341,8 @@ Response* Server::handleDeleteRequest(Request& req) {
   std::string resource = req.getResource();
   if (Server::isDirectory(resource)) return new Response(403);
   log("Resource: " << resource);
-  if (remove(resource.c_str()) != 0) return new Response(500);
+  errno = 0;
+  if (remove(resource.c_str()) != 0 && errno != ENOENT) return new Response(500);
+  else if (errno == ENOENT) return new Response(404);
   return new Response(204);
 }
