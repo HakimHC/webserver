@@ -5,6 +5,8 @@
 # include <string>
 # include <vector>
 
+# include "redirection.hpp"
+
 class Location {
  public:
    Location();
@@ -17,9 +19,10 @@ class Location {
   const std::string&                getRoot() const;
   const std::string&                getAlias() const;
   const std::string&                getIndex() const;
+  const std::string&                getReturn() const;
   const std::vector<std::string>&   getAllowedMethods() const;
   const size_t&                     getMaxClientBodySize() const;
-  const std::string&                getRedirect() const;
+  const Redirection&                getRedirect() const;
   const bool&                       getAutoIndex() const;
 
   /* Setters */
@@ -28,10 +31,12 @@ class Location {
   void                              setIndex(const std::string&);
   void                              setAllowedMethods(const std::vector<std::string>&);
   void                              setMaxClientBodySize(const size_t&);
-  void                              setRedirect(const std::string&);
-  void                              setAutoIndex(const bool&);
+  void                              setRedirect(const Redirection&);
+  // void                              setAutoIndex(const bool&);
   void                              print() const;
   static void 						          removeTrailing(std::string &);		
+
+  void                              parseRedirection();
 
  private:
   std::string                _uri;
@@ -39,7 +44,7 @@ class Location {
   std::string                _index;
   std::vector<std::string>   _allowedMethods;
   size_t                     _maxClientBodySize;
-  std::string                _redirect;
+  Redirection                _redirect;
   std::string                _alias;
   std::string                _saveFile;
   bool                       _autoIndex;

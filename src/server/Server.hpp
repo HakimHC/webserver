@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <map>
+
 #include "Location.hpp"
 #include "Request.hpp"
 #include "Response.hpp"
@@ -52,6 +53,9 @@ class Server {
     void setResponseErrorPages(const Request&);
 
     std::string concatWithRootOrAlias(const Request&);
+    Response* returnRedirection(const Request&, int);
+
+    bool locationExists(const Request&) const;
 };
 
 #endif  // __SERVER_HPP__

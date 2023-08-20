@@ -23,21 +23,24 @@ const bool& Location::getAutoIndex() const {
 const std::string& Location::getIndex() const {
   return this->_index;
 }
+const std::string& Location::getReturn() const {
+  return this->_return;
+}
 const std::vector<std::string>& Location::getAllowedMethods() const {
   return this->_allowedMethods;
 }
 const size_t& Location::getMaxClientBodySize() const {
   return this->_maxClientBodySize;
 }
-const std::string& Location::getRedirect() const {
+const Redirection& Location::getRedirect() const {
   return this->_redirect;
 }
 void Location::setUri(const std::string& s) {
   this->_uri = s;
 }
-void Location::setAutoIndex(const bool& s) {
-  this->_autoIndex = s;
-}
+// void Location::setAutoIndex(const bool& s) {
+//   this->_autoIndex = s;
+// }
 void Location::setRoot(const std::string& s) {
   this->_root = s;
 }
@@ -50,7 +53,7 @@ void Location::setAllowedMethods(const std::vector<std::string>& s) {
 void Location::setMaxClientBodySize(const size_t& s) {
   this->_maxClientBodySize = s;
 }
-void Location::setRedirect(const std::string& s) {
+void Location::setRedirect(const Redirection& s) {
   this->_redirect = s;
 }
 bool NotSpace(char c){
@@ -71,7 +74,7 @@ void Location::removeTrailing (std::string &str){
 
 Location::Location(std::string &text, std::string &uri): _uri(uri), _root(DEFAULT_ROOT),
 	_index(DEFAULT_INDEX), _maxClientBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE),
-  _redirect(""), _alias(""), _saveFile(""), _autoIndex(false), _return("") {
+	_alias(""), _saveFile(""), _autoIndex(false), _return("") {
 	std::istringstream iss(text);
 	std::string line, s1, s2;
 	while (std::getline(iss, line)){
@@ -99,10 +102,10 @@ void Location::_setPriv(std::string line){
 			if (!st1.empty()) _allowedMethods.push_back(st1);
 		}
 	}
-	if (s1 == "redirect"){
-		std::getline(iss3, st1);
-		_redirect = st1;
-	}
+	// if (s1 == "redirect"){
+	// 	std::getline(iss3, st1);
+	// 	_redirect = st1;
+	// }
 	if (s1 == "root"){
 		std::getline(iss3, st1);
 		_root = st1;
@@ -126,6 +129,7 @@ void Location::_setPriv(std::string line){
 	if (s1 == "return"){
 		std::getline(iss3, st1);
 		_return = st1;
+		this->parseRedirection();
 	}
 
   /* Hakim */ 
@@ -138,7 +142,8 @@ void Location::print() const{
 	std::cout << "root:" << _root << std::endl;
 	std::cout << "index:" << _index << std::endl;
 	std::cout << "maxClientBodySize:" << _maxClientBodySize << std::endl;
-	std::cout << "redirect:" << _redirect << std::endl;
+	std::cout << "redirect.statusCode:" << _redirect.statusCode << std::endl;
+	std::cout << "redirect.location:" << _redirect.redirLocation << std::endl;
 	std::cout << "alias:" << _alias << std::endl;
 	std::cout << "saveFile:" << _saveFile << std::endl;
 	std::cout << "autoIndex:" << _autoIndex << std::endl;
@@ -146,4 +151,19 @@ void Location::print() const{
 	for (unsigned int i = 0; i < _allowedMethods.size(); i++){
 		std::cout << "allowed method:" << _allowedMethods[i] << std::endl;
 	}
+}
+
+void Location::parseRedirection() {
+	if (this->_return.empty()) return;
+	std::string token;
+	std::stringstream tokenizer(this->_return);
+	std::cout << "keloke papi" << std::endl;
+
+	// First token
+	std::getline(tokenizer, token, ' ');
+	this->_redirect.statusCode = std::atoi(token.c_str());
+	// Second token
+	// token
+	std::getline(tokenizer, token, ' ');
+	this->_redirect.redirLocation = token;
 }
