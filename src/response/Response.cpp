@@ -25,6 +25,7 @@ Response::Response(int sc) : _responseStatusCode(sc) {
   ss << this->_body.size();
   this->_headers["Content-Length"] = ss.str();
   this->_headers["Content-Type"] = "text/html";
+  this->_headers["Server"] = "adrgonza-warriors-server";
   this->generateResponseData();
 }
 
@@ -104,7 +105,8 @@ void Response::generateResponseData() {
   if (this->_headers.find("Location") != this->_headers.end())
     this->_allData += "Location: " + this->_headers["Location"] + "\r\n";
   this->_allData += "\r\n";
-  this->_allData += this->_body;
+  if (this->_responseStatusCode != 204)
+    this->_allData += this->_body;
 }
 
 const std::string &Response::getData() const { return this->_allData; }

@@ -32,6 +32,7 @@ public:
 
   Response *handleGetRequest(Request &);
   Response *handlePostRequest(Request &);
+  Response *handleDeleteRequest(Request &);
 
   Response *returnIndexFile(const std::string &);
   bool isMethodAllowed(const Request &);
