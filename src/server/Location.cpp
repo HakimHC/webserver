@@ -14,6 +14,7 @@ const std::string &Location::getAlias() const { return this->_alias; }
 const bool &Location::getAutoIndex() const { return this->_autoIndex; }
 const std::string &Location::getIndex() const { return this->_index; }
 const std::string &Location::getReturn() const { return this->_return; }
+const std::string &Location::getSaveFile() const { return this->_saveFile; }
 const std::vector<std::string> &Location::getAllowedMethods() const {
   return this->_allowedMethods;
 }

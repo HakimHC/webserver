@@ -31,6 +31,7 @@ public:
   static bool isDirectory(std::string const &);
 
   Response *handleGetRequest(Request &);
+  Response *handlePostRequest(Request &);
 
   Response *returnIndexFile(const std::string &);
   bool isMethodAllowed(const Request &);
