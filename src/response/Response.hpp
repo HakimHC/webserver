@@ -24,15 +24,21 @@ class Response {
 
    void setErrorPageFile(const int&, const std::string&);
 
+   void setExtension(const std::string&);
+
  private:
    void initStatusCodes();
+   void initMimeTypes();
    int                                _responseStatusCode;
    std::map<int, std::string>         _statusCodesMap;
+   std::map<std::string, std::string>         _mimeTypesMap;
    std::map<std::string, std::string> _headers;
    std::string                        _body;
 
    std::string                        _allData;
    std::map<int, std::string>         _errorPageFiles;
+
+   std::string                        _extension;
 
    void generateCurrentDateTime();
 };

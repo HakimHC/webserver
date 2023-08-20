@@ -6,6 +6,7 @@
 Response::~Response() {}
 Response::Response() {
   this->initStatusCodes();
+  this->initMimeTypes();
   this->generateCurrentDateTime();
   this->initHeaders();
 }
@@ -42,6 +43,7 @@ Response::Response(int sc): _responseStatusCode(sc) {
 Response::Response(const std::vector< std::string >& dirContents) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
+  this->_extension = ".html";
   this->_responseStatusCode = 200;
   
   std::string encodedDirectoryName = dirContents[0];
@@ -108,7 +110,7 @@ void Response::initHeaders() {
   std::stringstream ss;
   ss << this->_body.size();
   this->_headers["Content-Length"] = ss.str();
-  this->_headers["Content-Type"] = "text/html";
+  this->_headers["Content-Type"] = this->_mimeTypesMap[this->_extension];
   this->_headers["Server"] = "adrgonza-warriors-server";
 }
 
@@ -180,4 +182,88 @@ void Response::addHeader(const std::string& key, const std::string& value) {
 
 void Response::setErrorPageFile(const int& key, const std::string& value) {
   this->_errorPageFiles[key] = value;
+}
+
+void Response::initMimeTypes() {
+_mimeTypesMap[""] = "text/plain";
+_mimeTypesMap[".aac"] = "audio/aac";
+_mimeTypesMap[".abw"] = "application/x-abiword";
+_mimeTypesMap[".arc"] = "application/x-freearc";
+_mimeTypesMap[".avif"] = "image/avif";
+_mimeTypesMap[".avi"] = "video/x-msvideo";
+_mimeTypesMap[".azw"] = "application/vnd.amazon.ebook";
+_mimeTypesMap[".bin"] = "application/octet-stream";
+_mimeTypesMap[".bmp"] = "image/bmp";
+_mimeTypesMap[".bz"] = "application/x-bzip";
+_mimeTypesMap[".bz2"] = "application/x-bzip2";
+_mimeTypesMap[".cda"] = "application/x-cdf";
+_mimeTypesMap[".csh"] = "application/x-csh";
+_mimeTypesMap[".css"] = "text/css";
+_mimeTypesMap[".csv"] = "text/csv";
+_mimeTypesMap[".doc"] = "application/msword";
+_mimeTypesMap[".docx"] = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+_mimeTypesMap[".eot"] = "application/vnd.ms-fontobject";
+_mimeTypesMap[".epub"] = "application/epub+zip";
+_mimeTypesMap[".gz"] = "application/gzip";
+_mimeTypesMap[".gif"] = "image/gif";
+_mimeTypesMap[".htm"] = "text/html";
+_mimeTypesMap[".html"] = "text/html";
+_mimeTypesMap[".ico"] = "image/vnd.microsoft.icon";
+_mimeTypesMap[".ics"] = "text/calendar";
+_mimeTypesMap[".jar"] = "application/java-archive";
+_mimeTypesMap[".jpeg"] = "image/jpeg";
+_mimeTypesMap[".jpg"] = "image/jpeg";
+_mimeTypesMap[".js"] = "text/javascript";
+_mimeTypesMap[".json"] = "application/json";
+_mimeTypesMap[".jsonld"] = "application/ld+json";
+_mimeTypesMap[".mid"] = "audio/midi";
+_mimeTypesMap[".midi"] = "audio/midi";
+_mimeTypesMap[".mjs"] = "text/javascript";
+_mimeTypesMap[".mp3"] = "audio/mpeg";
+_mimeTypesMap[".mp4"] = "video/mp4";
+_mimeTypesMap[".mpeg"] = "video/mpeg";
+_mimeTypesMap[".mpkg"] = "application/vnd.apple.installer+xml";
+_mimeTypesMap[".odp"] = "application/vnd.oasis.opendocument.presentation";
+_mimeTypesMap[".ods"] = "application/vnd.oasis.opendocument.spreadsheet";
+_mimeTypesMap[".odt"] = "application/vnd.oasis.opendocument.text";
+_mimeTypesMap[".oga"] = "audio/ogg";
+_mimeTypesMap[".ogv"] = "video/ogg";
+_mimeTypesMap[".ogx"] = "application/ogg";
+_mimeTypesMap[".opus"] = "audio/opus";
+_mimeTypesMap[".otf"] = "font/otf";
+_mimeTypesMap[".png"] = "image/png";
+_mimeTypesMap[".pdf"] = "application/pdf";
+_mimeTypesMap[".php"] = "application/x-httpd-php";
+_mimeTypesMap[".ppt"] = "application/vnd.ms-powerpoint";
+_mimeTypesMap[".pptx"] = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+_mimeTypesMap[".rar"] = "application/vnd.rar";
+_mimeTypesMap[".rtf"] = "application/rtf";
+_mimeTypesMap[".sh"] = "application/x-sh";
+_mimeTypesMap[".svg"] = "image/svg+xml";
+_mimeTypesMap[".tar"] = "application/x-tar";
+_mimeTypesMap[".tif"] = "image/tiff";
+_mimeTypesMap[".tiff"] = "image/tiff";
+_mimeTypesMap[".ts"] = "video/mp2t";
+_mimeTypesMap[".ttf"] = "font/ttf";
+_mimeTypesMap[".txt"] = "text/plain";
+_mimeTypesMap[".vsd"] = "application/vnd.visio";
+_mimeTypesMap[".wav"] = "audio/wav";
+_mimeTypesMap[".weba"] = "audio/webm";
+_mimeTypesMap[".webm"] = "video/webm";
+_mimeTypesMap[".webp"] = "image/webp";
+_mimeTypesMap[".woff"] = "font/woff";
+_mimeTypesMap[".woff2"] = "font/woff2";
+_mimeTypesMap[".xhtml"] = "application/xhtml+xml";
+_mimeTypesMap[".xls"] = "application/vnd.ms-excel";
+_mimeTypesMap[".xlsx"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+_mimeTypesMap[".xml"] = "application/xml";
+_mimeTypesMap[".xul"] = "application/vnd.mozilla.xul+xml";
+_mimeTypesMap[".zip"] = "application/zip";
+_mimeTypesMap[".3gp"] = "video/3gpp";
+_mimeTypesMap[".3g2"] = "video/3gpp2";
+_mimeTypesMap[".7z"] = "application/x-7z-compressed";
+}
+
+void Response::setExtension(const std::string& e) {
+  this->_extension = e;
 }
