@@ -4,9 +4,9 @@
 #include <poll.h>
 
 #include <cstdint>
+#include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 #include "Location.hpp"
 #include "Request.hpp"
@@ -16,46 +16,46 @@
 #define _MAX_BUFFER_SIZE 2048
 
 class Server {
-  public:
-    Server();
-    ~Server();
-	  Server (std::string &serverString);
+public:
+  Server();
+  ~Server();
+  Server(std::string &serverString);
 
-    void  print() const;
-    const uint16_t& port() const;
-    const std::string& serverName() const;
-    Response*  generateResponse(Request&);
+  void print() const;
+  const uint16_t &port() const;
+  const std::string &serverName() const;
+  Response *generateResponse(Request &);
 
-    typedef std::string HTTPMethods;
+  typedef std::string HTTPMethods;
 
-    static bool isDirectory(std::string const&);
+  static bool isDirectory(std::string const &);
 
-    Response* handleGetRequest(Request&);
+  Response *handleGetRequest(Request &);
 
-    Response* returnIndexFile(const std::string&);
-    bool isMethodAllowed(const Request&);
+  Response *returnIndexFile(const std::string &);
+  bool isMethodAllowed(const Request &);
 
-  private:
-    void  acceptClient();
-    void  readClientData(const size_t&);
+private:
+  void acceptClient();
+  void readClientData(const size_t &);
 
-    std::string						              _host;
-    uint16_t                            _listen;
-    uint16_t                            _clientMaxBodySize;
-	  
-    std::string                      	  _serverName;
-	  std::map< std::string, Location>	  _locations; //key = _uri
-	  std::map <std::string, std::string> _errorPages; //Meter valores por defecto
+  std::string _host;
+  uint16_t _listen;
+  uint16_t _clientMaxBodySize;
 
-    std::vector<std::string>* readDirectoryContent(const std::string&) const;
-    Response* generateAutoIndex(const std::string& s);
+  std::string _serverName;
+  std::map<std::string, Location> _locations;     // key = _uri
+  std::map<std::string, std::string> _errorPages; // Meter valores por defecto
 
-    void setResponseErrorPages(const Request&);
+  std::vector<std::string> *readDirectoryContent(const std::string &) const;
+  Response *generateAutoIndex(const std::string &s);
 
-    std::string concatWithRootOrAlias(const Request&);
-    Response* returnRedirection(const Request&, int);
+  void setResponseErrorPages(const Request &);
 
-    bool locationExists(const Request&) const;
+  std::string concatWithRootOrAlias(const Request &);
+  Response *returnRedirection(const Request &, int);
+
+  bool locationExists(const Request &) const;
 };
 
-#endif  // __SERVER_HPP__
+#endif // __SERVER_HPP__

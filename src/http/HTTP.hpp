@@ -7,18 +7,18 @@
 #include "Server.hpp"
 
 class HTTP {
- public:
+public:
   HTTP();
   HTTP(std::string confFile);
   ~HTTP();
 
   void addServer(Server);
-  void  print() const;
+  void print() const;
   void start();
 
- private:
+private:
   /* std::vector<Server> _servers; */
-  std::vector<Listener*> _listeners;
+  std::vector<Listener *> _listeners;
 };
 
-#endif  // __HTTP_HPP__
+#endif // __HTTP_HPP__

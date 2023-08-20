@@ -1,12 +1,12 @@
+#include <cstring>
+#include <exception>
 #include <fcntl.h>
+#include <iostream>
 #include <netinet/in.h>
 #include <stdexcept>
+#include <string>
 #include <sys/socket.h>
 #include <unistd.h>
-#include <cstring>
-#include <string>
-#include <iostream>
-#include <exception>
 
 #include "Listener.hpp"
 #include "Request.hpp"
@@ -14,32 +14,31 @@
 #include "defaults.hpp"
 #include "logging.hpp"
 
-Listener::Listener(uint16_t port) 
-  :_port(port) {
+Listener::Listener(uint16_t port) : _port(port) {
 
-    this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
-    if (this->_socketFd < 0)
-      throw std::runtime_error("fatal: cannot create socket ");
+  this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
+  if (this->_socketFd < 0)
+    throw std::runtime_error("fatal: cannot create socket ");
 
-    struct sockaddr_in addr;
-    memset(&addr, 0, sizeof(addr));
-    addr.sin_family = AF_INET;
-    addr.sin_port = htons(this->_port);
-    addr.sin_addr.s_addr = INADDR_ANY;
+  struct sockaddr_in addr;
+  memset(&addr, 0, sizeof(addr));
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(this->_port);
+  addr.sin_addr.s_addr = INADDR_ANY;
 
-    if (bind(this->_socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
-      throw std::runtime_error("fatal: cannot bind socket");
+  if (bind(this->_socketFd, (struct sockaddr *)&addr, sizeof(addr)) < 0)
+    throw std::runtime_error("fatal: cannot bind socket");
 
-    std::cout << "Server listening on 127.0.0.1:" << this->_port << "..."
-      << std::endl;
+  std::cout << "Server listening on 127.0.0.1:" << this->_port << "..."
+            << std::endl;
 
-    if (listen(this->_socketFd, 5) < 0)
-      throw std::runtime_error("fatal: socket cannot listen");
+  if (listen(this->_socketFd, 5) < 0)
+    throw std::runtime_error("fatal: socket cannot listen");
 
-    /* Auxiliaty client, the first element in our pollfd vector will always be the
-     * servers fd, this is to make it parallel. */
-    this->_clients.push_back(Client(-1));
-    this->initPoll();
+  /* Auxiliaty client, the first element in our pollfd vector will always be the
+   * servers fd, this is to make it parallel. */
+  this->_clients.push_back(Client(-1));
+  this->initPoll();
 }
 
 void Listener::initPoll() {
@@ -50,13 +49,9 @@ void Listener::initPoll() {
   this->_pollFds.push_back(serverPollFd);
 }
 
-void Listener::addServer(Server& s) {
-  this->_servers.push_back(s);
-}
+void Listener::addServer(Server &s) { this->_servers.push_back(s); }
 
-const uint16_t& Listener::port() const {
-  return this->_port;
-}
+const uint16_t &Listener::port() const { return this->_port; }
 
 void Listener::print() const {
   std::cout << "====LISTENER====" << std::endl;
@@ -98,13 +93,14 @@ void Listener::readClientData(const size_t &clientIndex) {
     std::cout << "Recieved data:" << std::endl;
     this->_clients[clientIndex].setRequestBuffer(buf);
     log(this->_clients[clientIndex].getRequestBuffer());
-  
+
     this->respond(this->_clients[clientIndex]);
   }
 }
 
 void Listener::_listen() {
-  if (poll(this->_pollFds.data(), static_cast<unsigned int>(this->_pollFds.size()), 0) < 0)
+  if (poll(this->_pollFds.data(),
+           static_cast<unsigned int>(this->_pollFds.size()), 0) < 0)
     throw std::runtime_error(
         "fatal: poll() syscall failed, shutting down server...");
 
@@ -117,13 +113,14 @@ void Listener::_listen() {
         this->readClientData(i);
       }
     }
- }
+  }
 }
 
-Response* Listener::sendRequestToServer(Request& req) {
+Response *Listener::sendRequestToServer(Request &req) {
   std::map<std::string, std::string> headers = req.headers();
   const std::string host = headers["Host"];
-  if (host.empty()) throw std::runtime_error("400 Bad Request");
+  if (host.empty())
+    throw std::runtime_error("400 Bad Request");
   for (size_t i = 0; i < this->_servers.size(); i++) {
     if (this->_servers[i].serverName() == host) {
       return this->_servers[i].generateResponse(req);
@@ -132,27 +129,27 @@ Response* Listener::sendRequestToServer(Request& req) {
   return this->_servers[DEFAULT_SERVER].generateResponse(req);
 }
 
-void Listener::respond(Client& client) {
+void Listener::respond(Client &client) {
   try {
     Request req = Request(client.getRequestBuffer());
     req.print();
-    Response* r = this->sendRequestToServer(req);
+    Response *r = this->sendRequestToServer(req);
     log("===== RESPONSE ====");
     log(r->getData());
     send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
     log("===================");
     this->closeConnection(client);
     delete r;
-  }
-  catch (std::exception& e) {
+  } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     Response badRequest(400);
-    send(client.getSocketfd(), badRequest.getData().data(), badRequest.getData().size(), 0);
+    send(client.getSocketfd(), badRequest.getData().data(),
+         badRequest.getData().size(), 0);
     this->closeConnection(client);
   }
 }
 
-void Listener::closeConnection(Client& client) {
+void Listener::closeConnection(Client &client) {
   std::vector<Client>::iterator it = this->_clients.begin();
   std::vector<struct pollfd>::iterator itPoll = this->_pollFds.begin();
   std::vector<Client>::iterator ite = this->_clients.end();
