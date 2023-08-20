@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <cstring>
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -178,15 +179,12 @@ Response *Server::generateResponse(Request &req) {
     break;
   case POST:
     response = handlePostRequest(req);
-    // response = new Response(501);
     break;
   case DELETE:
-    response = handleGetRequest(req);
-    // response = new Response(501);
+    response = handleDeleteRequest(req);
     break;
   default:
-    // response = new Response(405);
-    response = handleGetRequest(req);
+    response = new Response(405);
     break;
   }
   return response;
@@ -206,7 +204,6 @@ Response *Server::handleGetRequest(Request &req) {
       index = DEFAULT_INDEX;
     req.setResource(req.getResource() + index);
     bool autoindex = false;
-    std::cout << "This location exists: " << locationExists(req) << std::endl;
     if (locationExists(req))
       autoindex = this->_locations[req.getLocation()].getAutoIndex();
     if (access(req.getResource().c_str(), F_OK) == EXIT_SUCCESS)
@@ -338,4 +335,12 @@ Response* Server::handlePostRequest(Request& req) {
   uploadedFile << req.getBody();
   uploadedFile.close();
   return new Response(201);
+}
+
+Response* Server::handleDeleteRequest(Request& req) {
+  std::string resource = req.getResource();
+  if (Server::isDirectory(resource)) return new Response(403);
+  log("Resource: " << resource);
+  if (remove(resource.c_str()) != 0) return new Response(500);
+  return new Response(204);
 }
