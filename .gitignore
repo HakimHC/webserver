@@ -1,5 +1,6 @@
 # Name of the executable
 webserv
+testd
 
 # Object files
 **/*.o
@@ -35,3 +36,8 @@ cgi_tester
 # Tester dependencies
 YoupiBanane
 tester.conf
+
+## Debugger
+
+.vscode
+*.dSYM
