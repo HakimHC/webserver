@@ -36,11 +36,13 @@ Server::Server(std::string &serverString)
   std::string line, s1, s2;
   while (std::getline(iss, line)) {
     Location::removeTrailing(line);
-    if (find(line.begin(), line.end(), '{') != line.end()) {
+    if (line[0] == '#')
+		continue ;
+	if (find(line.begin(), line.end(), '{') != line.end()) {
       std::istringstream iss2(line);
       std::getline(iss2, s1, ' ');
       if (s1 != "location")
-        std::runtime_error("Unidentified object in server body");
+        throw std::runtime_error("Unidentified object in server body");
       std::getline(iss2, s2, ' ');
       std::getline(iss, line, '}');
       Location temp(line, s2);
@@ -55,26 +57,26 @@ Server::Server(std::string &serverString)
     if (s1 == "host") {
       this->_host = s2;
     }
-    if (s1 == "listen") {
+    else if (s1 == "listen") {
       uint16_t temp;
       std::istringstream iss3(s2);
       iss3 >> temp;
       if (iss3.fail())
-        std::runtime_error("Incorrect parameter for listen.");
+       	throw std::runtime_error("Incorrect parameter for listen.");
       this->_listen = temp;
     }
-    if (s1 == "server_name") {
+    else if (s1 == "server_name") {
       this->_serverName = s2;
     }
-    if (s1 == "client_max_body_size") {
+    else if (s1 == "client_max_body_size") {
       uint16_t temp;
       std::istringstream iss3(s2);
       iss3 >> temp;
       if (iss3.fail())
-        std::runtime_error("Incorrect parameter for Client Max Body Size.");
+        throw std::runtime_error("Incorrect parameter for Client Max Body Size.");
       this->_clientMaxBodySize = temp;
     }
-    if (s1 == "error_page") {
+    else if (s1 == "error_page") {
       std::stack<std::string> store;
       std::istringstream iss3(s2);
       while (std::getline(iss3, s2, ' '))
@@ -86,6 +88,10 @@ Server::Server(std::string &serverString)
         store.pop();
       }
     }
+	else if (s1 == "" || s1[0] == '#' || s1[0] == '}')
+	 continue ;
+	else
+		throw (std::runtime_error("Unknown directive error."));
   }
 }
 

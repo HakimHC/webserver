@@ -75,45 +75,42 @@ void Location::_setPriv(std::string line) {
       std::runtime_error("Incorrect parameter for Max Client Body Size.");
     this->_maxClientBodySize = temp;
   }
-  if (s1 == "allowed_methods" || s1 == "allow") {
+  else if (s1 == "allowed_methods" || s1 == "allow") {
     while (std::getline(iss3, st1, ' ')) {
       if (!st1.empty())
         _allowedMethods.push_back(st1);
     }
   }
-  // if (s1 == "redirect"){
-  // 	std::getline(iss3, st1);
-  // 	_redirect = st1;
-  // }
-  if (s1 == "root") {
+  else if (s1 == "root") {
     std::getline(iss3, st1);
     _root = st1;
   }
-  if (s1 == "index") {
+  else if (s1 == "index") {
     std::getline(iss3, st1);
     _index = st1;
   }
-  if (s1 == "alias") {
+  else if (s1 == "alias") {
     std::getline(iss3, st1);
     _alias = st1;
   }
-  if (s1 == "autoindex") {
+  else if (s1 == "autoindex") {
     std::getline(iss3, st1);
     _autoIndex = (st1 == "on");
   }
-  if (s1 == "save_file") {
+  else if (s1 == "save_file") {
     std::getline(iss3, st1);
     _saveFile = st1;
   }
-  if (s1 == "return") {
+  else if (s1 == "return") {
     std::getline(iss3, st1);
     _return = st1;
     this->parseRedirection();
   }
+  else if (s1 == "" || s1[0] == '#')
+	return ;
+  else
+	throw (std::runtime_error("Unknown directive error. (" + s1 + ")"));
 
-  /* Hakim */
-  /* if (this->_alias.empty() && this->_root.empty()) this->_alias =
-   * DEFAULT_ALIAS; */
 }
 
 void Location::print() const {

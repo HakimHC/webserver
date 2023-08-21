@@ -15,7 +15,7 @@ void HTTP::addServer(Server server) {
   for (size_t i = 0; i < this->_listeners.size(); i++) {
     if (this->_listeners[i]->port() == server.port()) {
       this->_listeners[i]->addServer(server);
-      return;
+      return ;
     }
   }
   Listener *listener = new Listener(server.port());
@@ -31,13 +31,17 @@ HTTP::HTTP(std::string file) {
   }
   std::string line;
   while (std::getline(inputFile, line)) {
-    std::istringstream iss(line);
     Location::removeTrailing(line);
+	if (line.size() == 0)
+		continue ;
+    std::istringstream iss(line);
     std::string s1, s2;
     std::getline(iss, s1, ' ');
     std::getline(iss, s2, '#');
-    if (s1 != "server")
-      continue;
+    if (s1.size() == 0 && s2.size() == 0)
+		continue ;
+	if (s1 != "server" && std::find(s2.begin(), s2.end(),'{') != s2.end())
+      throw (std::runtime_error("Block is not a server"));
     long count = -1;
     std::string serverString = "";
     while (count != 0) {

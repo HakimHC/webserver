@@ -87,8 +87,8 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
 
-$(TESTNAME): $(TESTSRC)
-	$(CXX) $(CXXFLAGS) $(TESTSRC) $(LDFLAGS) -g3 -o  $@
+$(TESTNAME): $(SRC)
+	$(CXX) $(CXXFLAGS) $(SRC) $(LDFLAGS) -g3 -o  $@
 
 clean:
 	$(RM) $(OBJ)
