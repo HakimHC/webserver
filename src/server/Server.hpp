@@ -58,6 +58,7 @@ private:
   Response *returnRedirection(const Request &, int);
 
   bool locationExists(const Request &) const;
+  bool checkValid() const;
 };
 
 #endif // __SERVER_HPP__

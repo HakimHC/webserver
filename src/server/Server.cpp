@@ -28,12 +28,13 @@
 Server::~Server() {}
 Server::Server() {}
 
+
 Server::Server(std::string &serverString)
     : _host(DEFAULT_HOST), _listen(0),
       _clientMaxBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE), _serverName("") {
   std::istringstream iss(serverString);
 
-  std::string line, s1, s2;
+  std::string line, s1, s2, leftover;
   while (std::getline(iss, line)) {
     Location::removeTrailing(line);
     if (line[0] == '#')
@@ -63,6 +64,10 @@ Server::Server(std::string &serverString)
       iss3 >> temp;
       if (iss3.fail())
        	throw std::runtime_error("Incorrect parameter for listen.");
+	std::getline(iss3,leftover);
+	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+		Location::notSpace) != leftover.end())
+      throw std::runtime_error("Incorrect parameter for listen port.");
       this->_listen = temp;
     }
     else if (s1 == "server_name") {
@@ -74,6 +79,10 @@ Server::Server(std::string &serverString)
       iss3 >> temp;
       if (iss3.fail())
         throw std::runtime_error("Incorrect parameter for Client Max Body Size.");
+	std::getline(iss3,leftover);
+	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+		Location::notSpace) != leftover.end())
+      throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
       this->_clientMaxBodySize = temp;
     }
     else if (s1 == "error_page") {
@@ -351,4 +360,23 @@ Response* Server::handleDeleteRequest(Request& req) {
   if (remove(resource.c_str()) != 0 && errno != ENOENT) return new Response(500);
   else if (errno == ENOENT) return new Response(404);
   return new Response(204);
+}
+
+bool Server::checkValid() const{
+std::map<std::string, std::string>::const_iterator it1 = _errorPages.begin();
+while(it1 != _errorPages.end()){
+	std::string leftover;
+	std::istringstream iss(it1->second);
+	int u;
+	iss >> u;
+	if (iss.fail() || !(u >= 300 && u < 600))
+      throw std::runtime_error("Incorrect parameter error pages.");
+	std::getline(iss,leftover);
+	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+		Location::notSpace) != leftover.end())
+      throw std::runtime_error("Incorrect parameter for error pages.");
+
+}
+
+return (1);
 }
