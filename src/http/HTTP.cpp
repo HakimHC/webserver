@@ -21,6 +21,7 @@ void HTTP::addServer(Server server) {
   Listener *listener = new Listener(server.port());
   listener->addServer(server);
   this->_listeners.push_back(listener);
+
 }
 
 HTTP::HTTP(std::string file) {

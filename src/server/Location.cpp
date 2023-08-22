@@ -35,13 +35,13 @@ void Location::setMaxClientBodySize(const size_t &s) {
   this->_maxClientBodySize = s;
 }
 void Location::setRedirect(const Redirection &s) { this->_redirect = s; }
-bool NotSpace(char c) { return (!std::isspace(static_cast<unsigned char>(c))); }
+bool Location::notSpace(char c) { return (!std::isspace(static_cast<unsigned char>(c))); }
 
 void Location::removeTrailing(std::string &str) {
   std::string::iterator it1;
   std::string::reverse_iterator it2;
-  it1 = find_if(str.begin(), str.end(), NotSpace);
-  it2 = find_if(str.rbegin(), str.rend(), NotSpace);
+  it1 = find_if(str.begin(), str.end(), notSpace);
+  it2 = find_if(str.rbegin(), str.rend(), notSpace);
   if (it1 == str.end() || it2 == str.rend())
     str.clear();
   else
@@ -49,21 +49,27 @@ void Location::removeTrailing(std::string &str) {
 }
 
 Location::Location(std::string &text, std::string &uri)
-    : _uri(uri), _root(DEFAULT_ROOT), _index(DEFAULT_INDEX),
+    : _uri(uri), _index(DEFAULT_INDEX),
       _maxClientBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE), _alias(""),
       _saveFile(""), _autoIndex(false), _return("") {
   std::istringstream iss(text);
   std::string line, s1, s2;
+	memset(&this->_redirect, 0, sizeof(_redirect));
   while (std::getline(iss, line)) {
     removeTrailing(line);
     _setPriv(line);
   }
+  if (_alias == "" && _root == "")
+	_root = DEFAULT_ROOT;
   if (this->_allowedMethods.size() == 0)
     this->_allowedMethods.push_back("GET");
+	if (!checkValid()){
+		throw std::runtime_error("Location has incompatible params.");
+	}
 }
 
 void Location::_setPriv(std::string line) {
-  std::string s1, s2, st1;
+  std::string s1, s2, st1, leftover;
   std::istringstream iss2(line);
   std::getline(iss2, s1, ' ');
   std::getline(iss2, s2, ';');
@@ -72,7 +78,11 @@ void Location::_setPriv(std::string line) {
     size_t temp;
     iss3 >> temp;
     if (iss3.fail())
-      std::runtime_error("Incorrect parameter for Max Client Body Size.");
+      throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
+	std::getline(iss3,leftover);
+	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+		notSpace) != leftover.end())
+      throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
     this->_maxClientBodySize = temp;
   }
   else if (s1 == "allowed_methods" || s1 == "allow") {
@@ -143,4 +153,15 @@ void Location::parseRedirection() {
   // token
   std::getline(tokenizer, token, ' ');
   this->_redirect.redirLocation = token;
+}
+
+bool Location::checkValid(){
+	if (_redirect.statusCode != 0 && (_redirect.statusCode <300 
+		|| _redirect.statusCode >309))
+		throw std::runtime_error("Invalid redirection Code.");
+	if (_root.size() > 0 && _alias.size() > 0)
+		throw std::runtime_error("A location cannot have both root and alias.");
+	if (_uri.size() == 0)
+		throw std::runtime_error("Uri cannot be empty");
+	return (1);
 }

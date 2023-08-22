@@ -35,8 +35,10 @@ public:
   // void                              setAutoIndex(const bool&);
   void print() const;
   static void removeTrailing(std::string &);
+  static bool notSpace(char c);
 
   void parseRedirection();
+  bool checkValid();
 
 private:
   std::string _uri;

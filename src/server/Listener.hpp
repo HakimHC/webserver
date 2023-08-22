@@ -33,6 +33,8 @@ private:
   void acceptClient();
   void readClientData(const size_t &);
   void closeConnection(Client &);
+  bool checkValid();
 };
 
 #endif // __LISTENER_HPP__
+

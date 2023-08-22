@@ -49,7 +49,8 @@ void Listener::initPoll() {
   this->_pollFds.push_back(serverPollFd);
 }
 
-void Listener::addServer(Server &s) { this->_servers.push_back(s); }
+void Listener::addServer(Server &s) { this->_servers.push_back(s);
+checkValid(); }
 
 const uint16_t &Listener::port() const { return this->_port; }
 
@@ -163,4 +164,15 @@ void Listener::closeConnection(Client &client) {
     }
     itPoll++;
   }
+}
+
+bool Listener::checkValid() {
+	std::map<std::string, uint32_t> map;
+	for (size_t i = 0; i < this->_servers.size(); i++) {
+		if (map.find(_servers[i].serverName()) == map.end())
+			map[_servers[i].serverName()] = 420;
+		else
+			throw std::runtime_error("duplicate server_name");
+	}
+	return true;
 }
