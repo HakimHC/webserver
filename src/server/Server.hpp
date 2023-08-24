@@ -38,27 +38,23 @@ public:
   bool isMethodAllowed(const Request &);
 
 private:
-  void acceptClient();
-  void readClientData(const size_t &);
-
   std::string _host;
   uint16_t _listen;
   uint16_t _clientMaxBodySize;
-
   std::string _serverName;
   std::map<std::string, Location> _locations;     // key = _uri
   std::map<std::string, std::string> _errorPages; // Meter valores por defecto
-
+    
   std::vector<std::string> *readDirectoryContent(const std::string &) const;
+  void acceptClient();
+  void readClientData(const size_t &);
   Response *generateAutoIndex(const std::string &s);
-
   void setResponseErrorPages(const Request &);
-
   std::string concatWithRootOrAlias(const Request &);
   Response *returnRedirection(const Request &, int);
-
   bool locationExists(const Request &) const;
   bool checkValid() const;
+  std::string executepythonCGI(std::string script, std::string queryString);
 };
 
 #endif // __SERVER_HPP__

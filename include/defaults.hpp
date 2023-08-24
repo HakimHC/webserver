@@ -8,5 +8,6 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_SERVER 0
 #define DEFAULT_CONFIG_FILE "webserv.conf"
+#define DEFAULT_CGI ""
 
 #endif // __DEFAULTS_HPP__

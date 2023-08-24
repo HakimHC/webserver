@@ -5,6 +5,8 @@
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <unistd.h>
 
 #include <algorithm>
@@ -27,7 +29,6 @@
 
 Server::~Server() {}
 Server::Server() {}
-
 
 Server::Server(std::string &serverString)
     : _host(DEFAULT_HOST), _listen(0),
@@ -380,3 +381,40 @@ while(it1 != _errorPages.end()){
 
 return (1);
 }
+
+std::string	Server::executepythonCGI(std::string script, std::string queryString)
+{
+	int		id;
+	int		pip[2];
+	int		status;
+	char	**env;
+	std::string	result;
+	char	buffer[10];
+	bool	error = false;
+
+	bzero(buffer, 10 * sizeof(char));
+	env = new char*[2];
+	env[0] = new char[queryString.size() + 1];
+	std::strcpy(env[0],queryString.c_str());
+	env[1] = NULL;
+	if (pipe(pip) == -1)
+		return "";
+	id = fork();
+	if (id == -1)
+		return "";
+	if (id == 0) { 
+		close(pip[0]);
+		execle("/usr/local/bin/python3", "/usr/local/bin/python3", script.c_str(), NULL, env);
+		exit(EXIT_FAILURE);
+	}
+	close(pip[1]);
+	while (read(pip[0], buffer, 9) > 0) {
+		result += std::string(buffer) + "\n";
+	}
+	waitpid(id,&status, 0);
+	close(pip[0]);
+	delete env[0];
+	delete env;
+	return result;
+}
+

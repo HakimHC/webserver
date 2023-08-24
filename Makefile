@@ -75,8 +75,9 @@ SRC				= $(MAIN) 	\
 						$(HTTP) \
 
 
-TESTSRC = src/main/testmain.cpp src/server/Location.cpp src/server/Server.cpp \
-	src/http/HTTP.cpp src/server/Listener.cpp src/client/Client.cpp
+#TESTSRC = $(SRC)
+
+TESTSRC = lowtest.cpp
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)
@@ -87,8 +88,8 @@ all: $(NAME)
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
 
-$(TESTNAME): $(SRC)
-	$(CXX) $(CXXFLAGS) $(SRC) $(LDFLAGS) -g3 -o  $@
+$(TESTNAME): $(TESTSRC)
+	$(CXX) $(CXXFLAGS) $(TESTSRC) $(LDFLAGS) -g3 -o  $@
 
 clean:
 	$(RM) $(OBJ)

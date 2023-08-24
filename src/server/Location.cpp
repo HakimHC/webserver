@@ -6,11 +6,13 @@
 #include "defaults.hpp"
 
 Location::~Location() {}
-Location::Location() : _root(DEFAULT_ROOT), _index(DEFAULT_INDEX) {}
+Location::Location() : _root(DEFAULT_ROOT), _index(DEFAULT_INDEX),
+ _cgi(DEFAULT_CGI) {}
 
 const std::string &Location::getUri() const { return this->_uri; }
 const std::string &Location::getRoot() const { return this->_root; }
 const std::string &Location::getAlias() const { return this->_alias; }
+const std::string &Location::getCGI() const { return this->_cgi; }
 const bool &Location::getAutoIndex() const { return this->_autoIndex; }
 const std::string &Location::getIndex() const { return this->_index; }
 const std::string &Location::getReturn() const { return this->_return; }
@@ -49,7 +51,7 @@ void Location::removeTrailing(std::string &str) {
 }
 
 Location::Location(std::string &text, std::string &uri)
-    : _uri(uri), _index(DEFAULT_INDEX),
+    : _uri(uri), _index(DEFAULT_INDEX), _cgi(DEFAULT_CGI),
       _maxClientBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE), _alias(""),
       _saveFile(""), _autoIndex(false), _return("") {
   std::istringstream iss(text);
@@ -102,6 +104,10 @@ void Location::_setPriv(std::string line) {
   else if (s1 == "alias") {
     std::getline(iss3, st1);
     _alias = st1;
+  }
+  else if (s1 =="cgi"){
+    std::getline(iss3, st1);
+    _cgi = st1;
   }
   else if (s1 == "autoindex") {
     std::getline(iss3, st1);
