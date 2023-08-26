@@ -41,3 +41,6 @@ tester.conf
 
 .vscode
 *.dSYM
+
+# Diffs
+git_diff

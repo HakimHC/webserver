@@ -26,6 +26,8 @@ public:
 
   void setExtension(const std::string &);
 
+  void print() const;
+
 private:
   void initStatusCodes();
   void initMimeTypes();

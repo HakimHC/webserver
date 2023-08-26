@@ -14,6 +14,7 @@
 
 #define _NUM_ALLOWED_METHODS 3
 #define _MAX_BUFFER_SIZE 2048
+#define _MAX_CLIENTS 1024
 
 class Server {
 public:
@@ -56,6 +57,8 @@ private:
 
   std::string concatWithRootOrAlias(const Request &);
   Response *returnRedirection(const Request &, int);
+
+  Response* returnResponse(const int&);
 
   bool locationExists(const Request &) const;
   bool checkValid() const;

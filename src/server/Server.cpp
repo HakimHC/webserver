@@ -49,7 +49,7 @@ Server::Server(std::string &serverString)
       Location temp(line, s2);
       // if (_locations.find(temp.getUri()) == _locations.end())
       _locations[temp.getUri()] = temp;
-      temp.print();
+      // temp.print();
       continue;
     }
     std::istringstream iss2(line);
@@ -169,22 +169,58 @@ std::string Server::concatWithRootOrAlias(const Request &req) {
   return resource;
 }
 
+Response* Server::returnResponse(const int& statusCode) {
+  // std::stringstream ss;
+  // ss << statusCode;
+  // std::map<std::string, std::string>::iterator it;
+
+  // it = this->_errorPages.find(ss.str());
+  // log("First: " << it->first);
+  // log("Second: " << it->second);
+  // if (it == this->_errorPages.end())
+  //   return new Response(statusCode);
+  // const bool isDir = Server::isDirectory(req.getResource().substr(0, req.getResource().size() - 1));
+  // std::string res = req.getResource();
+  // if (isDir) {
+  //   res += it->second;
+  // }
+  // else {
+  //   res.replace(res.find_last_of("/") + 1, res.size(), it->second);
+  // }
+
+  // return this->returnIndexFile(res);
+
+  std::map<std::string, std::string>::iterator it;
+  std::stringstream ss;
+  ss << statusCode;
+  it = this->_errorPages.find(ss.str());
+  if (it == this->_errorPages.end())
+    return new Response(statusCode);
+
+  log("First: " << it->first);
+  log("Second: " << it->second);
+  Response* r = new Response(302);
+  r->addHeader("Location", it->second);
+  r->generateResponseData();
+  return r;
+}
+
 Response *Server::generateResponse(Request &req) {
-  if (req.getBody().size() > this->_clientMaxBodySize)
-    return new Response(413);
-  if (req.getHttpVersion() != "HTTP/1.1")
-    return new Response(505);
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
   req.setLocation(location);
-  // _locations[req.getLocation()].print();
   req.setResource(this->concatWithRootOrAlias(req));
 
+  if (req.getBody().size() > this->_clientMaxBodySize)
+    return returnResponse(413);
+  if (req.getHttpVersion() != "HTTP/1.1")
+    return returnResponse(505);
   if (!this->isMethodAllowed(req))
-    return new Response(405);
+    return returnResponse(405);
   if (locationExists(req) &&
       !this->_locations[req.getLocation()].getReturn().empty())
     return this->returnRedirection(req, NORMAL_REDIRECT);
+
 
   Response *response;
 
@@ -199,7 +235,7 @@ Response *Server::generateResponse(Request &req) {
     response = handleDeleteRequest(req);
     break;
   default:
-    response = new Response(405);
+    response = returnResponse(405);
     break;
   }
   return response;
@@ -223,11 +259,10 @@ Response *Server::handleGetRequest(Request &req) {
       autoindex = this->_locations[req.getLocation()].getAutoIndex();
     if (access(req.getResource().c_str(), F_OK) == EXIT_SUCCESS)
       return this->returnIndexFile(req.getResource());
-    // else if (autoindex == true) return new Response(501);
     else if (autoindex == true)
       return this->generateAutoIndex(noindex);
     else
-      return new Response(403);
+      return returnResponse(403);
   } else
     return this->returnIndexFile(req.getResource());
 }
@@ -237,10 +272,17 @@ Response *Server::returnIndexFile(const std::string &resource) {
   errno = 0;
   std::ifstream index(resource);
   if (index.is_open()) {
-    std::string line;
     std::string all;
+    // char buf[DEFAULT_MAX_CLIENT_BODY_SIZE];
+
+    // while (!index.eof()) {
+    //     memset(buf, 0, sizeof(buf));
+    //     index.read(buf, DEFAULT_MAX_CLIENT_BODY_SIZE);
+    //     all += buf;
+    // }
+    std::string line;
     while (std::getline(index, line))
-      all += line;
+      all += line + "\n";
     index.close();
     Response *response = new Response();
     response->setExtension(
@@ -254,9 +296,9 @@ Response *Server::returnIndexFile(const std::string &resource) {
     log("open() failed [" << resource << "] (" << strerror(errno) << ")");
     Response *response;
     if (errno == ENOENT)
-      response = new Response(404);
+      response = returnResponse(404);
     else
-      response = new Response(403);
+      response = returnResponse(403);
     return response;
   }
 }
@@ -295,10 +337,10 @@ Response *Server::generateAutoIndex(const std::string &s) {
   try {
     contents = this->readDirectoryContent(s);
   } catch (...) {
-    return new Response(403);
+    return returnResponse(403);
   }
   contents->insert(contents->begin(), s);
-  Response *r = new Response(*contents);
+  Response *r = returnResponse(*contents);
   delete contents;
   return r;
 }
@@ -313,7 +355,7 @@ bool Server::locationExists(const Request &req) const {
 
 Response *Server::returnRedirection(const Request &req, int statusCode) {
   if (statusCode == DIRECTORY_REDIRECT) {
-    Response *response = new Response(301);
+    Response *response = returnResponse(301);
     std::stringstream ss;
     ss << this->_listen;
     response->addHeader("Location",
@@ -330,7 +372,7 @@ Response *Server::returnRedirection(const Request &req, int statusCode) {
     url = "http://localhost:" + port.str() + redir.redirLocation;
   } else
     url = redir.redirLocation;
-  Response *response = new Response(redir.statusCode);
+  Response *response = returnResponse(redir.statusCode);
   response->addHeader("Location", url);
   response->generateResponseData();
   return response;
@@ -346,7 +388,7 @@ Response* Server::handlePostRequest(Request& req) {
   log("Final file name: " << outfileName);
   std::ofstream uploadedFile(uploadDirectory + "/" + outfileName);
   if (!uploadedFile.is_open())
-    return new Response(403);
+    return returnResponse(403);
   uploadedFile << req.getBody();
   uploadedFile.close();
   return new Response(201);
@@ -354,11 +396,11 @@ Response* Server::handlePostRequest(Request& req) {
 
 Response* Server::handleDeleteRequest(Request& req) {
   std::string resource = req.getResource();
-  if (Server::isDirectory(resource)) return new Response(403);
+  if (Server::isDirectory(resource)) return returnResponse(403);
   log("Resource: " << resource);
   errno = 0;
-  if (remove(resource.c_str()) != 0 && errno != ENOENT) return new Response(500);
-  else if (errno == ENOENT) return new Response(404);
+  if (remove(resource.c_str()) != 0 && errno != ENOENT) return returnResponse(500);
+  else if (errno == ENOENT) return returnResponse(404);
   return new Response(204);
 }
 

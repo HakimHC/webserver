@@ -29,22 +29,6 @@ Response::Response(int sc) : _responseStatusCode(sc) {
   this->generateResponseData();
 }
 
-// Response::Response(const std::vector< std::string >& dirContents) {
-//   this->initStatusCodes();
-//   this->generateCurrentDateTime();
-//   this->_responseStatusCode = 200;
-//   this->_body += "<html><head><title>Index of " + dirContents[0] +
-//   "</title></head>"; this->_body += "<body><h1>Index of " + dirContents[0] +
-//   "</h1><hr><pre><a href=\"../\">../</a>\n"; for (size_t i = 1; i <
-//   dirContents.size(); i++) {
-//     this->_body += "<a href=\"" + dirContents[i] + "\">" + dirContents[i] +
-//     "</a>\n";
-//   }
-//   this->_body += "<pre><hr></body></html>";
-//   this->initHeaders();
-//   this->generateResponseData();
-// }
-
 Response::Response(const std::vector<std::string> &dirContents) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
@@ -92,18 +76,16 @@ Response::Response(const std::vector<std::string> &dirContents) {
 }
 
 void Response::generateResponseData() {
-  this->_allData = "";
+  std::map<std::string, std::string>::iterator it = this->_headers.begin();
+  std::map<std::string, std::string>::iterator ite = this->_headers.end();
+
   std::stringstream ss;
   ss << this->_responseStatusCode;
+  this->_allData = "";
   this->_allData += std::string(HTTP_VERSION) + " " + ss.str() + " " +
                     this->_statusCodesMap[this->_responseStatusCode] + "\r\n";
-  this->_allData += "Server: " + this->_headers["Server"] + "\r\n";
-  this->_allData +=
-      "Content-Length: " + this->_headers["Content-Length"] + "\r\n";
-  this->_allData += "Content-Type: " + this->_headers["Content-Type"] + "\r\n";
-  this->_allData += "Date: " + this->_headers["Date"] + "\r\n";
-  if (this->_headers.find("Location") != this->_headers.end())
-    this->_allData += "Location: " + this->_headers["Location"] + "\r\n";
+  for (; it != ite; it++)
+    this->_allData += it->first + ": " + it->second + "\r\n";
   this->_allData += "\r\n";
   if (this->_responseStatusCode != 204)
     this->_allData += this->_body;
@@ -276,3 +258,15 @@ void Response::initMimeTypes() {
 }
 
 void Response::setExtension(const std::string &e) { this->_extension = e; }
+
+void Response::print() const {
+  std::map<std::string, std::string>::const_iterator it = this->_headers.begin();
+  std::map<std::string, std::string>::const_iterator ite = this->_headers.end();
+
+  log(this->_allData.substr(0, this->_allData.find("\r\n")));
+  for (; it != ite; it++)
+    log(it->first << ": " << it->second);
+  if (this->_body.size() > 4000)
+    { log("Body exceeds 4000 bytes, occulting output..."); return; }
+  log("\r\n" << this->_body);
+}

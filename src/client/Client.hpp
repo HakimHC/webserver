@@ -3,6 +3,8 @@
 
 #include <string>
 
+#include "Response.hpp"
+
 class Client {
 public:
   Client(int);
@@ -13,9 +15,15 @@ public:
   const int &getSocketfd() const;
   const std::string &getRequestBuffer() const;
 
+  const Response* getResponse() const;
+  void  setResponse(Response*);
+
 private:
   int _fd;
   std::string _requestBuffer;
+
+  Response* _response;
+
 };
 
 #endif // __CLIENT_HPP__

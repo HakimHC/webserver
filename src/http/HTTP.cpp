@@ -9,9 +9,13 @@
 #include <unistd.h>
 
 HTTP::HTTP() {}
-HTTP::~HTTP() {}
+HTTP::~HTTP() {
+  for (size_t i = 0; i < this->_listeners.size(); i++)
+    delete this->_listeners[i];
+}
 
 void HTTP::addServer(Server server) {
+  server.print();
   for (size_t i = 0; i < this->_listeners.size(); i++) {
     if (this->_listeners[i]->port() == server.port()) {
       this->_listeners[i]->addServer(server);

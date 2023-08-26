@@ -144,7 +144,6 @@ void Location::parseRedirection() {
     return;
   std::string token;
   std::stringstream tokenizer(this->_return);
-  std::cout << "keloke papi" << std::endl;
 
   // First token
   std::getline(tokenizer, token, ' ');
