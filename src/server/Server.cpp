@@ -90,10 +90,13 @@ Server::Server(std::string &serverString)
       std::istringstream iss3(s2);
       while (std::getline(iss3, s2, ' '))
         store.push(s2);
-      std::string key = store.top();
+      std::string value = store.top();
       store.pop();
       while (store.size() > 0) {
-        _errorPages[key] = store.top();
+        ErrorPage errPage;
+        errPage.value = value;
+        errPage.key = store.top();
+        _errorPages.push_back(errPage);
         store.pop();
       }
     }
@@ -112,10 +115,10 @@ void Server::print() const {
   std::cout << "Port: " << this->_listen << std::endl;
   std::cout << "Max Body Size: " << _clientMaxBodySize << std::endl;
   std::cout << "Error Page: " << std::endl;
-  for (std::map<std::string, std::string>::const_iterator i =
+  for (std::vector<ErrorPage>::const_iterator i =
            _errorPages.begin();
        i != _errorPages.end(); ++i)
-    std::cout << (*i).first << ":" << (*i).second << std::endl;
+    std::cout << i->key << ":" << i->value << std::endl;
 
   std::cout << "Locations: ";
 
@@ -170,37 +173,21 @@ std::string Server::concatWithRootOrAlias(const Request &req) {
 }
 
 Response* Server::returnResponse(const int& statusCode) {
-  // std::stringstream ss;
-  // ss << statusCode;
-  // std::map<std::string, std::string>::iterator it;
-
-  // it = this->_errorPages.find(ss.str());
-  // log("First: " << it->first);
-  // log("Second: " << it->second);
-  // if (it == this->_errorPages.end())
-  //   return new Response(statusCode);
-  // const bool isDir = Server::isDirectory(req.getResource().substr(0, req.getResource().size() - 1));
-  // std::string res = req.getResource();
-  // if (isDir) {
-  //   res += it->second;
-  // }
-  // else {
-  //   res.replace(res.find_last_of("/") + 1, res.size(), it->second);
-  // }
-
-  // return this->returnIndexFile(res);
-
-  std::map<std::string, std::string>::iterator it;
   std::stringstream ss;
   ss << statusCode;
-  it = this->_errorPages.find(ss.str());
-  if (it == this->_errorPages.end())
+  bool found = false;
+  size_t i;
+  for (i = 0; i < this->_errorPages.size(); i++)
+    if (this->_errorPages[i].key == ss.str()) {
+      found = true;
+      break;
+    }
+  
+  if (!found)
     return new Response(statusCode);
 
-  log("First: " << it->first);
-  log("Second: " << it->second);
   Response* r = new Response(302);
-  r->addHeader("Location", it->second);
+  r->addHeader("Location", this->_errorPages[i].value);
   r->generateResponseData();
   return r;
 }
@@ -340,7 +327,7 @@ Response *Server::generateAutoIndex(const std::string &s) {
     return returnResponse(403);
   }
   contents->insert(contents->begin(), s);
-  Response *r = returnResponse(*contents);
+  Response *r = new Response(*contents);
   delete contents;
   return r;
 }
@@ -405,10 +392,10 @@ Response* Server::handleDeleteRequest(Request& req) {
 }
 
 bool Server::checkValid() const{
-std::map<std::string, std::string>::const_iterator it1 = _errorPages.begin();
+std::vector<ErrorPage>::const_iterator it1 = _errorPages.begin();
 while(it1 != _errorPages.end()){
 	std::string leftover;
-	std::istringstream iss(it1->second);
+	std::istringstream iss(it1->value);
 	int u;
 	iss >> u;
 	if (iss.fail() || !(u >= 300 && u < 600))
