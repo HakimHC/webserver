@@ -35,6 +35,7 @@ public:
   Response *handleDeleteRequest(Request &);
 
   Response *returnIndexFile(const std::string &);
+  Response *returnPythonCGI(Request &req);
   bool isMethodAllowed(const Request &);
 
 private:
@@ -54,6 +55,7 @@ private:
   Response *returnRedirection(const Request &, int);
   bool locationExists(const Request &) const;
   bool checkValid() const;
+  bool isPythonCGIReq( Request &req ) ;
   std::string executepythonCGI(std::string script, std::string queryString);
 };
 

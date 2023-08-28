@@ -56,7 +56,8 @@ Location::Location(std::string &text, std::string &uri)
       _saveFile(""), _autoIndex(false), _return("") {
   std::istringstream iss(text);
   std::string line, s1, s2;
-	memset(&this->_redirect, 0, sizeof(_redirect));
+	this->_redirect.statusCode = 0;
+  this->_redirect.redirLocation = "";
   while (std::getline(iss, line)) {
     removeTrailing(line);
     _setPriv(line);

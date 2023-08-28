@@ -10,7 +10,7 @@ CXX				= g++
 
 # Compiler flags
 CXXFLAGS 	= -Wall -Werror -Wextra
-CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
+#CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
 CXXFLAGS 	+= -g3
 CXXFLAGS 	+= $(INC)
 
@@ -75,9 +75,9 @@ SRC				= $(MAIN) 	\
 						$(HTTP) \
 
 
-#TESTSRC = $(SRC)
+TESTSRC = $(SRC)
 
-TESTSRC = lowtest.cpp
+#TESTSRC = lowtest.cpp
 
 # Object files
 OBJ 			= $(SRC:.cpp=.o)

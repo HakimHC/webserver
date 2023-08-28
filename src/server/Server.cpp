@@ -63,12 +63,14 @@ Server::Server(std::string &serverString)
       uint16_t temp;
       std::istringstream iss3(s2);
       iss3 >> temp;
-      if (iss3.fail())
+      if (iss3.fail()){
        	throw std::runtime_error("Incorrect parameter for listen.");
-	std::getline(iss3,leftover);
-	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
-		Location::notSpace) != leftover.end())
-      throw std::runtime_error("Incorrect parameter for listen port.");
+      }
+      std::getline(iss3,leftover);
+	    if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+		  Location::notSpace) != leftover.end()){
+        throw std::runtime_error("Incorrect parameter for listen port.");
+      }
       this->_listen = temp;
     }
     else if (s1 == "server_name") {
@@ -78,12 +80,14 @@ Server::Server(std::string &serverString)
       uint16_t temp;
       std::istringstream iss3(s2);
       iss3 >> temp;
-      if (iss3.fail())
+      if (iss3.fail()){
         throw std::runtime_error("Incorrect parameter for Client Max Body Size.");
-	std::getline(iss3,leftover);
-	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
-		Location::notSpace) != leftover.end())
-      throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
+      }
+      std::getline(iss3,leftover);
+      if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+        Location::notSpace) != leftover.end()){
+          throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
+      }
       this->_clientMaxBodySize = temp;
     }
     else if (s1 == "error_page") {
@@ -207,31 +211,63 @@ Response *Server::generateResponse(Request &req) {
 }
 
 Response *Server::handleGetRequest(Request &req) {
-  if (Server::isDirectory(req.getResource()) &&
-      req.getUri()[req.getUri().size() - 1] != '/')
-    return this->returnRedirection(req, DIRECTORY_REDIRECT);
-  else if (Server::isDirectory(
+	if (Server::isDirectory(req.getResource()) &&
+     		req.getUri()[req.getUri().size() - 1] != '/')
+    	return this->returnRedirection(req, DIRECTORY_REDIRECT);
+  	else if (Server::isDirectory(
                req.getResource().substr(0, req.getResource().size() - 1))) {
-    std::string index;
-    std::string noindex = req.getResource();
-    if (this->_locations.find(req.getLocation()) != this->_locations.end())
-      index = this->_locations[req.getLocation()].getIndex();
-    else
-      index = DEFAULT_INDEX;
-    req.setResource(req.getResource() + index);
-    bool autoindex = false;
-    if (locationExists(req))
-      autoindex = this->_locations[req.getLocation()].getAutoIndex();
-    if (access(req.getResource().c_str(), F_OK) == EXIT_SUCCESS)
-      return this->returnIndexFile(req.getResource());
-    // else if (autoindex == true) return new Response(501);
-    else if (autoindex == true)
-      return this->generateAutoIndex(noindex);
-    else
-      return new Response(403);
-  } else
-    return this->returnIndexFile(req.getResource());
+    	std::string index;
+    	std::string noindex = req.getResource();
+    	if (this->_locations.find(req.getLocation()) != this->_locations.end())
+      		index = this->_locations[req.getLocation()].getIndex();
+    	else
+      		index = DEFAULT_INDEX;
+    	req.setResource(req.getResource() + index);
+    	bool autoindex = false;
+    	if (locationExists(req))
+      		autoindex = this->_locations[req.getLocation()].getAutoIndex();
+    	if (access(req.getResource().c_str(), F_OK) == EXIT_SUCCESS)
+      		return this->returnIndexFile(req.getResource());
+    	// else if (autoindex == true) return new Response(501);
+    	else if (autoindex == true)
+      		return this->generateAutoIndex(noindex);
+    	else
+      		return new Response(403);
+  	} else if (isPythonCGIReq(req)){
+		return this->returnPythonCGI(req);
+	} else
+    	return this->returnIndexFile(req.getResource());
 }
+
+Response *Server::returnPythonCGI(Request &req) {
+	std::cout << this->_serverName << " is generating a response.." << std::endl;
+	errno = 0;
+	char buffer[1024];
+	bzero(buffer, sizeof(buffer));
+	getcwd(buffer, sizeof(buffer) - 1);
+	std::string resourcePath(buffer);
+	resourcePath += "/" +req.getResource();
+	std::string all = executepythonCGI(resourcePath,req.getQueryString());
+    if (all.length() > 0){
+		Response *response = new Response();
+		response->setExtension(".py");
+		response->setBody(all);
+		response->setResponseStatusCode(200);
+		response->initHeaders();
+		response->generateResponseData();
+		return response;
+	} else {
+    	log("CGI  failed [" << req.getResource() << "] (" << strerror(errno) << ")");
+   		Response *response;
+    	if (errno == ENOENT)
+      		response = new Response(404);
+    	else
+      		response = new Response(403);
+    	return response;
+  }
+}
+
+
 
 Response *Server::returnIndexFile(const std::string &resource) {
   std::cout << this->_serverName << " is generating a response.." << std::endl;
@@ -269,6 +305,21 @@ bool Server::isDirectory(std::string const &path) {
     return false;
 
   return S_ISDIR(fileInfo.st_mode);
+}
+
+bool Server::isPythonCGIReq(Request &req ) {
+	if (!locationExists(req))
+		return false;
+	char buffer[1024];
+	bzero(buffer, sizeof(buffer));
+	getcwd(buffer, sizeof(buffer) - 1);
+	std::string resourcePath(buffer);
+	resourcePath += "/" + req.getResource();
+	if (this->_locations[req.getLocation()].getCGI()== ".py" && 
+		req.getResource().substr(req.getResource().size() - 3) == ".py" &&
+		!access(resourcePath.c_str(),F_OK))
+			return true;
+	return false;
 }
 
 std::vector<std::string> *
@@ -390,7 +441,7 @@ std::string	Server::executepythonCGI(std::string script, std::string queryString
 	char	**env;
 	std::string	result;
 	char	buffer[10];
-	bool	error = false;
+	//bool	error = false;
 
 	bzero(buffer, 10 * sizeof(char));
 	env = new char*[2];
@@ -400,11 +451,15 @@ std::string	Server::executepythonCGI(std::string script, std::string queryString
 	if (pipe(pip) == -1)
 		return "";
 	id = fork();
-	if (id == -1)
+	if (id == -1){
+		delete[] env[0];
+		delete[] env;
 		return "";
+	}
 	if (id == 0) { 
 		close(pip[0]);
-		execle("/usr/local/bin/python3", "/usr/local/bin/python3", script.c_str(), NULL, env);
+		int w = execle(DEFAULT_PYTHON_ROUTE, DEFAULT_PYTHON_ROUTE, script.c_str(), NULL, env);
+		log("Fatal execle " << w);
 		exit(EXIT_FAILURE);
 	}
 	close(pip[1]);
@@ -413,8 +468,8 @@ std::string	Server::executepythonCGI(std::string script, std::string queryString
 	}
 	waitpid(id,&status, 0);
 	close(pip[0]);
-	delete env[0];
-	delete env;
+	delete[] env[0];
+	delete[] env;
 	return result;
 }
 
