@@ -30,7 +30,6 @@ log
 
 # Project related files && testers
 mime_types
-tester
 cgi_tester
 
 # Tester dependencies

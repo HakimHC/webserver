@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  webserv:
+    build: ./webserv
+    ports:
+      - "9292:9292"
+  nginx:
+    build: ./nginx
+    ports:
+      - "8080:80"
+  py-tester:
+    build: ./py-tester
+    depends_on:
+      - webserv
+      - nginx
