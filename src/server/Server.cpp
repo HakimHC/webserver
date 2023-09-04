@@ -30,82 +30,82 @@ Server::Server() {}
 
 
 Server::Server(std::string &serverString)
-    : _host(DEFAULT_HOST), _listen(0),
-      _clientMaxBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE), _serverName("") {
-  std::istringstream iss(serverString);
+	: _host(DEFAULT_HOST), _listen(0),
+	_clientMaxBodySize(DEFAULT_MAX_CLIENT_BODY_SIZE), _serverName("") {
+		std::istringstream iss(serverString);
 
-  std::string line, s1, s2, leftover;
-  while (std::getline(iss, line)) {
-    Location::removeTrailing(line);
-    if (line[0] == '#')
-		continue ;
-	if (find(line.begin(), line.end(), '{') != line.end()) {
-      std::istringstream iss2(line);
-      std::getline(iss2, s1, ' ');
-      if (s1 != "location")
-        throw std::runtime_error("Unidentified object in server body");
-      std::getline(iss2, s2, ' ');
-      std::getline(iss, line, '}');
-      Location temp(line, s2);
-      // if (_locations.find(temp.getUri()) == _locations.end())
-      _locations[temp.getUri()] = temp;
-      // temp.print();
-      continue;
-    }
-    std::istringstream iss2(line);
-    std::getline(iss2, s1, ' ');
-    std::getline(iss2, s2, ';');
-    if (s1 == "host") {
-      this->_host = s2;
-    }
-    else if (s1 == "listen") {
-      uint16_t temp;
-      std::istringstream iss3(s2);
-      iss3 >> temp;
-      if (iss3.fail())
-       	throw std::runtime_error("Incorrect parameter for listen.");
-	std::getline(iss3,leftover);
-	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
-		Location::notSpace) != leftover.end())
-      throw std::runtime_error("Incorrect parameter for listen port.");
-      this->_listen = temp;
-    }
-    else if (s1 == "server_name") {
-      this->_serverName = s2;
-    }
-    else if (s1 == "client_max_body_size") {
-      uint16_t temp;
-      std::istringstream iss3(s2);
-      iss3 >> temp;
-      if (iss3.fail())
-        throw std::runtime_error("Incorrect parameter for Client Max Body Size.");
-	std::getline(iss3,leftover);
-	if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
-		Location::notSpace) != leftover.end())
-      throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
-      this->_clientMaxBodySize = temp;
-    }
-    else if (s1 == "error_page") {
-      std::stack<std::string> store;
-      std::istringstream iss3(s2);
-      while (std::getline(iss3, s2, ' '))
-        store.push(s2);
-      std::string value = store.top();
-      store.pop();
-      while (store.size() > 0) {
-        ErrorPage errPage;
-        errPage.value = value;
-        errPage.key = store.top();
-        _errorPages.push_back(errPage);
-        store.pop();
-      }
-    }
-	else if (s1 == "" || s1[0] == '#' || s1[0] == '}')
-	 continue ;
-	else
-		throw (std::runtime_error("Unknown directive error."));
-  }
-}
+		std::string line, s1, s2, leftover;
+		while (std::getline(iss, line)) {
+			Location::removeTrailing(line);
+			if (line[0] == '#')
+				continue ;
+			if (find(line.begin(), line.end(), '{') != line.end()) {
+				std::istringstream iss2(line);
+				std::getline(iss2, s1, ' ');
+				if (s1 != "location")
+					throw std::runtime_error("Unidentified object in server body");
+				std::getline(iss2, s2, ' ');
+				std::getline(iss, line, '}');
+				Location temp(line, s2);
+				// if (_locations.find(temp.getUri()) == _locations.end())
+				_locations[temp.getUri()] = temp;
+				// temp.print();
+				continue;
+			}
+			std::istringstream iss2(line);
+			std::getline(iss2, s1, ' ');
+			std::getline(iss2, s2, ';');
+			if (s1 == "host") {
+				this->_host = s2;
+			}
+			else if (s1 == "listen") {
+				uint16_t temp;
+				std::istringstream iss3(s2);
+				iss3 >> temp;
+				if (iss3.fail())
+					throw std::runtime_error("Incorrect parameter for listen.");
+				std::getline(iss3,leftover);
+				if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+							Location::notSpace) != leftover.end())
+					throw std::runtime_error("Incorrect parameter for listen port.");
+				this->_listen = temp;
+			}
+			else if (s1 == "server_name") {
+				this->_serverName = s2;
+			}
+			else if (s1 == "client_max_body_size") {
+				uint16_t temp;
+				std::istringstream iss3(s2);
+				iss3 >> temp;
+				if (iss3.fail())
+					throw std::runtime_error("Incorrect parameter for Client Max Body Size.");
+				std::getline(iss3,leftover);
+				if (leftover.size() >0 && std::find_if(leftover.begin(), leftover.end(),
+							Location::notSpace) != leftover.end())
+					throw std::runtime_error("Incorrect parameter for Max Client Body Size.");
+				this->_clientMaxBodySize = temp;
+			}
+			else if (s1 == "error_page") {
+				std::stack<std::string> store;
+				std::istringstream iss3(s2);
+				while (std::getline(iss3, s2, ' '))
+					store.push(s2);
+				std::string value = store.top();
+				store.pop();
+				while (store.size() > 0) {
+					ErrorPage errPage;
+					errPage.value = value;
+					errPage.key = store.top();
+					_errorPages.push_back(errPage);
+					store.pop();
+				}
+			}
+			else if (s1 == "" || s1[0] == '#' || s1[0] == '}')
+				continue ;
+			else
+				throw (std::runtime_error("Unknown directive error."));
+		}
+	}
 
 void Server::print() const {
   std::cout << std::endl;

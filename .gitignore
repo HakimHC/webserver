@@ -8,8 +8,6 @@ testd
 # Stderr logs (AddressSanitizer, etc)
 error_log
 
-# Nginx test container directory
-nginx
 
 # Clangd compile flags
 compile_flags.txt
@@ -27,14 +25,6 @@ TODO
 
 #log files
 log
-
-# Project related files && testers
-mime_types
-cgi_tester
-
-# Tester dependencies
-YoupiBanane
-tester.conf
 
 ## Debugger
 
