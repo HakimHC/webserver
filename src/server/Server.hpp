@@ -56,6 +56,7 @@ private:
   bool locationExists(const Request &) const;
   bool checkValid() const;
   bool isPythonCGIReq( Request &req ) ;
+  std::vector<std::string> separatePyCGI(std::string );
   std::string executepythonCGI(std::string script, std::string queryString);
 };
 

@@ -9,7 +9,7 @@ OS				= $(shell uname -s)
 CXX				= g++
 
 # Compiler flags
-CXXFLAGS 	= -Wall -Werror -Wextra
+CXXFLAGS 	= -Wall -Werror -Wextra #-fsanitize=thread
 #CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
 CXXFLAGS 	+= -g3
 CXXFLAGS 	+= $(INC)
