@@ -31,6 +31,7 @@ INC				+= -I $(UTILSDIR)
 INC				+= -I $(HTTPDIR)
 INC				+= -I $(INC_DIR)
 INC				+= -I $(RESPONSEDIR)
+INC				+= -I $(CGIDIR)
 
 # Source code directory
 SRCDIR 		= src
@@ -62,6 +63,10 @@ HTTP 		= $(addprefix $(HTTPDIR)/,$(SRC_HTTP))
 HTTPDIR	= $(addprefix $(SRCDIR)/,http)
 SRC_HTTP	= HTTP.cpp \
 
+CGI 		= $(addprefix $(CGIDIR)/,$(SRC_CGI))
+CGIDIR	= $(addprefix $(SRCDIR)/,CGI)
+SRC_CGI	= CGI.cpp \
+
 MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 MAINDIR		= $(addprefix $(SRCDIR)/,main)
 SRC_MAIN	= main.cpp
@@ -73,6 +78,7 @@ SRC				= $(MAIN) 	\
 						$(RESPONSE) \
 						$(UTILS) \
 						$(HTTP) \
+						$(CGI) \
 
 
 TESTSRC = $(SRC)

@@ -24,6 +24,7 @@
 #include "defaults.hpp"
 #include "logging.hpp"
 #include "utils.hpp"
+#include "CGI.hpp"
 
 #define _BACKLOG 5
 
@@ -233,7 +234,7 @@ Response *Server::generateResponse(Request &req) {
   return response;
 }
 
-Response *Server::handleGetRequest(Request &req) {
+Response *Server::	handleGetRequest(Request &req) {
 	if (Server::isDirectory(req.getResource()) &&
      		req.getUri()[req.getUri().size() - 1] != '/')
     	return this->returnRedirection(req, DIRECTORY_REDIRECT);
@@ -256,40 +257,15 @@ Response *Server::handleGetRequest(Request &req) {
       		return this->generateAutoIndex(noindex);
     	else
       		return new Response(403);
-  	} else if (isPythonCGIReq(req)){
-		return this->returnPythonCGI(req);
-	} else
-    	return this->returnIndexFile(req.getResource());
-}
+			
+  		} else if (isPythonCGIReq(req)){
+			CGI mycgi(req);
+			mycgi.startCGI();
+			mycgi.responseReady();
+			return mycgi.prepareResponse();
 
-Response *Server::returnPythonCGI(Request &req) {
-	std::cout << this->_serverName << " is generating a response.." << std::endl;
-	errno = 0;
-	char buffer[1024];
-	bzero(buffer, sizeof(buffer));
-	getcwd(buffer, sizeof(buffer) - 1);
-	std::string resourcePath(buffer);
-	resourcePath += "/" +req.getResource();
-	std::string all = executepythonCGI(resourcePath,req.getQueryString());
-    if (all.length() > 0){
-		Response *response = new Response();
-		std::vector<std::string> separeted = separatePyCGI(all);
-		response->setExtension(".py");
-		response->setBody(separeted[2]);
-		response->addHeader(separeted[0], separeted[1]);
-		response->setResponseStatusCode(200);
-		response->initHeaders();
-		response->generateResponseData();
-		return response;
-	} else {
-    	log("CGI  failed [" << req.getResource() << "] (" << strerror(errno) << ")");
-   		Response *response;
-    	if (errno == ENOENT)
-      		response = new Response(404);
-    	else
-      		response = new Response(403);
-    	return response;
-  }
+		} else
+    	return this->returnIndexFile(req.getResource());
 }
 
 
@@ -337,21 +313,6 @@ bool Server::isDirectory(std::string const &path) {
     return false;
 
   return S_ISDIR(fileInfo.st_mode);
-}
-
-bool Server::	isPythonCGIReq(Request &req ) {
-	if (!locationExists(req))
-		return false;
-	char buffer[1024];
-	bzero(buffer, sizeof(buffer));
-	getcwd(buffer, sizeof(buffer) - 1);
-	std::string resourcePath(buffer);
-	resourcePath += "/" + req.getResource();
-	if (this->_locations[req.getLocation()].getCGI()== ".py" && 
-		req.getResource().substr(req.getResource().size() - 3) == ".py" &&
-		!access(resourcePath.c_str(),F_OK))
-			return true;
-	return false;
 }
 
 std::vector<std::string> *
@@ -461,68 +422,21 @@ while(it1 != _errorPages.end()){
       throw std::runtime_error("Incorrect parameter for error pages.");
 
 }
-
-return (1);
+	return (1);
 }
 
-std::string	Server::executepythonCGI(std::string script, std::string queryString)
-{
-	int		id;
-	int		pip[2];
-	int		status;
-	char	**env;
-	std::string	result;
-	char	buffer[10];
-	//bool	error = false;
-
-	bzero(buffer, 10 * sizeof(char));
-	queryString = "QUERY_STRING="+ queryString;
-	env = new char*[2];
-	env[0] = new char[queryString.size() + 1];
-	std::strcpy(env[0],queryString.c_str());
-	env[1] = NULL;
-	if (pipe(pip) == -1)
-		return "";
-	id = fork();
-	if (id == -1){
-		delete[] env[0];
-		delete[] env;
-		return "";
-	}
-	if (id == 0) { 
-		close(pip[0]);
-		if (dup2(pip[1], STDOUT_FILENO) == -1)
-			log("whaaat");
-		close(pip[1]);
-		int w = execle(DEFAULT_PYTHON_ROUTE, DEFAULT_PYTHON_ROUTE, script.c_str(), NULL, env);
-		log("Fatal execle " << w);
-		exit(EXIT_FAILURE);
-	}
-	close(pip[1]);
-	while (read(pip[0], buffer, 9) > 0) {
-		result += std::string(buffer);
-		bzero(buffer, sizeof(buffer));
-	}
-	waitpid(id,&status, 0);
-	close(pip[0]);
-	delete[] env[0];
-	delete[] env;
-	return result;
+bool Server::isPythonCGIReq(Request &req ) {
+	if (!locationExists(req))
+		return false;
+	char buffer[1024];
+	bzero(buffer, sizeof(buffer));
+	getcwd(buffer, sizeof(buffer) - 1);
+	std::string resourcePath(buffer);
+	resourcePath += "/" + req.getResource();
+	if (this->_locations[req.getLocation()].getCGI()== ".py" && 
+		req.getResource().substr(req.getResource().size() - 3) == ".py" &&
+		!access(resourcePath.c_str(),F_OK))
+			return true;
+	return false;
 }
 
-  std::vector<std::string> Server::separatePyCGI(std::string all){
-	std::istringstream iss(all);
-	std::vector<std::string> toReturn;
-	std::string hold, hold2;
-
-	std::getline(iss, hold, ' ');
-	toReturn.push_back(hold);
-	std::getline(iss, hold);
-	toReturn.push_back(hold);
-	std::getline(iss, hold);
-	while (std::getline(iss, hold))
-		hold2  += hold + "\n";
-	toReturn.push_back(hold2);
-	
-	return toReturn;
-  }
