@@ -37,33 +37,29 @@ public:
   Response *handleDeleteRequest(Request &);
 
   Response *returnIndexFile(const std::string &);
+  Response *returnPythonCGI(Request &req);
   bool isMethodAllowed(const Request &);
 
 private:
-  void acceptClient();
-  void readClientData(const size_t &);
-
   std::string _host;
   uint16_t _listen;
   uint16_t _clientMaxBodySize;
-
   std::string _serverName;
   std::map<std::string, Location> _locations;     // key = _uri
-  // std::map<std::string, std::string> _errorPages; // Meter valores por defecto
   std::vector<ErrorPage>                _errorPages;
-
   std::vector<std::string> *readDirectoryContent(const std::string &) const;
+  void acceptClient();
+  void readClientData(const size_t &);
   Response *generateAutoIndex(const std::string &s);
-
   void setResponseErrorPages(const Request &);
-
   std::string concatWithRootOrAlias(const Request &);
   Response *returnRedirection(const Request &, int);
-
   Response* returnResponse(const int&);
-
   bool locationExists(const Request &) const;
   bool checkValid() const;
+  bool isPythonCGIReq( Request &req ) ;
+  std::vector<std::string> separatePyCGI(std::string );
+  std::string executepythonCGI(std::string script, std::string queryString);
 };
 
 #endif // __SERVER_HPP__

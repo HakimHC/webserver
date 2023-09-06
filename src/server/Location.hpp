@@ -18,6 +18,7 @@ public:
   const std::string &getRoot() const;
   const std::string &getAlias() const;
   const std::string &getIndex() const;
+  const std::string &getCGI() const;
   const std::string &getReturn() const;
   const std::string &getSaveFile() const;
   const std::vector<std::string> &getAllowedMethods() const;
@@ -44,6 +45,7 @@ private:
   std::string _uri;
   std::string _root;
   std::string _index;
+  std::string _cgi;
   std::vector<std::string> _allowedMethods;
   size_t _maxClientBodySize;
   Redirection _redirect;

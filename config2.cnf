@@ -1,0 +1,47 @@
+server {
+  # Choose the port and host for each server
+  host 0.0.0.0;
+  listen 8080;
+
+  server_name myserver; # Set up the server name or not
+
+  client_max_body_size 10; # Limit client body size.
+  error_page 404 405 4xx.html; # Setup default error pages.
+
+  location / {
+    root /www; # Opcional
+    index index.html; # Set a default file to answer if the request is a directory
+  }
+
+  location /alias {
+    alias /www; # Define a directory or a file from where the file should be searched
+  }
+
+  location /autoindex {
+    autoindex on; # Turn on or off directory listing
+  }
+
+  location /post {
+    allow POST DELETE; # Define a list of accepted HTTP methods for the route.
+    save_file /upload; # Make the route able to accept uploaded files and configure where they should be saved
+  }
+
+  location /redir {
+    return 301 http://google.com; # Define an HTTP redirection.
+  }
+
+  location /cgi {
+    # UNDEFINED
+  }
+}
+
+server {
+  listen 8181;
+  server_name server2;
+
+  root /www;
+
+  location / {
+    autoindex on;
+  }
+}
