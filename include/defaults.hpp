@@ -8,5 +8,8 @@
 #define DEFAULT_HOST "localhost"
 #define DEFAULT_SERVER 0
 #define DEFAULT_CONFIG_FILE "webserv.conf"
-
+#define DEFAULT_CGI ""
+#define DEFAULT_PYTHON_ROUTE "/usr/bin/python3"
+//#define DEFAULT_PYTHON_ROUTE "/usr/local/bin/python3""
+//
 #endif // __DEFAULTS_HPP__
