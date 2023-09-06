@@ -14,6 +14,7 @@
 #include "defaults.hpp"
 #include "logging.hpp"
 
+Listener::~Listener() {}
 Listener::Listener(uint16_t port) : _port(port) {
 
   this->_socketFd = socket(AF_INET, SOCK_STREAM, 0);
@@ -32,7 +33,7 @@ Listener::Listener(uint16_t port) : _port(port) {
   std::cout << "Server listening on 127.0.0.1:" << this->_port << "..."
             << std::endl;
 
-  if (listen(this->_socketFd, 5) < 0)
+  if (listen(this->_socketFd, _MAX_CLIENTS) < 0)
     throw std::runtime_error("fatal: socket cannot listen");
 
   /* Auxiliaty client, the first element in our pollfd vector will always be the
@@ -69,9 +70,10 @@ void Listener::acceptClient() {
     std::cerr << "error: cannot accept client's connection" << std::endl;
     return;
   }
+  fcntl(client.getSocketfd(), F_SETFL, O_NONBLOCK);
   struct pollfd clientPollFd;
   clientPollFd.fd = client.getSocketfd();
-  clientPollFd.events = POLLIN;
+  clientPollFd.events = POLLIN | POLLOUT;
 
   this->_pollFds.push_back(clientPollFd);
   this->_clients.push_back(client);
@@ -113,6 +115,14 @@ void Listener::_listen() {
       } else {
         this->readClientData(i);
       }
+      if (this->_clients[i].getResponse() && this->_pollFds[i].revents & POLLOUT) {
+        Client& client = this->_clients[i];
+        const Response* r = client.getResponse();
+        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        client.setResponse(NULL);
+        delete r;
+        this->closeConnection(client);
+      }
     }
   }
 }
@@ -133,20 +143,17 @@ Response *Listener::sendRequestToServer(Request &req) {
 void Listener::respond(Client &client) {
   try {
     Request req = Request(client.getRequestBuffer());
-    req.print();
     Response *r = this->sendRequestToServer(req);
     log("===== RESPONSE ====");
-    log(r->getData());
-    send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+    r->print();
     log("===================");
-    this->closeConnection(client);
-    delete r;
+    client.setResponse(r);
+    // Could check if client wants to keep connection
+    // if (req.getHeaders()["Connection"])
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
-    Response badRequest(400);
-    send(client.getSocketfd(), badRequest.getData().data(),
-         badRequest.getData().size(), 0);
-    this->closeConnection(client);
+    Response* badRequest = new Response(400);
+    client.setResponse(badRequest);
   }
 }
 

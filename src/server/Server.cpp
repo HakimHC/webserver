@@ -49,7 +49,7 @@ Server::Server(std::string &serverString)
       Location temp(line, s2);
       // if (_locations.find(temp.getUri()) == _locations.end())
       _locations[temp.getUri()] = temp;
-      temp.print();
+      // temp.print();
       continue;
     }
     std::istringstream iss2(line);
@@ -90,10 +90,13 @@ Server::Server(std::string &serverString)
       std::istringstream iss3(s2);
       while (std::getline(iss3, s2, ' '))
         store.push(s2);
-      std::string key = store.top();
+      std::string value = store.top();
       store.pop();
       while (store.size() > 0) {
-        _errorPages[key] = store.top();
+        ErrorPage errPage;
+        errPage.value = value;
+        errPage.key = store.top();
+        _errorPages.push_back(errPage);
         store.pop();
       }
     }
@@ -112,10 +115,10 @@ void Server::print() const {
   std::cout << "Port: " << this->_listen << std::endl;
   std::cout << "Max Body Size: " << _clientMaxBodySize << std::endl;
   std::cout << "Error Page: " << std::endl;
-  for (std::map<std::string, std::string>::const_iterator i =
+  for (std::vector<ErrorPage>::const_iterator i =
            _errorPages.begin();
        i != _errorPages.end(); ++i)
-    std::cout << (*i).first << ":" << (*i).second << std::endl;
+    std::cout << i->key << ":" << i->value << std::endl;
 
   std::cout << "Locations: ";
 
@@ -169,22 +172,42 @@ std::string Server::concatWithRootOrAlias(const Request &req) {
   return resource;
 }
 
+Response* Server::returnResponse(const int& statusCode) {
+  std::stringstream ss;
+  ss << statusCode;
+  bool found = false;
+  size_t i;
+  for (i = 0; i < this->_errorPages.size(); i++)
+    if (this->_errorPages[i].key == ss.str()) {
+      found = true;
+      break;
+    }
+  
+  if (!found)
+    return new Response(statusCode);
+
+  Response* r = new Response(302);
+  r->addHeader("Location", this->_errorPages[i].value);
+  r->generateResponseData();
+  return r;
+}
+
 Response *Server::generateResponse(Request &req) {
-  if (req.getBody().size() > this->_clientMaxBodySize)
-    return new Response(413);
-  if (req.getHttpVersion() != "HTTP/1.1")
-    return new Response(505);
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
   req.setLocation(location);
-  // _locations[req.getLocation()].print();
   req.setResource(this->concatWithRootOrAlias(req));
 
+  if (req.getBody().size() > this->_clientMaxBodySize)
+    return returnResponse(413);
+  if (req.getHttpVersion() != "HTTP/1.1")
+    return returnResponse(505);
   if (!this->isMethodAllowed(req))
-    return new Response(405);
+    return returnResponse(405);
   if (locationExists(req) &&
       !this->_locations[req.getLocation()].getReturn().empty())
     return this->returnRedirection(req, NORMAL_REDIRECT);
+
 
   Response *response;
 
@@ -199,7 +222,7 @@ Response *Server::generateResponse(Request &req) {
     response = handleDeleteRequest(req);
     break;
   default:
-    response = new Response(405);
+    response = returnResponse(405);
     break;
   }
   return response;
@@ -223,11 +246,10 @@ Response *Server::handleGetRequest(Request &req) {
       autoindex = this->_locations[req.getLocation()].getAutoIndex();
     if (access(req.getResource().c_str(), F_OK) == EXIT_SUCCESS)
       return this->returnIndexFile(req.getResource());
-    // else if (autoindex == true) return new Response(501);
     else if (autoindex == true)
       return this->generateAutoIndex(noindex);
     else
-      return new Response(403);
+      return returnResponse(403);
   } else
     return this->returnIndexFile(req.getResource());
 }
@@ -237,10 +259,17 @@ Response *Server::returnIndexFile(const std::string &resource) {
   errno = 0;
   std::ifstream index(resource);
   if (index.is_open()) {
-    std::string line;
     std::string all;
+    // char buf[DEFAULT_MAX_CLIENT_BODY_SIZE];
+
+    // while (!index.eof()) {
+    //     memset(buf, 0, sizeof(buf));
+    //     index.read(buf, DEFAULT_MAX_CLIENT_BODY_SIZE);
+    //     all += buf;
+    // }
+    std::string line;
     while (std::getline(index, line))
-      all += line;
+      all += line + "\n";
     index.close();
     Response *response = new Response();
     response->setExtension(
@@ -254,9 +283,9 @@ Response *Server::returnIndexFile(const std::string &resource) {
     log("open() failed [" << resource << "] (" << strerror(errno) << ")");
     Response *response;
     if (errno == ENOENT)
-      response = new Response(404);
+      response = returnResponse(404);
     else
-      response = new Response(403);
+      response = returnResponse(403);
     return response;
   }
 }
@@ -295,7 +324,7 @@ Response *Server::generateAutoIndex(const std::string &s) {
   try {
     contents = this->readDirectoryContent(s);
   } catch (...) {
-    return new Response(403);
+    return returnResponse(403);
   }
   contents->insert(contents->begin(), s);
   Response *r = new Response(*contents);
@@ -313,7 +342,7 @@ bool Server::locationExists(const Request &req) const {
 
 Response *Server::returnRedirection(const Request &req, int statusCode) {
   if (statusCode == DIRECTORY_REDIRECT) {
-    Response *response = new Response(301);
+    Response *response = returnResponse(301);
     std::stringstream ss;
     ss << this->_listen;
     response->addHeader("Location",
@@ -330,7 +359,7 @@ Response *Server::returnRedirection(const Request &req, int statusCode) {
     url = "http://localhost:" + port.str() + redir.redirLocation;
   } else
     url = redir.redirLocation;
-  Response *response = new Response(redir.statusCode);
+  Response *response = returnResponse(redir.statusCode);
   response->addHeader("Location", url);
   response->generateResponseData();
   return response;
@@ -346,7 +375,7 @@ Response* Server::handlePostRequest(Request& req) {
   log("Final file name: " << outfileName);
   std::ofstream uploadedFile(uploadDirectory + "/" + outfileName);
   if (!uploadedFile.is_open())
-    return new Response(403);
+    return returnResponse(403);
   uploadedFile << req.getBody();
   uploadedFile.close();
   return new Response(201);
@@ -354,19 +383,19 @@ Response* Server::handlePostRequest(Request& req) {
 
 Response* Server::handleDeleteRequest(Request& req) {
   std::string resource = req.getResource();
-  if (Server::isDirectory(resource)) return new Response(403);
+  if (Server::isDirectory(resource)) return returnResponse(403);
   log("Resource: " << resource);
   errno = 0;
-  if (remove(resource.c_str()) != 0 && errno != ENOENT) return new Response(500);
-  else if (errno == ENOENT) return new Response(404);
+  if (remove(resource.c_str()) != 0 && errno != ENOENT) return returnResponse(500);
+  else if (errno == ENOENT) return returnResponse(404);
   return new Response(204);
 }
 
 bool Server::checkValid() const{
-std::map<std::string, std::string>::const_iterator it1 = _errorPages.begin();
+std::vector<ErrorPage>::const_iterator it1 = _errorPages.begin();
 while(it1 != _errorPages.end()){
 	std::string leftover;
-	std::istringstream iss(it1->second);
+	std::istringstream iss(it1->value);
 	int u;
 	iss >> u;
 	if (iss.fail() || !(u >= 300 && u < 600))
