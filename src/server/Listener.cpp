@@ -125,6 +125,7 @@ void Listener::_listen() {
       }
     }
   }
+  //check servers if done
 }
 
 Response *Listener::sendRequestToServer(Request &req) {
