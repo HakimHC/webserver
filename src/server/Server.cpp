@@ -210,10 +210,10 @@ Response *Server::generateResponse(Request &req) {
     return returnResponse(505);
   if (!this->isMethodAllowed(req))
     return returnResponse(405);
+
   if (locationExists(req) &&
       !this->_locations[req.getLocation()].getReturn().empty())
     return this->returnRedirection(req, NORMAL_REDIRECT);
-
 
   Response *response;
 
@@ -426,8 +426,6 @@ while(it1 != _errorPages.end()){
 }
 
 bool Server::isPythonCGIReq(Request &req ) {
-	if (!locationExists(req))
-		return false;
 	char buffer[1024];
 	bzero(buffer, sizeof(buffer));
 	getcwd(buffer, sizeof(buffer) - 1);
@@ -435,7 +433,7 @@ bool Server::isPythonCGIReq(Request &req ) {
 	resourcePath += "/" + req.getResource();
 	if (this->_locations[req.getLocation()].getCGI()== ".py" && 
 		req.getResource().substr(req.getResource().size() - 3) == ".py" &&
-		!access(resourcePath.c_str(),F_OK))
+		!access(resourcePath.c_str(),X_OK))
 			return true;
 	return false;
 }

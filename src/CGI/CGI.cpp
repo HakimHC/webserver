@@ -2,9 +2,13 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <poll.h>
 
 #include <iostream>
 #include <sstream>
+#include <cstring>
 
 #include "defaults.hpp"
 #include "logging.hpp"
@@ -55,13 +59,26 @@ void CGI::startCGI(){
 
 bool CGI::responseReady(){
 	char	buffer[10];
-	int		status;
+	int		status, ret;
+	
+	
 	
 	bzero(buffer, 10 * sizeof(char));
-	while (read(_pip[0], buffer, 9) > 0) {
-		_result += std::string(buffer);
-		bzero(buffer, sizeof(buffer));
-	}
+	fcntl(_pip[0], F_SETFL, O_NONBLOCK);
+	_pfd.fd = _pip[0];
+	_pfd.events = POLLIN;
+	 while ((ret = poll(&_pfd, 1, 0)) > 0) {
+        if (_pfd.revents & POLLIN) {
+            ssize_t n = read(_pip[0], buffer, sizeof(buffer) - 1);
+            if (n > 0) {
+                buffer[n] = '\0'; // Ensure null-termination for the string constructor
+                _result += std::string(buffer);
+                bzero(buffer, sizeof(buffer));
+            } else {
+                break;
+            }
+        }
+    }
 	waitpid(_id,&status, 0);
 	close(_pip[0]);
 	return true;

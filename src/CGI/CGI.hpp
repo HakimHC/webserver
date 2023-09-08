@@ -1,6 +1,7 @@
 #ifndef __CGI_HPP__
 #define __CGI_HPP__
 #include "CGI.hpp"
+#include <poll.h>
 #include "Request.hpp"
 #include "Response.hpp"
 
@@ -18,8 +19,6 @@ class CGI {
 	bool responseReady();
 	Response *prepareResponse();
 	
-
-
 	private:
 		bool		_collecting;
 		std::string _resourcePath;
@@ -28,7 +27,7 @@ class CGI {
 		std::string	_queryString;
 		bool		_failed;
 		std::string	_result;
-
+		struct pollfd _pfd;
 };
 
 
