@@ -58,34 +58,37 @@ void CGI::startCGI(){
 
 
 bool CGI::responseReady(){
-	char	buffer[10];
+	char	buffer[1 << 12];
 	int		status, ret;
-	
-	
 	
 	bzero(buffer, 10 * sizeof(char));
 	fcntl(_pip[0], F_SETFL, O_NONBLOCK);
 	_pfd.fd = _pip[0];
 	_pfd.events = POLLIN;
-	 while ((ret = poll(&_pfd, 1, 0)) > 0) {
+	if ((ret = poll(&_pfd, 1, 0)) > 0) {
         if (_pfd.revents & POLLIN) {
             ssize_t n = read(_pip[0], buffer, sizeof(buffer) - 1);
             if (n > 0) {
-                buffer[n] = '\0'; // Ensure null-termination for the string constructor
+                buffer[n] = '\0'; 
                 _result += std::string(buffer);
                 bzero(buffer, sizeof(buffer));
             } else {
-                break;
+                _collecting = false;
             }
         }
     }
-	waitpid(_id,&status, 0);
-	close(_pip[0]);
-	return true;
+	if (_collecting == false){
+		waitpid(_id,&status, 0);
+		close(_pip[0]);
+		return true;
+	}
+	return false;
 }
 
 
-	Response *CGI::prepareResponse(){
+Response *CGI::prepareResponse(){
+	Response *response = new Response();
+	response->setCGI(this);
 	if (_result.length() > 0){
 		Response *response = new Response();
 		std::vector<std::string> separeted = separatePyCGI(_result);

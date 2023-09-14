@@ -270,3 +270,27 @@ void Response::print() const {
     { log("Body exceeds 4000 bytes, occulting output..."); return; }
   log("\r\n" << this->_body);
 }
+
+void Response::prepareCGIResponse(){
+	return ;
+	// if (_result.length() > 0){
+	// 	Response *response = new Response();
+	// 	std::vector<std::string> separeted = separatePyCGI(_result);
+	// 	response->setExtension(".py");
+	// 	response->setBody(separeted[2]);
+	// 	response->addHeader(separeted[0], separeted[1]);
+	// 	response->setResponseStatusCode(200);
+	// 	response->initHeaders();
+	// 	response->generateResponseData();
+	// 	return response;
+	// } else {
+    // 	log("CGI  failed [" << _resourcePath << "] (" << strerror(errno) << ")");
+   	// 	Response *response;
+    // 	if (errno == ENOENT)
+    //   		response = new Response(404);
+    // 	else
+    //   		response = new Response(403);
+    // 	return response;
+  
+	// }
+}

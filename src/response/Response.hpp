@@ -4,8 +4,11 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "CGI.hpp"
 
 #define HTTP_VERSION "HTTP/1.1"
+
+class CGI;
 
 class Response {
 public:
@@ -27,6 +30,8 @@ public:
   void setExtension(const std::string &);
 
   void print() const;
+  void prepareCGIResponse();
+  void setCGI(CGI * entry) {this->_cgi = entry;}
 
 private:
   void initStatusCodes();
@@ -41,6 +46,7 @@ private:
   std::map<int, std::string> _errorPageFiles;
 
   std::string _extension;
+  CGI 		* _cgi;
 
   void generateCurrentDateTime();
 };

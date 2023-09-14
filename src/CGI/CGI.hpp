@@ -5,6 +5,8 @@
 #include "Request.hpp"
 #include "Response.hpp"
 
+class Response;
+
 class CGI {
 	public:
 	CGI() {}
