@@ -203,3 +203,11 @@ std::string	CGI::executepythonCGI(std::string script, std::string queryString)
 	
 	return toReturn;
   }
+
+std::string CGI::getResult(){
+	return this->_result;
+}
+
+std::string CGI::getResourcePath(){
+	return this->_resourcePath;
+}

@@ -16,6 +16,7 @@ public:
   const std::string &getRequestBuffer() const;
 
   const Response* getResponse() const;
+  Response* getResponse();
   void  setResponse(Response*);
 
 private:

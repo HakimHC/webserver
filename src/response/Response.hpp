@@ -32,6 +32,8 @@ public:
   void print() const;
   void prepareCGIResponse();
   void setCGI(CGI * entry) {this->_cgi = entry;}
+  CGI  *getCGI(){return this->_cgi;}
+  CGI  *getCGI() const {return this->_cgi;}
 
 private:
   void initStatusCodes();

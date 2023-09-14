@@ -259,10 +259,10 @@ Response *Server::	handleGetRequest(Request &req) {
       		return new Response(403);
 			
   		} else if (isPythonCGIReq(req)){
-			CGI mycgi(req);
-			mycgi.startCGI();
+			CGI *mycgi = new CGI(req);
+			mycgi->startCGI();
 			//mycgi.responseReady();
-			return mycgi.prepareResponse();
+			return mycgi->prepareResponse();
 
 		} else
     	return this->returnIndexFile(req.getResource());

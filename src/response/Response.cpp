@@ -3,15 +3,20 @@
 #include "Response.hpp"
 #include "logging.hpp"
 
-Response::~Response() {}
-Response::Response() {
+Response::~Response(){
+	if (this->_cgi != NULL){
+		delete _cgi;
+		_cgi = NULL;
+	}
+}
+Response::Response(): _cgi(NULL) {
   this->initStatusCodes();
   this->initMimeTypes();
   this->generateCurrentDateTime();
   this->initHeaders();
 }
 
-Response::Response(int sc) : _responseStatusCode(sc) {
+Response::Response(int sc) : _responseStatusCode(sc), _cgi(NULL) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
   std::stringstream statusCodeString;
@@ -29,7 +34,7 @@ Response::Response(int sc) : _responseStatusCode(sc) {
   this->generateResponseData();
 }
 
-Response::Response(const std::vector<std::string> &dirContents) {
+Response::Response(const std::vector<std::string> &dirContents): _cgi(NULL) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
   this->_extension = ".html";
@@ -272,25 +277,21 @@ void Response::print() const {
 }
 
 void Response::prepareCGIResponse(){
-	return ;
-	// if (_result.length() > 0){
-	// 	Response *response = new Response();
-	// 	std::vector<std::string> separeted = separatePyCGI(_result);
-	// 	response->setExtension(".py");
-	// 	response->setBody(separeted[2]);
-	// 	response->addHeader(separeted[0], separeted[1]);
-	// 	response->setResponseStatusCode(200);
-	// 	response->initHeaders();
-	// 	response->generateResponseData();
-	// 	return response;
-	// } else {
-    // 	log("CGI  failed [" << _resourcePath << "] (" << strerror(errno) << ")");
-   	// 	Response *response;
-    // 	if (errno == ENOENT)
-    //   		response = new Response(404);
-    // 	else
-    //   		response = new Response(403);
-    // 	return response;
-  
-	// }
+	if (_cgi && _cgi->getResult().length() > 0){
+		std::vector<std::string> separeted = CGI::separatePyCGI(_cgi->getResult());
+		this->setExtension(".py");
+		this->setBody(separeted[2]);
+		this->addHeader(separeted[0], separeted[1]);
+		this->setResponseStatusCode(200);
+		this->initHeaders();
+		this->generateResponseData();
+		return ;
+	} else {
+    	log("CGI  failed [" << _cgi->getResourcePath() << "] (" << strerror(errno) << ")");
+    	if (errno == ENOENT)
+      		*this = Response(404);
+    	else
+      		*this = Response(403);
+    	return ;
+	}
 }

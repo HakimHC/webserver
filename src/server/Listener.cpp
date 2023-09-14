@@ -115,7 +115,8 @@ void Listener::_listen() {
       } else {
         this->readClientData(i);
       }
-      if (this->_clients[i].getResponse() && this->_pollFds[i].revents & POLLOUT) {
+      if (this->_clients[i].getResponse() && this->_pollFds[i].revents & POLLOUT
+	  	&& this->_clients[i].getResponse()->getCGI() == NULL) {
         Client& client = this->_clients[i];
         const Response* r = client.getResponse();
         send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
@@ -123,9 +124,15 @@ void Listener::_listen() {
         delete r;
         this->closeConnection(client);
       }
+	  else if (this->_clients[i].getResponse() 
+	  && this->_clients[i].getResponse()->getCGI() != NULL
+	  && this->_clients[i].getResponse()->getCGI()->responseReady()){
+			this->_clients[i].getResponse()->prepareCGIResponse();
+	  
     }
   }
   //check servers if done
+}
 }
 
 Response *Listener::sendRequestToServer(Request &req) {

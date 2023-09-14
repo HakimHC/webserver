@@ -1,6 +1,5 @@
 #ifndef __CGI_HPP__
 #define __CGI_HPP__
-#include "CGI.hpp"
 #include <poll.h>
 #include "Request.hpp"
 #include "Response.hpp"
@@ -20,6 +19,8 @@ class CGI {
 	void startCGI();
 	bool responseReady();
 	Response *prepareResponse();
+	std::string getResult();
+	std::string getResourcePath();
 	
 	private:
 		bool		_collecting;
