@@ -88,28 +88,11 @@ bool CGI::responseReady(){
 
 Response *CGI::prepareResponse(){
 	Response *response = new Response();
-	response->setCGI(this);
-	if (_result.length() > 0){
-		Response *response = new Response();
-		std::vector<std::string> separeted = separatePyCGI(_result);
-		response->setExtension(".py");
-		response->setBody(separeted[2]);
-		response->addHeader(separeted[0], separeted[1]);
-		response->setResponseStatusCode(200);
-		response->initHeaders();
-		response->generateResponseData();
-		return response;
-	} else {
-    	log("CGI  failed [" << _resourcePath << "] (" << strerror(errno) << ")");
-   		Response *response;
-    	if (errno == ENOENT)
-      		response = new Response(404);
-    	else
-      		response = new Response(403);
-    	return response;
-  
-	}
+	response->setCGI(this); 
+	response->startTimer(); 
+	return response;
 }
+
 
 // Response *CGI::returnPythonCGI(Request &req) {
 // 	std::cout << "" << " is generating a response.." << std::endl;

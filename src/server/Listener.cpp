@@ -124,15 +124,38 @@ void Listener::_listen() {
         delete r;
         this->closeConnection(client);
       }
-	  else if (this->_clients[i].getResponse() 
+	        else if (this->_clients[i].getResponse() 
 	  && this->_clients[i].getResponse()->getCGI() != NULL
 	  && this->_clients[i].getResponse()->getCGI()->responseReady()){
 			this->_clients[i].getResponse()->prepareCGIResponse();
 	  
-    }
-  }
+      }
+	}
+	else if (this->_clients[i].getResponse() 
+	  && this->_clients[i].getResponse()->getCGI() != NULL
+	  && this->_clients[i].getResponse()->getCGI()->responseReady()){
+		this->_clients[i].getResponse()->prepareCGIResponse();
+		Client& client = this->_clients[i];
+		const Response* r = client.getResponse();
+        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        client.setResponse(NULL);
+        delete r;
+        this->closeConnection(client);
+	}
+	else if (this->_clients[i].getResponse() 
+	  && this->_clients[i].getResponse()->getCGI() != NULL
+	  && this->_clients[i].getResponse()->getCGITime()-std::time(0)>60){
+		Client& client = this->_clients[i];
+		const Response* r = new Response(504);
+        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        client.setResponse(NULL);
+		delete r;
+		const Response* w = client.getResponse();
+		delete w;
+        this->closeConnection(client);
+	  }
   //check servers if done
-}
+	}
 }
 
 Response *Listener::sendRequestToServer(Request &req) {

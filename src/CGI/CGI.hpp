@@ -31,6 +31,7 @@ class CGI {
 		bool		_failed;
 		std::string	_result;
 		struct pollfd _pfd;
+		
 };
 
 

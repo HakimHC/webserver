@@ -295,3 +295,11 @@ void Response::prepareCGIResponse(){
     	return ;
 	}
 }
+
+void Response::startTimer(){
+	_cgiStartTime = std::time(0);
+}
+
+std::time_t Response::getCGITime(){
+	return _cgiStartTime;
+}
