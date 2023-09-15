@@ -62,6 +62,10 @@ HTTP 		= $(addprefix $(HTTPDIR)/,$(SRC_HTTP))
 HTTPDIR	= $(addprefix $(SRCDIR)/,http)
 SRC_HTTP	= HTTP.cpp \
 
+SESSION 	= $(addprefix $(SESSIONDIR)/,$(SRC_SESSION))
+SESSIONDIR	= $(addprefix $(SRCDIR)/,Session)
+SRC_SESSION	= Session.cpp \
+
 MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 MAINDIR		= $(addprefix $(SRCDIR)/,main)
 SRC_MAIN	= main.cpp
@@ -73,6 +77,7 @@ SRC				= $(MAIN) 	\
 						$(RESPONSE) \
 						$(UTILS) \
 						$(HTTP) \
+						$(SESSION) \
 
 
 TESTSRC = $(SRC)

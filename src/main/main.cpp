@@ -24,11 +24,7 @@ int main(int argc, char *argv[]) {
   /* webServer.print(); */
   try {
     HTTP webServer = HTTP(configFile);
-<<<<<<< HEAD
    webServer.start();
-=======
-    webServer.start();
->>>>>>> CGI1
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     return EXIT_FAILURE;
