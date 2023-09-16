@@ -44,3 +44,7 @@ tester.conf
 
 # Diffs
 git_diff
+
+# Ctags files
+tags
+selected
