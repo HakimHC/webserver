@@ -18,7 +18,6 @@ for key, values in parameters.items():
 print("</ul>")
 
 print("</body>")
-while True:
-	pass
+
 print("</html>")
 

@@ -261,7 +261,6 @@ Response *Server::	handleGetRequest(Request &req) {
   		} else if (isPythonCGIReq(req)){
 			CGI *mycgi = new CGI(req);
 			mycgi->startCGI();
-			//mycgi.responseReady();
 			return mycgi->prepareResponse();
 
 		} else

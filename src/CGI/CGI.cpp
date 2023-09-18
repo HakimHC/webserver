@@ -52,6 +52,9 @@ void CGI::startCGI(){
 		exit(EXIT_FAILURE);
 	}
 	close(_pip[1]);
+	fcntl(_pip[0], F_SETFL, O_NONBLOCK);
+	_pfd.fd = _pip[0];
+	_pfd.events = POLLIN;
 	delete[] env[0];
 	delete[] env;
 }
@@ -61,11 +64,9 @@ bool CGI::responseReady(){
 	char	buffer[1 << 12];
 	int		status, ret;
 	
-	bzero(buffer, 10 * sizeof(char));
-	fcntl(_pip[0], F_SETFL, O_NONBLOCK);
-	_pfd.fd = _pip[0];
-	_pfd.events = POLLIN;
-	if ((ret = poll(&_pfd, 1, 0)) > 0) {
+	log("Checking if response is ready");
+	bzero(buffer, 1 << 12 * sizeof(char));
+	if ((ret = poll(&_pfd, 1, 500)) > 0) {
         if (_pfd.revents & POLLIN) {
             ssize_t n = read(_pip[0], buffer, sizeof(buffer) - 1);
             if (n > 0) {

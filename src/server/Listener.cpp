@@ -7,6 +7,7 @@
 #include <string>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <ctime>
 
 #include "Listener.hpp"
 #include "Request.hpp"
@@ -124,35 +125,16 @@ void Listener::_listen() {
         delete r;
         this->closeConnection(client);
       }
-	        else if (this->_clients[i].getResponse() 
-	  && this->_clients[i].getResponse()->getCGI() != NULL
-	  && this->_clients[i].getResponse()->getCGI()->responseReady()){
-			this->_clients[i].getResponse()->prepareCGIResponse();
+	  else if (checkCGIready()){
+	  	this->_clients[i].getResponse()->prepareCGIResponse();
 	  
       }
 	}
-	else if (this->_clients[i].getResponse() 
-	  && this->_clients[i].getResponse()->getCGI() != NULL
-	  && this->_clients[i].getResponse()->getCGI()->responseReady()){
-		this->_clients[i].getResponse()->prepareCGIResponse();
-		Client& client = this->_clients[i];
-		const Response* r = client.getResponse();
-        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
-        client.setResponse(NULL);
-        delete r;
-        this->closeConnection(client);
+	else if (checkCGIready(i) && this->_pollFds[i].revents & POLLOUT){
+		sendCGIResponse(i);
 	}
-	else if (this->_clients[i].getResponse() 
-	  && this->_clients[i].getResponse()->getCGI() != NULL
-	  && this->_clients[i].getResponse()->getCGITime()-std::time(0)>60){
-		Client& client = this->_clients[i];
-		const Response* r = new Response(504);
-        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
-        client.setResponse(NULL);
-		delete r;
-		const Response* w = client.getResponse();
-		delete w;
-        this->closeConnection(client);
+	else if (checkCGITimeout(i) && this->_pollFds[i].revents & POLLOUT){
+		sendCGITimeout(i);
 	  }
   //check servers if done
 	}
@@ -213,4 +195,37 @@ bool Listener::checkValid() {
 			throw std::runtime_error("duplicate server_name");
 	}
 	return true;
+}
+
+bool Listener::checkCGIready(int i){
+	return this->_clients[i].getResponse() 
+	  && this->_clients[i].getResponse()->getCGI() != NULL
+	  && this->_clients[i].getResponse()->getCGI()->responseReady();
+}
+
+bool Listener::checkCGITimeout(int i){
+	return this->_clients[i].getResponse() 
+	  && this->_clients[i].getResponse()->getCGI() != NULL
+	  && -this->_clients[i].getResponse()->getCGITime()+std::time(0)>10;
+}
+
+void Listener::sendCGIResponse(int i){
+	this->_clients[i].getResponse()->prepareCGIResponse();
+		Client& client = this->_clients[i];
+		const Response* r = client.getResponse();
+        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        client.setResponse(NULL);
+        delete r;
+        this->closeConnection(client);
+}
+
+void Listener::sendCGITimeout(int i){
+	Client& client = this->_clients[i];
+	const Response* r = new Response(504);
+	send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+	client.setResponse(NULL);
+	delete r;
+	const Response* w = client.getResponse();
+	delete w;
+	this->closeConnection(client);
 }
