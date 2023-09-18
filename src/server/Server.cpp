@@ -430,8 +430,7 @@ bool Server::isPythonCGIReq(Request &req ) {
 	getcwd(buffer, sizeof(buffer) - 1);
 	std::string resourcePath(buffer);
 	resourcePath += "/" + req.getResource();
-	if (this->_locations[req.getLocation()].getCGI()== ".py" && 
-		req.getResource().substr(req.getResource().size() - 3) == ".py" &&
+	if (this->_locations[req.getLocation()].getCGI()== "on" && 
 		!access(resourcePath.c_str(),X_OK))
 			return true;
 	return false;

@@ -1,7 +1,9 @@
 # Name of the executable
 NAME 			= webserv
 TESTNAME		= testd
+CCGI			= www/cgi-bin/ccgi
 
+SRC_CCGI = www/cgi-bin/CGI.cpp
 # Operating System
 OS				= $(shell uname -s)
 
@@ -97,6 +99,9 @@ $(NAME): $(OBJ)
 $(TESTNAME): $(TESTSRC)
 	$(CXX) $(CXXFLAGS) $(TESTSRC) $(LDFLAGS) -g3 -o  $@
 
+$(CCGI):
+	$(CXX) $(SRC_CCGI) -o $@
+
 clean:
 	$(RM) $(OBJ)
 
@@ -113,3 +118,5 @@ re:: all
 asan: CXXFLAGS += -fsanitize=address
 asan: LDFLAGS += -fsanitize=address
 asan: re
+
+cgi: $(CCGI)

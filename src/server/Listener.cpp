@@ -125,17 +125,14 @@ void Listener::_listen() {
         delete r;
         this->closeConnection(client);
       }
-	  else if (checkCGIready()){
-	  	this->_clients[i].getResponse()->prepareCGIResponse();
 	  
-      }
 	}
-	else if (checkCGIready(i) && this->_pollFds[i].revents & POLLOUT){
-		sendCGIResponse(i);
-	}
-	else if (checkCGITimeout(i) && this->_pollFds[i].revents & POLLOUT){
-		sendCGITimeout(i);
-	  }
+		else if (checkCGIready(i) && this->_pollFds[i].revents & POLLOUT){
+			sendCGIResponse(i);
+		}
+		else if (checkCGITimeout(i) && this->_pollFds[i].revents & POLLOUT){
+			sendCGITimeout(i);
+		}
   //check servers if done
 	}
 }

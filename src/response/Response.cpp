@@ -279,7 +279,8 @@ void Response::print() const {
 void Response::prepareCGIResponse(){
 	if (_cgi && _cgi->getResult().length() > 0){
 		std::vector<std::string> separeted = CGI::separatePyCGI(_cgi->getResult());
-		this->setExtension(".py");
+		//do smtg
+		this->setExtension(".cgi");
 		this->setBody(separeted[2]);
 		this->addHeader(separeted[0], separeted[1]);
 		this->setResponseStatusCode(200);

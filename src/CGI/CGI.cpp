@@ -47,7 +47,8 @@ void CGI::startCGI(){
 		if (dup2(_pip[1], STDOUT_FILENO) == -1)
 			log("whaaat");
 		close(_pip[1]);
-		int w = execle(DEFAULT_PYTHON_ROUTE, DEFAULT_PYTHON_ROUTE, _resourcePath.c_str(), NULL, env);
+		log("Launching CGI");
+		int w = execle(_resourcePath.c_str(), _resourcePath.c_str(),  NULL, env);
 		log("Fatal execle " << w);
 		exit(EXIT_FAILURE);
 	}
