@@ -3,7 +3,7 @@ NAME 			= webserv
 TESTNAME		= testd
 CCGI			= www/cgi-bin/ccgi
 
-SRC_CCGI = www/cgi-bin/CGI.cpp
+SRC_CCGI = www/cgi-bin/ccgi.cpp
 # Operating System
 OS				= $(shell uname -s)
 
@@ -92,6 +92,7 @@ OBJ 			= $(SRC:.cpp=.o)
 
 # Rules
 all: $(NAME)
+all: $(CCGI)
 
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
@@ -99,8 +100,8 @@ $(NAME): $(OBJ)
 $(TESTNAME): $(TESTSRC)
 	$(CXX) $(CXXFLAGS) $(TESTSRC) $(LDFLAGS) -g3 -o  $@
 
-$(CCGI):
-	$(CXX) $(SRC_CCGI) -o $@
+$(CCGI): $(SRC_CCGI)
+	$(CXX) $(CXXFLAGS) $(SRC_CCGI) -o $@
 
 clean:
 	$(RM) $(OBJ)
@@ -108,6 +109,7 @@ clean:
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) $(TESTNAME)
+	$(RM) $(CCGI)
 
 test: $(TESTNAME)
 

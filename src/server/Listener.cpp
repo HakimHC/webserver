@@ -203,7 +203,7 @@ bool Listener::checkCGIready(int i){
 bool Listener::checkCGITimeout(int i){
 	return this->_clients[i].getResponse() 
 	  && this->_clients[i].getResponse()->getCGI() != NULL
-	  && -this->_clients[i].getResponse()->getCGITime()+std::time(0)>10;
+	  && -this->_clients[i].getResponse()->getCGITime()+std::time(0)>DEFAULT_CGI_TIMEOUT;
 }
 
 void Listener::sendCGIResponse(int i){

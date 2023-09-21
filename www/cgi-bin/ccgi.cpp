@@ -17,25 +17,26 @@ int main() {
                 std::cout << "Content-Type: text/html\n\n";
                 std::cout << "<html><body>\n";
                 std::cout << "<img src=\"" << animal << ".jpg\" alt=\"" << animal << " image\">\n";
-                std::cout << "</body></html>\n";
             } else {
                 std::cout << "Content-Type: text/html\n\n";
                 std::cout << "<html><body>\n";
                 std::cout << "Animal not found.\n";
-                std::cout << "</body></html>\n";
             }
         } else {
             std::cout << "Content-Type: text/html\n\n";
             std::cout << "<html><body>\n";
             std::cout << "Animal parameter not found in query string.\n";
-            std::cout << "</body></html>\n";
         }
     } else {
         std::cout << "Content-Type: text/html\n\n";
         std::cout << "<html><body>\n";
         std::cout << "No query string provided.\n";
-        std::cout << "</body></html>\n";
     }
-
+	std::cout << "<form action=\"ccgi\" method=\"GET\">";
+  	std::cout << "<label for=\"animal\">Enter an animal:</label>";
+	std::cout << "<input type=\"text\" id=\"animal\" name=\"animal\">";
+  	std::cout << "<button type=\"submit\">Submit</button>";
+	std::cout << "</form>";
+    std::cout << "</body></html>\n";
     return 0;
 }
