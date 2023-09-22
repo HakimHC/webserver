@@ -23,22 +23,21 @@ CGI::CGI(Request &req): _collecting(true),_failed(false), _result(""){
 	std::string resourcePath(buffer);
 	_resourcePath = resourcePath + "/" +req.getResource();
 	_queryString = "QUERY_STRING="+ req.getQueryString();
+	_requestMethod = "REQUEST_METHOD=" + req.getMethod();
+	_requestURI = "REQUEST_URI=" + req.getUri();
+	setHeadersEnvVar( req.getHeaders());
+
 }
 
 void CGI::startCGI(){
-	char	**env;
-	env = new char*[2];
-	env[0] = new char[_queryString.size() + 1];
-	std::strcpy(env[0],_queryString.c_str());
-	env[1] = NULL;
+	setEnv();
 	if (pipe(_pip) == -1){
 		_failed = true;
 		return ;
 	}
 	_id = fork();
 	if (_id == -1){
-		delete[] env[0];
-		delete[] env;
+		freeEnv();
 		_failed = true;
 		return ;
 	}
@@ -48,7 +47,7 @@ void CGI::startCGI(){
 			log("whaaat");
 		close(_pip[1]);
 		log("Launching CGI");
-		int w = execle(_resourcePath.c_str(), _resourcePath.c_str(),  NULL, env);
+		int w = execle(_resourcePath.c_str(), _resourcePath.c_str(),  NULL, _env);
 		log("Fatal execle " << w);
 		exit(EXIT_FAILURE);
 	}
@@ -56,8 +55,7 @@ void CGI::startCGI(){
 	fcntl(_pip[0], F_SETFL, O_NONBLOCK);
 	_pfd.fd = _pip[0];
 	_pfd.events = POLLIN;
-	delete[] env[0];
-	delete[] env;
+	freeEnv();
 }
 
 
@@ -96,82 +94,6 @@ Response *CGI::prepareResponse(){
 }
 
 
-// Response *CGI::returnPythonCGI(Request &req) {
-// 	std::cout << "" << " is generating a response.." << std::endl;
-// 	errno = 0;
-// 	char buffer[1024];
-// 	bzero(buffer, sizeof(buffer));
-// 	getcwd(buffer, sizeof(buffer) - 1);
-// 	std::string resourcePath(buffer);
-// 	resourcePath += "/" +req.getResource();
-// 	std::string all = executepythonCGI(resourcePath,req.getQueryString());
-//     if (all.length() > 0){
-// 		Response *response = new Response();
-// 		std::vector<std::string> separeted = separatePyCGI(all);
-// 		response->setExtension(".py");
-// 		response->setBody(separeted[2]);
-// 		response->addHeader(separeted[0], separeted[1]);
-// 		response->setResponseStatusCode(200);
-// 		response->initHeaders();
-// 		response->generateResponseData();
-// 		return response;
-// 	} else {
-//     	log("CGI  failed [" << req.getResource() << "] (" << strerror(errno) << ")");
-//    		Response *response;
-//     	if (errno == ENOENT)
-//       		response = new Response(404);
-//     	else
-//       		response = new Response(403);
-//     	return response;
-//   }
-// }
-
-
-std::string	CGI::executepythonCGI(std::string script, std::string queryString)
-{
-	int		id;
-	int		pip[2];
-	int		status;
-	char	**env;
-	std::string	result;
-	char	buffer[10];
-	//bool	error = false;
-
-	bzero(buffer, 10 * sizeof(char));
-	queryString = "QUERY_STRING="+ queryString;
-	env = new char*[2];
-	env[0] = new char[queryString.size() + 1];
-	std::strcpy(env[0],queryString.c_str());
-	env[1] = NULL;
-	if (pipe(pip) == -1)
-		return "";
-	id = fork();
-	if (id == -1){
-		delete[] env[0];
-		delete[] env;
-		return "";
-	}
-	if (id == 0) { 
-		close(pip[0]);
-		if (dup2(pip[1], STDOUT_FILENO) == -1)
-			log("whaaat");
-		close(pip[1]);
-		int w = execle(DEFAULT_PYTHON_ROUTE, DEFAULT_PYTHON_ROUTE, script.c_str(), NULL, env);
-		log("Fatal execle " << w);
-		exit(EXIT_FAILURE);
-	}
-	close(pip[1]);
-	while (read(pip[0], buffer, 9) > 0) {
-		result += std::string(buffer);
-		bzero(buffer, sizeof(buffer));
-	}
-	waitpid(id,&status, 0);
-	close(pip[0]);
-	delete[] env[0];
-	delete[] env;
-	return result;
-}
-
  std::vector<std::string> CGI::separatePyCGI(std::string all){
 	std::istringstream iss(all);
 	std::vector<std::string> toReturn;
@@ -195,4 +117,46 @@ std::string CGI::getResult(){
 
 std::string CGI::getResourcePath(){
 	return this->_resourcePath;
+}
+
+void CGI::setHeadersEnvVar(const std::map<std::string, std::string> &headers){
+	std::map<std::string, std::string>::const_iterator itHead = headers.begin();
+	while (itHead != headers.end()){
+		std::string ini = "HTTP_" + itHead->first;
+		for (std::string::iterator it = ini.begin(); it != ini.end(); it++){
+			if (*it == '-')
+				*it = '_';
+			else
+				*it = std::toupper(static_cast<unsigned char>(*it));
+		}
+		_httpHeadersEnv[ini] = itHead->second;
+		itHead++;
+	}
+}
+
+void CGI::setEnv(){
+		
+	_env = new char*[4 + _httpHeadersEnv.size()];
+	(_env)[0] = new char[_queryString.size() + 1];
+	std::strcpy((_env)[0],_queryString.c_str());
+	(_env)[1] = new char[_requestMethod.size() + 1];
+	std::strcpy((_env)[1],_requestMethod.c_str());
+	(_env)[2] = new char[_requestURI.size() + 1];
+	std::strcpy((_env)[2],_requestURI.c_str());
+	int i =3;
+	for (std::map<std::string, std::string>::iterator it = _httpHeadersEnv.begin(); 
+				it != _httpHeadersEnv.end(); it++){
+		(_env)[i] = new char[(*it).first.size() +(*it).second.size() + 2];
+		std::strcpy((_env)[i],((*it).first + "=" + (*it).second).c_str());
+		i++;
+	}
+	(_env)[3 + _httpHeadersEnv.size()] = NULL;
+	_envSize = i;
+}
+
+void CGI::freeEnv(){
+	for(unsigned int i = 0; i < _envSize; i++){
+		delete[] _env[i];
+	}
+	delete[] _env;
 }

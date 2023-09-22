@@ -13,24 +13,41 @@ class CGI {
 	CGI(Request &req);
 	//Response *returnPythonCGI(Request &req);
 	static bool isPythonCGIReq(Request &req);
-	std::string	executepythonCGI(std::string script, 
-		std::string queryString);
 	static std::vector<std::string> separatePyCGI(std::string all);
 	void startCGI();
 	bool responseReady();
 	Response *prepareResponse();
 	std::string getResult();
 	std::string getResourcePath();
-	
+	void setHeadersEnvVar(const std::map<std::string, std::string> &headers);
+	void setEnv();
+	void freeEnv();
+
 	private:
 		bool		_collecting;
 		std::string _resourcePath;
 		int			_id;
 		int			_pip[2];
-		std::string	_queryString;
+		std::string	_queryString; //done
+		std::string _requestMethod; //done
+		std::string _contentType;
+		std::string _contentLength;
+		std::string _pathInfo;
+		std::string _pathTranslated;
+		std::string _scriptName;
+		std::string _requestURI; //done
+		std::string _remoteAddr;
+		std::string _remoteHost;
+		std::string _serverName;
+		std::string _serverPort;
+		std::string _serverProtocol;
+		std::string _serverSoftware;
+		std::map<std::string, std::string> _httpHeadersEnv;
 		bool		_failed;
 		std::string	_result;
 		struct pollfd _pfd;
+		char 		  **_env;
+		unsigned int	_envSize;
 		
 };
 
