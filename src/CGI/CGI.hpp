@@ -14,6 +14,7 @@ class CGI {
 	//Response *returnPythonCGI(Request &req);
 	static bool isPythonCGIReq(Request &req);
 	static std::vector<std::string> separatePyCGI(std::string all);
+	static std::map<std::string, std::string> separateHeader(std::string all);
 	void startCGI();
 	bool responseReady();
 	Response *prepareResponse();

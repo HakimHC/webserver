@@ -278,11 +278,16 @@ void Response::print() const {
 
 void Response::prepareCGIResponse(){
 	if (_cgi && _cgi->getResult().length() > 0){
-		std::vector<std::string> separeted = CGI::separatePyCGI(_cgi->getResult());
-		//do smtg
+		std::vector<std::string> separeted = 
+			CGI::separatePyCGI(_cgi->getResult());
+		std::map<std::string, std::string> headers = 
+			CGI::separateHeader(separeted[0]);
 		this->setExtension(".cgi");
-		this->setBody(separeted[2]);
-		this->addHeader(separeted[0], separeted[1]);
+		this->setBody(separeted[1]);
+		for(std::map<std::string, std::string>::iterator it = headers.begin();
+			it != headers.end(); it++){
+			this->addHeader(it->first, it->second);
+		}
 		this->setResponseStatusCode(200);
 		this->initHeaders();
 		this->generateResponseData();

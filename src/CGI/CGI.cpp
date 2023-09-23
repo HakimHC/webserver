@@ -46,7 +46,6 @@ void CGI::startCGI(){
 		if (dup2(_pip[1], STDOUT_FILENO) == -1)
 			log("whaaat");
 		close(_pip[1]);
-		log("Launching CGI");
 		int w = execle(_resourcePath.c_str(), _resourcePath.c_str(),  NULL, _env);
 		log("Fatal execle " << w);
 		exit(EXIT_FAILURE);
@@ -95,18 +94,10 @@ Response *CGI::prepareResponse(){
 
 
  std::vector<std::string> CGI::separatePyCGI(std::string all){
-	std::istringstream iss(all);
 	std::vector<std::string> toReturn;
-	std::string hold, hold2;
-
-	std::getline(iss, hold, ' ');
-	toReturn.push_back(hold);
-	std::getline(iss, hold);
-	toReturn.push_back(hold);
-	std::getline(iss, hold);
-	while (std::getline(iss, hold))
-		hold2  += hold + "\n";
-	toReturn.push_back(hold2);
+	size_t pos = all.find("\n\n", 0);
+	toReturn.push_back(all.substr(0, pos));
+	toReturn.push_back(all.substr(pos + 2));
 	
 	return toReturn;
   }
@@ -160,3 +151,20 @@ void CGI::freeEnv(){
 	}
 	delete[] _env;
 }
+
+std::map<std::string, std::string> CGI::separateHeader(std::string headers){
+	std::map<std::string, std::string> headersMap;	
+	while (headers.size() > 0)
+	{
+		int pos = headers.find("\n");
+		std::string first = headers.substr(0, pos);
+		headers = headers.substr(pos +1);
+		std::string key = first.substr(0, first.find(": "));
+		std::string value = first.substr(first.find(": ") + 2);
+		headersMap[key] = value;
+		if (pos == -1)
+			break ;
+	}
+	return headersMap;
+}
+

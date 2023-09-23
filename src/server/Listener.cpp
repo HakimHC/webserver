@@ -127,13 +127,13 @@ void Listener::_listen() {
       }
 	  
 	}
-		else if (checkCGIready(i) && this->_pollFds[i].revents & POLLOUT){
-			sendCGIResponse(i);
-		}
-		else if (checkCGITimeout(i) && this->_pollFds[i].revents & POLLOUT){
-			sendCGITimeout(i);
-		}
-  //check servers if done
+	else if (checkCGIready(i) && this->_pollFds[i].revents & POLLOUT){
+		sendCGIResponse(i);
+	}
+	else if (checkCGITimeout(i) && this->_pollFds[i].revents & POLLOUT){
+		sendCGITimeout(i);
+	}
+  
 	}
 }
 
@@ -210,6 +210,8 @@ void Listener::sendCGIResponse(int i){
 	this->_clients[i].getResponse()->prepareCGIResponse();
 		Client& client = this->_clients[i];
 		const Response* r = client.getResponse();
+		log("CGI Response ready sending");
+		r->print();
         send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
         client.setResponse(NULL);
         delete r;
@@ -219,6 +221,8 @@ void Listener::sendCGIResponse(int i){
 void Listener::sendCGITimeout(int i){
 	Client& client = this->_clients[i];
 	const Response* r = new Response(504);
+	log("Timeout");
+	r->print();
 	send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
 	client.setResponse(NULL);
 	delete r;
