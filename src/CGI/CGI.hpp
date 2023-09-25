@@ -29,6 +29,7 @@ class CGI {
 		std::string _resourcePath;
 		int			_id;
 		int			_pip[2];
+		int			_pipOut[2];
 		std::string	_queryString; //done
 		std::string _requestMethod; //done
 		std::string _contentType;
@@ -43,12 +44,16 @@ class CGI {
 		std::string _serverPort;
 		std::string _serverProtocol;
 		std::string _serverSoftware;
+		std::string _unsentBody;
 		std::map<std::string, std::string> _httpHeadersEnv;
 		bool		_failed;
 		std::string	_result;
 		struct pollfd _pfd;
+		struct pollfd _pfdOut;
 		char 		  **_env;
 		unsigned int	_envSize;
+		unsigned int	_sendingBufferSize;
+		bool			_writing;
 		
 };
 

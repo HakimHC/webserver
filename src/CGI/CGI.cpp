@@ -9,12 +9,14 @@
 #include <iostream>
 #include <sstream>
 #include <cstring>
+#include <cstdlib>
 
 #include "defaults.hpp"
 #include "logging.hpp"
 #include "utils.hpp"
 
-CGI::CGI(Request &req): _collecting(true),_failed(false), _result(""){
+CGI::CGI(Request &req): _collecting(true),_failed(false), _result(""),
+  _writing(true){
 	std::cout << "" << " is generating a response.." << std::endl;
 	errno = 0;
 	char buffer[1024];
@@ -26,12 +28,13 @@ CGI::CGI(Request &req): _collecting(true),_failed(false), _result(""){
 	_requestMethod = "REQUEST_METHOD=" + req.getMethod();
 	_requestURI = "REQUEST_URI=" + req.getUri();
 	setHeadersEnvVar( req.getHeaders());
+	_unsentBody = req.getBody();
 
 }
 
 void CGI::startCGI(){
 	setEnv();
-	if (pipe(_pip) == -1){
+	if (pipe(_pip) == -1 || pipe(_pipOut) == -1){
 		_failed = true;
 		return ;
 	}
@@ -43,17 +46,24 @@ void CGI::startCGI(){
 	}
 	if (_id == 0) { 
 		close(_pip[0]);
-		if (dup2(_pip[1], STDOUT_FILENO) == -1)
+		close(_pipOut[1]);
+		if (dup2(_pip[1], STDOUT_FILENO) == -1 || 
+			dup2(_pipOut[0], STDIN_FILENO) == -1)
 			log("whaaat");
 		close(_pip[1]);
+		close(_pipOut[0]);
 		int w = execle(_resourcePath.c_str(), _resourcePath.c_str(),  NULL, _env);
 		log("Fatal execle " << w);
 		exit(EXIT_FAILURE);
 	}
 	close(_pip[1]);
+	close(_pipOut[0]);
 	fcntl(_pip[0], F_SETFL, O_NONBLOCK);
+	fcntl(_pipOut[1], F_SETFL, O_NONBLOCK);
 	_pfd.fd = _pip[0];
 	_pfd.events = POLLIN;
+	_pfdOut.fd = _pipOut[1];
+	_pfdOut.events = POLLOUT;
 	freeEnv();
 }
 
@@ -64,7 +74,23 @@ bool CGI::responseReady(){
 	
 	log("Checking if response is ready");
 	bzero(buffer, 1 << 12 * sizeof(char));
-	if ((ret = poll(&_pfd, 1, 500)) > 0) {
+	if (((ret = poll(&_pfdOut, 1, 500)) > 0) && _writing == true 
+			&& _unsentBody.size() >0) {
+        if (_pfdOut.revents & POLLOUT) {
+            ssize_t n = write(_pipOut[1],
+						_unsentBody.substr(0,_sendingBufferSize).c_str(),
+						_sendingBufferSize + 1);
+            if (n > 0) {
+                _unsentBody = _unsentBody.substr(n);
+            } else {
+                _writing = false;
+            }
+        }
+    }
+	else if(_writing == true && _unsentBody.size()==0){
+		_writing = false;
+	}	
+	else if ((ret = poll(&_pfd, 1, 0)) > 0 && _writing == false) {
         if (_pfd.revents & POLLIN) {
             ssize_t n = read(_pip[0], buffer, sizeof(buffer) - 1);
             if (n > 0) {
@@ -79,6 +105,7 @@ bool CGI::responseReady(){
 	if (_collecting == false){
 		waitpid(_id,&status, 0);
 		close(_pip[0]);
+		close(_pipOut[1]);
 		return true;
 	}
 	return false;
@@ -113,7 +140,13 @@ std::string CGI::getResourcePath(){
 void CGI::setHeadersEnvVar(const std::map<std::string, std::string> &headers){
 	std::map<std::string, std::string>::const_iterator itHead = headers.begin();
 	while (itHead != headers.end()){
-		std::string ini = "HTTP_" + itHead->first;
+		std::string ini;
+		if (itHead->first == "CONTENT_LENGTH" || itHead->first == "CONTENT_TYPE")
+				ini = itHead->first;
+				if (itHead->first == "CONTENT_LENGTH")
+					_sendingBufferSize = atoi(itHead->second.c_str());
+		else 
+				ini = "HTTP_" + itHead->first;
 		for (std::string::iterator it = ini.begin(); it != ini.end(); it++){
 			if (*it == '-')
 				*it = '_';
@@ -146,10 +179,12 @@ void CGI::setEnv(){
 }
 
 void CGI::freeEnv(){
+	log("freeing env");
 	for(unsigned int i = 0; i < _envSize; i++){
 		delete[] _env[i];
 	}
 	delete[] _env;
+	log("freeing env done");
 }
 
 std::map<std::string, std::string> CGI::separateHeader(std::string headers){

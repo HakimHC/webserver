@@ -13,7 +13,7 @@ CXX				= g++
 # Compiler flags
 CXXFLAGS 	= -Wall -Werror -Wextra #-fsanitize=thread
 #CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
-CXXFLAGS 	+= -g3
+CXXFLAGS 	+= -g3 -fsanitize=address
 CXXFLAGS 	+= $(INC)
 
 # If the OS happens to be Linux, compile with the LeakSanitizer (this flag is not supported on MacOS)
