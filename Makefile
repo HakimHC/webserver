@@ -1,7 +1,9 @@
 # Name of the executable
 NAME 			= webserv
 TESTNAME		= testd
+CCGI			= www/cgi-bin/ccgi
 
+SRC_CCGI = www/cgi-bin/ccgi.cpp
 # Operating System
 OS				= $(shell uname -s)
 
@@ -11,7 +13,7 @@ CXX				= g++
 # Compiler flags
 CXXFLAGS 	= -Wall -Werror -Wextra #-fsanitize=thread
 #CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
-CXXFLAGS 	+= -g3
+#CXXFLAGS 	+= -g3 -fsanitize=address
 CXXFLAGS 	+= $(INC)
 
 # If the OS happens to be Linux, compile with the LeakSanitizer (this flag is not supported on MacOS)
@@ -31,6 +33,7 @@ INC				+= -I $(UTILSDIR)
 INC				+= -I $(HTTPDIR)
 INC				+= -I $(INC_DIR)
 INC				+= -I $(RESPONSEDIR)
+INC				+= -I $(CGIDIR)
 
 # Source code directory
 SRCDIR 		= src
@@ -62,6 +65,10 @@ HTTP 		= $(addprefix $(HTTPDIR)/,$(SRC_HTTP))
 HTTPDIR	= $(addprefix $(SRCDIR)/,http)
 SRC_HTTP	= HTTP.cpp \
 
+CGI 		= $(addprefix $(CGIDIR)/,$(SRC_CGI))
+CGIDIR	= $(addprefix $(SRCDIR)/,CGI)
+SRC_CGI	= CGI.cpp \
+
 MAIN 			= $(addprefix $(MAINDIR)/,$(SRC_MAIN))
 MAINDIR		= $(addprefix $(SRCDIR)/,main)
 SRC_MAIN	= main.cpp
@@ -73,6 +80,7 @@ SRC				= $(MAIN) 	\
 						$(RESPONSE) \
 						$(UTILS) \
 						$(HTTP) \
+						$(CGI) \
 
 
 TESTSRC = $(SRC)
@@ -84,6 +92,7 @@ OBJ 			= $(SRC:.cpp=.o)
 
 # Rules
 all: $(NAME)
+all: $(CCGI)
 
 $(NAME): $(OBJ)
 	$(CXX) $(CXXFLAGS) $(OBJ) $(LDFLAGS) -o $@
@@ -91,12 +100,16 @@ $(NAME): $(OBJ)
 $(TESTNAME): $(TESTSRC)
 	$(CXX) $(CXXFLAGS) $(TESTSRC) $(LDFLAGS) -g3 -o  $@
 
+$(CCGI): $(SRC_CCGI)
+	$(CXX) $(CXXFLAGS) $(SRC_CCGI) -o $@
+
 clean:
 	$(RM) $(OBJ)
 
 fclean: clean
 	$(RM) $(NAME)
 	$(RM) $(TESTNAME)
+	$(RM) $(CCGI)
 
 test: $(TESTNAME)
 
@@ -107,3 +120,5 @@ re:: all
 asan: CXXFLAGS += -fsanitize=address
 asan: LDFLAGS += -fsanitize=address
 asan: re
+
+cgi: $(CCGI)

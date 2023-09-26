@@ -3,15 +3,20 @@
 #include "Response.hpp"
 #include "logging.hpp"
 
-Response::~Response() {}
-Response::Response() {
+Response::~Response(){
+	if (this->_cgi != NULL){
+		delete _cgi;
+		_cgi = NULL;
+	}
+}
+Response::Response(): _cgi(NULL) {
   this->initStatusCodes();
   this->initMimeTypes();
   this->generateCurrentDateTime();
   this->initHeaders();
 }
 
-Response::Response(int sc) : _responseStatusCode(sc) {
+Response::Response(int sc) : _responseStatusCode(sc), _cgi(NULL) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
   std::stringstream statusCodeString;
@@ -29,7 +34,7 @@ Response::Response(int sc) : _responseStatusCode(sc) {
   this->generateResponseData();
 }
 
-Response::Response(const std::vector<std::string> &dirContents) {
+Response::Response(const std::vector<std::string> &dirContents): _cgi(NULL) {
   this->initStatusCodes();
   this->generateCurrentDateTime();
   this->_extension = ".html";
@@ -269,4 +274,38 @@ void Response::print() const {
   if (this->_body.size() > 4000)
     { log("Body exceeds 4000 bytes, occulting output..."); return; }
   log("\r\n" << this->_body);
+}
+
+void Response::prepareCGIResponse(){
+	if (_cgi && _cgi->getResult().length() > 0){
+		std::vector<std::string> separeted = 
+			CGI::separatePyCGI(_cgi->getResult());
+		std::map<std::string, std::string> headers = 
+			CGI::separateHeader(separeted[0]);
+		this->setExtension(".cgi");
+		this->setBody(separeted[1]);
+		for(std::map<std::string, std::string>::iterator it = headers.begin();
+			it != headers.end(); it++){
+			this->addHeader(it->first, it->second);
+		}
+		this->setResponseStatusCode(200);
+		this->initHeaders();
+		this->generateResponseData();
+		return ;
+	} else {
+    	log("CGI  failed [" << _cgi->getResourcePath() << "] (" << strerror(errno) << ")");
+    	if (errno == ENOENT)
+      		*this = Response(404);
+    	else
+      		*this = Response(403);
+    	return ;
+	}
+}
+
+void Response::startTimer(){
+	_cgiStartTime = std::time(0);
+}
+
+std::time_t Response::getCGITime(){
+	return _cgiStartTime;
 }

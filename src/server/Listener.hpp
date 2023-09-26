@@ -34,6 +34,10 @@ private:
   void readClientData(const size_t &);
   void closeConnection(Client &);
   bool checkValid();
+  bool checkCGIready(int i);
+  bool checkCGITimeout(int i);
+  void sendCGIResponse(int i);
+  void sendCGITimeout(int i);
 };
 
 #endif // __LISTENER_HPP__

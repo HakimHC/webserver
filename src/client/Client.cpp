@@ -17,6 +17,10 @@ const Response* Client::getResponse() const {
   return this->_response;
 }
 
+Response* Client::getResponse() {
+  return this->_response;
+}
+
 void Client::setResponse(Response* r) {
   this->_response = r;
 }

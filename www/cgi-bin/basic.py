@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!		/usr/bin/env python3
 import os
 import urllib.parse
 
@@ -18,5 +18,6 @@ for key, values in parameters.items():
 print("</ul>")
 
 print("</body>")
+
 print("</html>")
 
