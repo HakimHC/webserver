@@ -199,6 +199,7 @@ Response* Server::returnResponse(const int& statusCode) {
 }
 
 Response *Server::generateResponse(Request &req) {
+  std::cout << "Size(): " << _locations.size() << std::endl;
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
   req.setLocation(location);
@@ -287,8 +288,9 @@ Response *Server::returnIndexFile(const std::string &resource) {
       all += line + "\n";
     index.close();
     Response *response = new Response();
-    response->setExtension(
-        resource.substr(resource.find("."), resource.size()));
+    size_t extPos = resource.find(".");
+    std::string ext = (extPos == std::string::npos) ? "" : resource.substr(extPos, resource.size());
+    response->setExtension(ext);
     response->setBody(all);
     response->setResponseStatusCode(200);
     response->initHeaders();
@@ -430,6 +432,8 @@ bool Server::isPythonCGIReq(Request &req ) {
 	getcwd(buffer, sizeof(buffer) - 1);
 	std::string resourcePath(buffer);
 	resourcePath += "/" + req.getResource();
+	if (this->_locations.find(req.getLocation()) == this->_locations.end())
+	  return false;
 	if (this->_locations[req.getLocation()].getCGI()== "on" && 
 		!access(resourcePath.c_str(),X_OK))
 			return true;

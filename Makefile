@@ -11,9 +11,8 @@ OS				= $(shell uname -s)
 CXX				= g++
 
 # Compiler flags
-CXXFLAGS 	= -Wall -Werror -Wextra #-fsanitize=thread
-#CXXFLAGS 	+= -Wshadow -Wconversion -pedantic
-#CXXFLAGS 	+= -g3 -fsanitize=address
+CXXFLAGS 	= -Wall -Werror -Wextra
+# CXXFLAGS 	+= -std=c++98
 CXXFLAGS 	+= $(INC)
 
 # If the OS happens to be Linux, compile with the LeakSanitizer (this flag is not supported on MacOS)
@@ -120,5 +119,10 @@ re:: all
 asan: CXXFLAGS += -fsanitize=address
 asan: LDFLAGS += -fsanitize=address
 asan: re
+
+debug: CXXFLAGS += -g3
+debug: CXXFLAGS += -fsanitize=address
+debug: LDFLAGS += -fsanitize=address
+debug: re
 
 cgi: $(CCGI)

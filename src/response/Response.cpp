@@ -1,5 +1,7 @@
 #include <sstream>
 
+#include <string.h>
+
 #include "Response.hpp"
 #include "logging.hpp"
 

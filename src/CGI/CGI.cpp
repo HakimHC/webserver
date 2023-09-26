@@ -143,8 +143,8 @@ void CGI::setHeadersEnvVar(const std::map<std::string, std::string> &headers){
 		std::string ini;
 		if (itHead->first == "CONTENT_LENGTH" || itHead->first == "CONTENT_TYPE")
 				ini = itHead->first;
-				if (itHead->first == "CONTENT_LENGTH")
-					_sendingBufferSize = atoi(itHead->second.c_str());
+    if (itHead->first == "CONTENT_LENGTH")
+      _sendingBufferSize = atoi(itHead->second.c_str());
 		else 
 				ini = "HTTP_" + itHead->first;
 		for (std::string::iterator it = ini.begin(); it != ini.end(); it++){
