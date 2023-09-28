@@ -21,7 +21,6 @@ int main(int argc, char *argv[]) {
 
   std::string configFile = (argv[1] ? argv[1] : DEFAULT_CONFIG_FILE);
 
-  /* webServer.print(); */
   try {
     HTTP webServer = HTTP(configFile);
     webServer.start();

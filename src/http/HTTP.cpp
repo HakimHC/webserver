@@ -15,7 +15,7 @@ HTTP::~HTTP() {
 }
 
 void HTTP::addServer(Server server) {
-  server.print();
+  /* server.print(); */
   for (size_t i = 0; i < this->_listeners.size(); i++) {
     if (this->_listeners[i]->port() == server.port()) {
       this->_listeners[i]->addServer(server);

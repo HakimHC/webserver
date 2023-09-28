@@ -23,7 +23,6 @@
 #include "Response.hpp"
 #include "defaults.hpp"
 #include "logging.hpp"
-#include "utils.hpp"
 #include "CGI.hpp"
 
 #define _BACKLOG 5
@@ -199,7 +198,6 @@ Response* Server::returnResponse(const int& statusCode) {
 }
 
 Response *Server::generateResponse(Request &req) {
-  std::cout << "Size(): " << _locations.size() << std::endl;
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
   req.setLocation(location);
@@ -271,18 +269,10 @@ Response *Server::	handleGetRequest(Request &req) {
 
 
 Response *Server::returnIndexFile(const std::string &resource) {
-  std::cout << this->_serverName << " is generating a response.." << std::endl;
   errno = 0;
   std::ifstream index(resource);
   if (index.is_open()) {
     std::string all;
-    // char buf[DEFAULT_MAX_CLIENT_BODY_SIZE];
-
-    // while (!index.eof()) {
-    //     memset(buf, 0, sizeof(buf));
-    //     index.read(buf, DEFAULT_MAX_CLIENT_BODY_SIZE);
-    //     all += buf;
-    // }
     std::string line;
     while (std::getline(index, line))
       all += line + "\n";
@@ -367,7 +357,6 @@ Response *Server::returnRedirection(const Request &req, int statusCode) {
     response->generateResponseData();
     return response;
   }
-  // this->_locations[req.getLocation()].parseRedirection();
   const Redirection &redir = this->_locations[req.getLocation()].getRedirect();
   std::string url;
   if (redir.redirLocation[0] == '/') {

@@ -14,6 +14,7 @@
 #include "Response.hpp"
 #include "defaults.hpp"
 #include "logging.hpp"
+#include "utils.hpp"
 
 Listener::~Listener() {}
 Listener::Listener(uint16_t port) : _port(port) {
@@ -87,17 +88,11 @@ void Listener::readClientData(const size_t &clientIndex) {
   ssize_t r = recv(this->_pollFds[clientIndex].fd, buf, sizeof(buf), 0);
 
   if (r == 0) {
-    std::cout << "Client disconnected" << std::endl;
     close(this->_pollFds[clientIndex].fd);
   } else if (r == -1) {
-    std::cout << "error: cannot read clients buffer, ending connection"
-              << std::endl;
     close(this->_pollFds[clientIndex].fd);
   } else {
-    std::cout << "Recieved data:" << std::endl;
     this->_clients[clientIndex].setRequestBuffer(buf);
-    log(this->_clients[clientIndex].getRequestBuffer());
-
     this->respond(this->_clients[clientIndex]);
   }
 }
@@ -111,7 +106,6 @@ void Listener::_listen() {
   for (size_t i = 0; i < this->_pollFds.size(); i++) {
     if (this->_pollFds[i].revents & POLLIN) {
       if (this->_pollFds[i].fd == this->_socketFd) {
-        std::cout << "Incoming connection..." << std::endl;
         this->acceptClient();
       } else {
         this->readClientData(i);
@@ -120,6 +114,8 @@ void Listener::_listen() {
 	  	&& this->_clients[i].getResponse()->getCGI() == NULL) {
         Client& client = this->_clients[i];
         const Response* r = client.getResponse();
+        std::string logging = r->getData().substr(0, r->getData().find("\r\n"));
+        LOG_INFO(logging);
         send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
         client.setResponse(NULL);
         delete r;
@@ -154,12 +150,8 @@ void Listener::respond(Client &client) {
   try {
     Request req = Request(client.getRequestBuffer());
     Response *r = this->sendRequestToServer(req);
-    log("===== RESPONSE ====");
-    r->print();
-    log("===================");
+    /* r->print(); */
     client.setResponse(r);
-    // Could check if client wants to keep connection
-    // if (req.getHeaders()["Connection"])
   } catch (std::exception &e) {
     std::cerr << e.what() << std::endl;
     Response* badRequest = new Response(400);
@@ -210,7 +202,7 @@ void Listener::sendCGIResponse(int i){
 	this->_clients[i].getResponse()->prepareCGIResponse();
 		Client& client = this->_clients[i];
 		const Response* r = client.getResponse();
-		log("CGI Response ready sending");
+		/* log("CGI Response ready sending"); */
 		r->print();
         send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
         client.setResponse(NULL);
@@ -221,7 +213,7 @@ void Listener::sendCGIResponse(int i){
 void Listener::sendCGITimeout(int i){
 	Client& client = this->_clients[i];
 	const Response* r = new Response(504);
-	log("Timeout");
+	/* log("Timeout"); */
 	r->print();
 	send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
 	client.setResponse(NULL);

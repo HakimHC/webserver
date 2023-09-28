@@ -41,9 +41,27 @@
 !_TAG_KIND_DESCRIPTION!JSON	o,object	/objects/
 !_TAG_KIND_DESCRIPTION!JSON	s,string	/strings/
 !_TAG_KIND_DESCRIPTION!JSON	z,null	/nulls/
+!_TAG_KIND_DESCRIPTION!JavaScript	C,constant	/constants/
+!_TAG_KIND_DESCRIPTION!JavaScript	G,getter	/getters/
+!_TAG_KIND_DESCRIPTION!JavaScript	M,field	/fields/
+!_TAG_KIND_DESCRIPTION!JavaScript	S,setter	/setters/
+!_TAG_KIND_DESCRIPTION!JavaScript	c,class	/classes/
+!_TAG_KIND_DESCRIPTION!JavaScript	f,function	/functions/
+!_TAG_KIND_DESCRIPTION!JavaScript	g,generator	/generators/
+!_TAG_KIND_DESCRIPTION!JavaScript	m,method	/methods/
+!_TAG_KIND_DESCRIPTION!JavaScript	p,property	/properties/
+!_TAG_KIND_DESCRIPTION!JavaScript	v,variable	/global variables/
 !_TAG_KIND_DESCRIPTION!Make	I,makefile	/makefiles/
 !_TAG_KIND_DESCRIPTION!Make	m,macro	/macros/
 !_TAG_KIND_DESCRIPTION!Make	t,target	/targets/
+!_TAG_KIND_DESCRIPTION!PHP	a,alias	/aliases/
+!_TAG_KIND_DESCRIPTION!PHP	c,class	/classes/
+!_TAG_KIND_DESCRIPTION!PHP	d,define	/constant definitions/
+!_TAG_KIND_DESCRIPTION!PHP	f,function	/functions/
+!_TAG_KIND_DESCRIPTION!PHP	i,interface	/interfaces/
+!_TAG_KIND_DESCRIPTION!PHP	n,namespace	/namespaces/
+!_TAG_KIND_DESCRIPTION!PHP	t,trait	/traits/
+!_TAG_KIND_DESCRIPTION!PHP	v,variable	/variables/
 !_TAG_KIND_DESCRIPTION!Python	I,namespace	/name referring a module defined in other file/
 !_TAG_KIND_DESCRIPTION!Python	Y,unknown	/name referring a class\/variable\/function\/module defined in other module/
 !_TAG_KIND_DESCRIPTION!Python	c,class	/classes/
@@ -59,7 +77,9 @@
 !_TAG_PARSER_VERSION!HTML	0.0	/current.age/
 !_TAG_PARSER_VERSION!Iniconf	0.0	/current.age/
 !_TAG_PARSER_VERSION!JSON	0.0	/current.age/
+!_TAG_PARSER_VERSION!JavaScript	0.0	/current.age/
 !_TAG_PARSER_VERSION!Make	0.0	/current.age/
+!_TAG_PARSER_VERSION!PHP	0.0	/current.age/
 !_TAG_PARSER_VERSION!Python	0.0	/current.age/
 !_TAG_PATTERN_LENGTH_LIMIT	96	/0 for no limit/
 !_TAG_PROC_CWD	/home/hakim/dev/common_core/webserver/	//
@@ -80,11 +100,20 @@
 !_TAG_ROLE_DESCRIPTION!Python!module	namespace	/namespace from where classes\/variables\/functions are imported/
 !_TAG_ROLE_DESCRIPTION!Python!unknown	imported	/imported from the other module/
 !_TAG_ROLE_DESCRIPTION!Python!unknown	indirectlyImported	/classes\/variables\/functions\/modules imported in alternative name/
+$(CCGI)	Makefile	/^$(CCGI): $(SRC_CCGI)$/;"	t
 $(NAME)	Makefile	/^$(NAME): $(OBJ)$/;"	t
 $(TESTNAME)	Makefile	/^$(TESTNAME): $(TESTSRC)$/;"	t
 ADRGONZA WARRIORS, FIGHT !!	www/index.bak.html	/^        <h2><center>ADRGONZA WARRIORS, FIGHT !!<\/center><\/h2>$/;"	i
+Adrgonza Warriors Webserver	testdir/index.html	/^<title>Adrgonza Warriors Webserver<\/title>$/;"	j
 Adrgonza Warriors Webserver	www/index.html	/^        <h1>Adrgonza Warriors Webserver<\/h1>$/;"	h
 Adrgonza Warriors Webserver	www/index.html	/^<title>Adrgonza Warriors Webserver<\/title>$/;"	j
+CCGI	Makefile	/^CCGI			= www\/cgi-bin\/ccgi$/;"	m
+CGI	Makefile	/^CGI 		= $(addprefix $(CGIDIR)\/,$(SRC_CGI))$/;"	m
+CGI	src/CGI/CGI.cpp	/^CGI::CGI(Request &req): _collecting(true),_failed(false), _result(""),$/;"	f	class:CGI
+CGI	src/CGI/CGI.hpp	/^	CGI() {}$/;"	f	class:CGI
+CGI	src/CGI/CGI.hpp	/^class CGI {$/;"	c
+CGI error	www/cgi-bin/error.html	/^<h2> CGI error <\/h2>$/;"	i
+CGIDIR	Makefile	/^CGIDIR	= $(addprefix $(SRCDIR)\/,CGI)$/;"	m
 CLIENT	Makefile	/^CLIENT 		= $(addprefix $(CLIENTDIR)\/,$(SRC_CLIENT))$/;"	m
 CLIENTDIR	Makefile	/^CLIENTDIR	= $(addprefix $(SRCDIR)\/,client)$/;"	m
 CXX	Makefile	/^CXX				= g++$/;"	m
@@ -92,6 +121,7 @@ Client	src/client/Client.cpp	/^Client::Client(int fd) : _fd(fd), _response(NULL)
 Client	src/client/Client.hpp	/^class Client {$/;"	c
 DEFAULT_ALIAS	include/defaults.hpp	/^#define DEFAULT_ALIAS /;"	d
 DEFAULT_CGI	include/defaults.hpp	/^#define DEFAULT_CGI /;"	d
+DEFAULT_CGI_TIMEOUT	include/defaults.hpp	/^#define DEFAULT_CGI_TIMEOUT /;"	d
 DEFAULT_CONFIG_FILE	include/defaults.hpp	/^#define DEFAULT_CONFIG_FILE /;"	d
 DEFAULT_HOST	include/defaults.hpp	/^#define DEFAULT_HOST /;"	d
 DEFAULT_INDEX	include/defaults.hpp	/^#define DEFAULT_INDEX /;"	d
@@ -116,6 +146,7 @@ HTTP_VERSION	src/response/Response.hpp	/^#define HTTP_VERSION /;"	d
 Hi, this is the first HTML file in the 'adrgonza warriors' webserver project	www/first.html	/^<h1> Hi, this is the first HTML file in the 'adrgonza warriors' webserver project <\/h1>$/;"	h
 INC	Makefile	/^INC				= -I $(SERVERDIR)$/;"	m
 INC_DIR	Makefile	/^INC_DIR		= include$/;"	m
+LOG_INFO	include/logging.hpp	/^#define LOG_INFO(/;"	d
 Listener	src/server/Listener.cpp	/^Listener::Listener(uint16_t port) : _port(port) {$/;"	f	class:Listener
 Listener	src/server/Listener.hpp	/^class Listener {$/;"	c
 Location	src/server/Location.cpp	/^Location::Location() : _root(DEFAULT_ROOT), _index(DEFAULT_INDEX),$/;"	f	class:Location
@@ -136,14 +167,16 @@ Redirection	include/redirection.hpp	/^} Redirection;$/;"	t	typeref:struct:__anon
 Request	src/request/Request.cpp	/^Request::Request() {}$/;"	f	class:Request
 Request	src/request/Request.cpp	/^Request::Request(const std::string &requestBuffer) {$/;"	f	class:Request
 Request	src/request/Request.hpp	/^class Request {$/;"	c
-Response	src/response/Response.cpp	/^Response::Response() {$/;"	f	class:Response
-Response	src/response/Response.cpp	/^Response::Response(const std::vector<std::string> &dirContents) {$/;"	f	class:Response
-Response	src/response/Response.cpp	/^Response::Response(int sc) : _responseStatusCode(sc) {$/;"	f	class:Response
+Response	src/response/Response.cpp	/^Response::Response(): _cgi(NULL) {$/;"	f	class:Response
+Response	src/response/Response.cpp	/^Response::Response(const std::vector<std::string> &dirContents): _cgi(NULL) {$/;"	f	class:Response
+Response	src/response/Response.cpp	/^Response::Response(int sc) : _responseStatusCode(sc), _cgi(NULL) {$/;"	f	class:Response
 Response	src/response/Response.hpp	/^class Response {$/;"	c
 SERVER	Makefile	/^SERVER 		= $(addprefix $(SERVERDIR)\/,$(SRC_SERVER))$/;"	m
 SERVERDIR	Makefile	/^SERVERDIR	= $(addprefix $(SRCDIR)\/,server)$/;"	m
 SRC	Makefile	/^SRC				= $(MAIN) 	\\$/;"	m
 SRCDIR	Makefile	/^SRCDIR 		= src$/;"	m
+SRC_CCGI	Makefile	/^SRC_CCGI = www\/cgi-bin\/ccgi.cpp$/;"	m
+SRC_CGI	Makefile	/^SRC_CGI	= CGI.cpp \\$/;"	m
 SRC_CLIENT	Makefile	/^SRC_CLIENT= Client.cpp$/;"	m
 SRC_HTTP	Makefile	/^SRC_HTTP	= HTTP.cpp \\$/;"	m
 SRC_MAIN	Makefile	/^SRC_MAIN	= main.cpp$/;"	m
@@ -165,9 +198,11 @@ UTILS	Makefile	/^UTILS 		= $(addprefix $(UTILSDIR)\/,$(SRC_UTILS))$/;"	m
 UTILSDIR	Makefile	/^UTILSDIR	= $(addprefix $(SRCDIR)\/,utils)$/;"	m
 Welcome to the Index location, this is vaca.html	www/index/vaca.html	/^<h1><center>Welcome to the Index location, this is vaca.html<\/center><\/h1>$/;"	h
 _BACKLOG	src/server/Server.cpp	/^#define _BACKLOG /;"	d	file:
+_CGI	src/server/Server.hpp	/^  std::vector<CGI>					_CGI;				$/;"	m	class:Server	typeref:typename:std::vector<CGI>
 _MAX_BUFFER_SIZE	src/server/Server.hpp	/^#define _MAX_BUFFER_SIZE /;"	d
 _MAX_CLIENTS	src/server/Server.hpp	/^#define _MAX_CLIENTS /;"	d
 _NUM_ALLOWED_METHODS	src/server/Server.hpp	/^#define _NUM_ALLOWED_METHODS /;"	d
+__CGI_HPP__	src/CGI/CGI.hpp	/^#define __CGI_HPP__$/;"	d
 __CLIENT_HPP__	src/client/Client.hpp	/^#define __CLIENT_HPP__$/;"	d
 __DEFAULTS_HPP__	include/defaults.hpp	/^#define __DEFAULTS_HPP__$/;"	d
 __ERROR_PAGE_HPP__	include/ErrorPage.hpp	/^# define __ERROR_PAGE_HPP__$/;"	d
@@ -188,55 +223,90 @@ _allowedMethods	src/server/Location.hpp	/^  std::vector<std::string> _allowedMet
 _autoIndex	src/server/Location.hpp	/^  bool _autoIndex;$/;"	m	class:Location	typeref:typename:bool
 _body	src/request/Request.hpp	/^  std::string _body;$/;"	m	class:Request	typeref:typename:std::string
 _body	src/response/Response.hpp	/^  std::string _body;$/;"	m	class:Response	typeref:typename:std::string
+_cgi	src/response/Response.hpp	/^  CGI 			* _cgi;$/;"	m	class:Response	typeref:typename:CGI *
 _cgi	src/server/Location.hpp	/^  std::string _cgi;$/;"	m	class:Location	typeref:typename:std::string
-_clientMaxBodySize	src/server/Server.hpp	/^  uint16_t _clientMaxBodySize;$/;"	m	class:Server	typeref:typename:uint16_t
+_cgiStartTime	src/response/Response.hpp	/^  std::time_t	_cgiStartTime;$/;"	m	class:Response	typeref:typename:std::time_t
+_clientMaxBodySize	src/server/Server.hpp	/^  uint16_t							_clientMaxBodySize;$/;"	m	class:Server	typeref:typename:uint16_t
 _clients	src/server/Listener.hpp	/^  std::vector<Client> _clients;$/;"	m	class:Listener	typeref:typename:std::vector<Client>
+_collecting	src/CGI/CGI.hpp	/^		bool		_collecting;$/;"	m	class:CGI	typeref:typename:bool
+_contentLength	src/CGI/CGI.hpp	/^		std::string _contentLength;$/;"	m	class:CGI	typeref:typename:std::string
+_contentType	src/CGI/CGI.hpp	/^		std::string _contentType;$/;"	m	class:CGI	typeref:typename:std::string
+_env	src/CGI/CGI.hpp	/^		char 		  **_env;$/;"	m	class:CGI	typeref:typename:char **
+_envSize	src/CGI/CGI.hpp	/^		unsigned int	_envSize;$/;"	m	class:CGI	typeref:typename:unsigned int
 _errorPageFiles	src/response/Response.hpp	/^  std::map<int, std::string> _errorPageFiles;$/;"	m	class:Response	typeref:typename:std::map<int,std::string>
-_errorPages	src/server/Server.hpp	/^  std::vector<ErrorPage>                _errorPages;$/;"	m	class:Server	typeref:typename:std::vector<ErrorPage>
-_extension	src/response/Response.hpp	/^  std::string _extension;$/;"	m	class:Response	typeref:typename:std::string
+_errorPages	src/server/Server.hpp	/^  std::vector<ErrorPage>			_errorPages;$/;"	m	class:Server	typeref:typename:std::vector<ErrorPage>
+_extension	src/response/Response.hpp	/^  std::string	_extension;$/;"	m	class:Response	typeref:typename:std::string
+_failed	src/CGI/CGI.hpp	/^		bool		_failed;$/;"	m	class:CGI	typeref:typename:bool
 _fd	src/client/Client.hpp	/^  int _fd;$/;"	m	class:Client	typeref:typename:int
 _headers	src/request/Request.hpp	/^  std::map<std::string, std::string> _headers;$/;"	m	class:Request	typeref:typename:std::map<std::string,std::string>
 _headers	src/response/Response.hpp	/^  std::map<std::string, std::string> _headers;$/;"	m	class:Response	typeref:typename:std::map<std::string,std::string>
-_host	src/server/Server.hpp	/^  std::string _host;$/;"	m	class:Server	typeref:typename:std::string
+_host	src/server/Server.hpp	/^  std::string 						_host;$/;"	m	class:Server	typeref:typename:std::string
+_httpHeadersEnv	src/CGI/CGI.hpp	/^		std::map<std::string, std::string> _httpHeadersEnv;$/;"	m	class:CGI	typeref:typename:std::map<std::string,std::string>
 _httpVersion	src/request/Request.hpp	/^  std::string _httpVersion;$/;"	m	class:Request	typeref:typename:std::string
+_id	src/CGI/CGI.hpp	/^		int			_id;$/;"	m	class:CGI	typeref:typename:int
 _index	src/server/Location.hpp	/^  std::string _index;$/;"	m	class:Location	typeref:typename:std::string
 _listen	src/server/Listener.cpp	/^void Listener::_listen() {$/;"	f	class:Listener	typeref:typename:void
-_listen	src/server/Server.hpp	/^  uint16_t _listen;$/;"	m	class:Server	typeref:typename:uint16_t
+_listen	src/server/Server.hpp	/^  uint16_t							_listen;$/;"	m	class:Server	typeref:typename:uint16_t
 _listeners	src/http/HTTP.hpp	/^  std::vector<Listener *> _listeners;$/;"	m	class:HTTP	typeref:typename:std::vector<Listener * >
 _location	src/request/Request.hpp	/^  std::string _location;$/;"	m	class:Request	typeref:typename:std::string
-_locations	src/server/Server.hpp	/^  std::map<std::string, Location> _locations;     \/\/ key = _uri$/;"	m	class:Server	typeref:typename:std::map<std::string,Location>
+_locations	src/server/Server.hpp	/^  std::map<std::string, Location>	_locations;     \/\/ key = _uri$/;"	m	class:Server	typeref:typename:std::map<std::string,Location>
 _maxClientBodySize	src/server/Location.hpp	/^  size_t _maxClientBodySize;$/;"	m	class:Location	typeref:typename:size_t
 _method	src/request/Request.hpp	/^  std::string _method;$/;"	m	class:Request	typeref:typename:std::string
 _mimeTypesMap	src/response/Response.hpp	/^  std::map<std::string, std::string> _mimeTypesMap;$/;"	m	class:Response	typeref:typename:std::map<std::string,std::string>
+_pathInfo	src/CGI/CGI.hpp	/^		std::string _pathInfo;$/;"	m	class:CGI	typeref:typename:std::string
+_pathTranslated	src/CGI/CGI.hpp	/^		std::string _pathTranslated;$/;"	m	class:CGI	typeref:typename:std::string
+_pfd	src/CGI/CGI.hpp	/^		struct pollfd _pfd;$/;"	m	class:CGI	typeref:struct:pollfd
+_pfdOut	src/CGI/CGI.hpp	/^		struct pollfd _pfdOut;$/;"	m	class:CGI	typeref:struct:pollfd
+_pip	src/CGI/CGI.hpp	/^		int			_pip[2];$/;"	m	class:CGI	typeref:typename:int[2]
+_pipOut	src/CGI/CGI.hpp	/^		int			_pipOut[2];$/;"	m	class:CGI	typeref:typename:int[2]
 _pollFds	src/server/Listener.hpp	/^  std::vector<struct pollfd> _pollFds;$/;"	m	class:Listener	typeref:typename:std::vector<struct pollfd>
 _port	src/server/Listener.hpp	/^  uint16_t _port;$/;"	m	class:Listener	typeref:typename:uint16_t
+_queryString	src/CGI/CGI.hpp	/^		std::string	_queryString; \/\/done$/;"	m	class:CGI	typeref:typename:std::string
 _queryString	src/request/Request.hpp	/^  std::string _queryString;$/;"	m	class:Request	typeref:typename:std::string
 _redirect	src/server/Location.hpp	/^  Redirection _redirect;$/;"	m	class:Location	typeref:typename:Redirection
+_remoteAddr	src/CGI/CGI.hpp	/^		std::string _remoteAddr;$/;"	m	class:CGI	typeref:typename:std::string
+_remoteHost	src/CGI/CGI.hpp	/^		std::string _remoteHost;$/;"	m	class:CGI	typeref:typename:std::string
 _requestBuffer	src/client/Client.hpp	/^  std::string _requestBuffer;$/;"	m	class:Client	typeref:typename:std::string
+_requestMethod	src/CGI/CGI.hpp	/^		std::string _requestMethod; \/\/done$/;"	m	class:CGI	typeref:typename:std::string
+_requestURI	src/CGI/CGI.hpp	/^		std::string _requestURI; \/\/done$/;"	m	class:CGI	typeref:typename:std::string
 _resource	src/request/Request.hpp	/^  std::string _resource;$/;"	m	class:Request	typeref:typename:std::string
+_resourcePath	src/CGI/CGI.hpp	/^		std::string _resourcePath;$/;"	m	class:CGI	typeref:typename:std::string
 _response	src/client/Client.hpp	/^  Response* _response;$/;"	m	class:Client	typeref:typename:Response *
 _responseStatusCode	src/response/Response.hpp	/^  int _responseStatusCode;$/;"	m	class:Response	typeref:typename:int
+_result	src/CGI/CGI.hpp	/^		std::string	_result;$/;"	m	class:CGI	typeref:typename:std::string
 _return	src/server/Location.hpp	/^  std::string _return;$/;"	m	class:Location	typeref:typename:std::string
 _root	src/server/Location.hpp	/^  std::string _root;$/;"	m	class:Location	typeref:typename:std::string
 _saveFile	src/server/Location.hpp	/^  std::string _saveFile;$/;"	m	class:Location	typeref:typename:std::string
-_serverName	src/server/Server.hpp	/^  std::string _serverName;$/;"	m	class:Server	typeref:typename:std::string
+_scriptName	src/CGI/CGI.hpp	/^		std::string _scriptName;$/;"	m	class:CGI	typeref:typename:std::string
+_sendingBufferSize	src/CGI/CGI.hpp	/^		unsigned int	_sendingBufferSize;$/;"	m	class:CGI	typeref:typename:unsigned int
+_serverName	src/CGI/CGI.hpp	/^		std::string _serverName;$/;"	m	class:CGI	typeref:typename:std::string
+_serverName	src/server/Server.hpp	/^  std::string						_serverName;$/;"	m	class:Server	typeref:typename:std::string
+_serverPort	src/CGI/CGI.hpp	/^		std::string _serverPort;$/;"	m	class:CGI	typeref:typename:std::string
+_serverProtocol	src/CGI/CGI.hpp	/^		std::string _serverProtocol;$/;"	m	class:CGI	typeref:typename:std::string
+_serverSoftware	src/CGI/CGI.hpp	/^		std::string _serverSoftware;$/;"	m	class:CGI	typeref:typename:std::string
 _servers	src/server/Listener.hpp	/^  std::vector<Server> _servers;$/;"	m	class:Listener	typeref:typename:std::vector<Server>
 _setPriv	src/server/Location.cpp	/^void Location::_setPriv(std::string line) {$/;"	f	class:Location	typeref:typename:void
 _socketFd	src/server/Listener.hpp	/^  int _socketFd;$/;"	m	class:Listener	typeref:typename:int
 _statusCodesMap	src/response/Response.hpp	/^  std::map<int, std::string> _statusCodesMap;$/;"	m	class:Response	typeref:typename:std::map<int,std::string>
+_unsentBody	src/CGI/CGI.hpp	/^		std::string _unsentBody;$/;"	m	class:CGI	typeref:typename:std::string
 _uri	src/request/Request.hpp	/^  std::string _uri;$/;"	m	class:Request	typeref:typename:std::string
 _uri	src/server/Location.hpp	/^  std::string _uri;$/;"	m	class:Location	typeref:typename:std::string
+_writing	src/CGI/CGI.hpp	/^		bool			_writing;$/;"	m	class:CGI	typeref:typename:bool
 acceptClient	src/server/Listener.cpp	/^void Listener::acceptClient() {$/;"	f	class:Listener	typeref:typename:void
 addHeader	src/response/Response.cpp	/^void Response::addHeader(const std::string &key, const std::string &value) {$/;"	f	class:Response	typeref:typename:void
 addServer	src/http/HTTP.cpp	/^void HTTP::addServer(Server server) {$/;"	f	class:HTTP	typeref:typename:void
 addServer	src/server/Listener.cpp	/^void Listener::addServer(Server &s) { this->_servers.push_back(s);$/;"	f	class:Listener	typeref:typename:void
 adrgonza warriors	www/index.bak.html	/^        <title>adrgonza warriors<\/title>$/;"	j
+all	Makefile	/^all: $(CCGI)$/;"	t
 all	Makefile	/^all: $(NAME)$/;"	t
 asan	Makefile	/^asan: CXXFLAGS += -fsanitize=address$/;"	t
 asan	Makefile	/^asan: LDFLAGS += -fsanitize=address$/;"	t
-asan	Makefile	/^asan: re/;"	t
+asan	Makefile	/^asan: re$/;"	t
 badge incoming	www/badge.html	/^<h1> badge incoming <\/h1>$/;"	h
 basic	www/basic.json	/^{"basic": "testing"}$/;"	s
+cgi	Makefile	/^cgi: $(CCGI)$/;"	t
+checkCGITimeout	src/server/Listener.cpp	/^bool Listener::checkCGITimeout(int i){$/;"	f	class:Listener	typeref:typename:bool
+checkCGIready	src/server/Listener.cpp	/^bool Listener::checkCGIready(int i){$/;"	f	class:Listener	typeref:typename:bool
 checkValid	src/server/Listener.cpp	/^bool Listener::checkValid() {$/;"	f	class:Listener	typeref:typename:bool
 checkValid	src/server/Location.cpp	/^bool Location::checkValid(){$/;"	f	class:Location	typeref:typename:bool
 checkValid	src/server/Server.cpp	/^bool Server::checkValid() const{$/;"	f	class:Server	typeref:typename:bool
@@ -244,12 +314,16 @@ clean	Makefile	/^clean:$/;"	t
 closeConnection	src/server/Listener.cpp	/^void Listener::closeConnection(Client &client) {$/;"	f	class:Listener	typeref:typename:void
 concatWithRootOrAlias	src/server/Server.cpp	/^std::string Server::concatWithRootOrAlias(const Request &req) {$/;"	f	class:Server	typeref:typename:std::string
 convertRequestType	src/request/Request.cpp	/^requestType Request::convertRequestType(std::string const &method) {$/;"	f	class:Request	typeref:typename:requestType
+debug	Makefile	/^debug: CXXFLAGS += -fsanitize=address$/;"	t
+debug	Makefile	/^debug: CXXFLAGS += -g3$/;"	t
+debug	Makefile	/^debug: LDFLAGS += -fsanitize=address$/;"	t
+debug	Makefile	/^debug: re$/;"	t
 errUsage	src/main/main.cpp	/^int errUsage() {$/;"	f	typeref:typename:int
-executepythonCGI	src/server/Server.cpp	/^std::string	Server::executepythonCGI(std::string script, std::string queryString)$/;"	f	class:Server	typeref:typename:std::string
 fclean	Makefile	/^fclean: clean$/;"	t
 field1	www/form.html	/^        <input type="text" id="field1" name="field1" required><br><br>$/;"	I
 field2	www/form.html	/^        <input type="text" id="field2" name="field2" required><br><br>$/;"	I
 first file auto index	www/autoindex/1.html	/^<h1> first file auto index <\/h1>$/;"	h
+freeEnv	src/CGI/CGI.cpp	/^void CGI::freeEnv(){$/;"	f	class:CGI	typeref:typename:void
 funny jaja chistoso	www/test/jaja.html	/^<h1> funny jaja chistoso <\/h1>$/;"	h
 generateAutoIndex	src/server/Server.cpp	/^Response *Server::generateAutoIndex(const std::string &s) {$/;"	f	class:Server	typeref:typename:Response *
 generateCurrentDateTime	src/response/Response.cpp	/^void Response::generateCurrentDateTime() {$/;"	f	class:Response	typeref:typename:void
@@ -259,7 +333,10 @@ getAlias	src/server/Location.cpp	/^const std::string &Location::getAlias() const
 getAllowedMethods	src/server/Location.cpp	/^const std::vector<std::string> &Location::getAllowedMethods() const {$/;"	f	class:Location	typeref:typename:const std::vector<std::string> &
 getAutoIndex	src/server/Location.cpp	/^const bool &Location::getAutoIndex() const { return this->_autoIndex; }$/;"	f	class:Location	typeref:typename:const bool &
 getBody	src/request/Request.cpp	/^const std::string &Request::getBody() const { return this->_body; }$/;"	f	class:Request	typeref:typename:const std::string &
+getCGI	src/response/Response.hpp	/^  CGI  *getCGI() const {return this->_cgi;}$/;"	f	class:Response	typeref:typename:CGI *
+getCGI	src/response/Response.hpp	/^  CGI  *getCGI(){return this->_cgi;}$/;"	f	class:Response	typeref:typename:CGI *
 getCGI	src/server/Location.cpp	/^const std::string &Location::getCGI() const { return this->_cgi; }$/;"	f	class:Location	typeref:typename:const std::string &
+getCGITime	src/response/Response.cpp	/^std::time_t Response::getCGITime(){$/;"	f	class:Response	typeref:typename:std::time_t
 getData	src/response/Response.cpp	/^const std::string &Response::getData() const { return this->_allData; }$/;"	f	class:Response	typeref:typename:const std::string &
 getHeaders	src/request/Request.cpp	/^const std::map<std::string, std::string> &Request::getHeaders() const {$/;"	f	class:Request	typeref:typename:const std::map<std::string,std::string> &
 getHttpVersion	src/request/Request.cpp	/^const std::string &Request::getHttpVersion() const {$/;"	f	class:Request	typeref:typename:const std::string &
@@ -274,19 +351,25 @@ getRequestBuffer	src/client/Client.cpp	/^const std::string &Client::getRequestBu
 getRequestHeadersLegacy	src/request/Request.cpp	/^std::string Request::getRequestHeadersLegacy(const std::string &buffer) {$/;"	f	class:Request	typeref:typename:std::string
 getRequestLineLegacy	src/request/Request.cpp	/^std::string Request::getRequestLineLegacy(std::string const &buffer) {$/;"	f	class:Request	typeref:typename:std::string
 getResource	src/request/Request.cpp	/^const std::string &Request::getResource() const { return this->_resource; }$/;"	f	class:Request	typeref:typename:const std::string &
+getResourcePath	src/CGI/CGI.cpp	/^std::string CGI::getResourcePath(){$/;"	f	class:CGI	typeref:typename:std::string
+getResponse	src/client/Client.cpp	/^Response* Client::getResponse() {$/;"	f	class:Client	typeref:typename:Response *
 getResponse	src/client/Client.cpp	/^const Response* Client::getResponse() const {$/;"	f	class:Client	typeref:typename:const Response *
+getResult	src/CGI/CGI.cpp	/^std::string CGI::getResult(){$/;"	f	class:CGI	typeref:typename:std::string
 getReturn	src/server/Location.cpp	/^const std::string &Location::getReturn() const { return this->_return; }$/;"	f	class:Location	typeref:typename:const std::string &
 getRoot	src/server/Location.cpp	/^const std::string &Location::getRoot() const { return this->_root; }$/;"	f	class:Location	typeref:typename:const std::string &
 getSaveFile	src/server/Location.cpp	/^const std::string &Location::getSaveFile() const { return this->_saveFile; }$/;"	f	class:Location	typeref:typename:const std::string &
 getSocketfd	src/client/Client.cpp	/^const int &Client::getSocketfd() const { return this->_fd; }$/;"	f	class:Client	typeref:typename:const int &
+getTime	src/utils/utils.hpp	/^std::string getTime() {$/;"	f	typeref:typename:std::string
 getUri	src/request/Request.cpp	/^const std::string &Request::getUri() const { return this->_uri; }$/;"	f	class:Request	typeref:typename:const std::string &
 getUri	src/server/Location.cpp	/^const std::string &Location::getUri() const { return this->_uri; }$/;"	f	class:Location	typeref:typename:const std::string &
+get_cookie	www/cgi-bin/cookie_handler.cgi	/^def get_cookie():$/;"	f
 handleDeleteRequest	src/server/Server.cpp	/^Response* Server::handleDeleteRequest(Request& req) {$/;"	f	class:Server	typeref:typename:Response *
-handleGetRequest	src/server/Server.cpp	/^Response *Server::handleGetRequest(Request &req) {$/;"	f	class:Server	typeref:typename:Response *
+handleGetRequest	src/server/Server.cpp	/^Response *Server::	handleGetRequest(Request &req) {$/;"	f	class:Server	typeref:typename:Response *
 handlePostRequest	src/server/Server.cpp	/^Response* Server::handlePostRequest(Request& req) {$/;"	f	class:Server	typeref:typename:Response *
 headers	src/request/Request.cpp	/^const std::map<std::string, std::string> &Request::headers() const {$/;"	f	class:Request	typeref:typename:const std::map<std::string,std::string> &
 hello from server1	www/server1.html	/^<h1> hello from server1 <\/h1>$/;"	h
 hello from server2	www/server2.html	/^<h1> hello from server2 <\/h1>$/;"	h
+hello world	testdir/index.html	/^        <h1> hello world <\/h1>$/;"	h
 initHeaders	src/response/Response.cpp	/^void Response::initHeaders() {$/;"	f	class:Response	typeref:typename:void
 initMimeTypes	src/response/Response.cpp	/^void Response::initMimeTypes() {$/;"	f	class:Response	typeref:typename:void
 initPoll	src/server/Listener.cpp	/^void Listener::initPoll() {$/;"	f	class:Listener	typeref:typename:void
@@ -294,21 +377,23 @@ initStatusCodes	src/response/Response.cpp	/^void Response::initStatusCodes() {$/
 isCrLf	src/utils/crlf.cpp	/^bool utils::isCrLf(std::string const &s) { return (s == "\\r\\n"); }$/;"	f	class:utils	typeref:typename:bool
 isDirectory	src/server/Server.cpp	/^bool Server::isDirectory(std::string const &path) {$/;"	f	class:Server	typeref:typename:bool
 isMethodAllowed	src/server/Server.cpp	/^bool Server::isMethodAllowed(const Request &req) {$/;"	f	class:Server	typeref:typename:bool
-isPythonCGIReq	src/server/Server.cpp	/^bool Server::	isPythonCGIReq(Request &req ) {$/;"	f	class:Server	typeref:typename:bool
+isPythonCGIReq	src/server/Server.cpp	/^bool Server::isPythonCGIReq(Request &req ) {$/;"	f	class:Server	typeref:typename:bool
 jajajjajaj	www/error.html	/^<h2> jajajjajaj <\/h2>$/;"	i
 key	include/ErrorPage.hpp	/^    std::string key;$/;"	m	struct:__anon85ebed550108	typeref:typename:std::string
 locationExists	src/server/Server.cpp	/^bool Server::locationExists(const Request &req) const {$/;"	f	class:Server	typeref:typename:bool
 log	include/logging.hpp	/^#define log(/;"	d
 main	src/main/main.cpp	/^int main(int argc, char *argv[]) {$/;"	f	typeref:typename:int
-main	src/main/testmain.cpp	/^int main() {$/;"	f	typeref:typename:int
+main	www/cgi-bin/ccgi.cpp	/^int main() {$/;"	f	typeref:typename:int
 notSpace	src/server/Location.cpp	/^bool Location::notSpace(char c) { return (!std::isspace(static_cast<unsigned char>(c))); }$/;"	f	class:Location	typeref:typename:bool
-parameters	cgi-bin/basic.py	/^parameters = urllib.parse.parse_qs(query_string)$/;"	v
 parameters	www/cgi-bin/basic.py	/^parameters = urllib.parse.parse_qs(query_string)$/;"	v
+parameters	www/cgi-bin/hangs.py	/^parameters = urllib.parse.parse_qs(query_string)$/;"	v
 parseLegacy	src/request/Request.cpp	/^void Request::parseLegacy(std::string const &buffer) {$/;"	f	class:Request	typeref:typename:void
 parseRedirection	src/server/Location.cpp	/^void Location::parseRedirection() {$/;"	f	class:Location	typeref:typename:void
 parseUri	src/request/Request.cpp	/^void Request::parseUri(const std::string &uri) {$/;"	f	class:Request	typeref:typename:void
 port	src/server/Listener.cpp	/^const uint16_t &Listener::port() const { return this->_port; }$/;"	f	class:Listener	typeref:typename:const uint16_t &
 port	src/server/Server.cpp	/^const uint16_t &Server::port() const { return this->_listen; }$/;"	f	class:Server	typeref:typename:const uint16_t &
+prepareCGIResponse	src/response/Response.cpp	/^void Response::prepareCGIResponse(){$/;"	f	class:Response	typeref:typename:void
+prepareResponse	src/CGI/CGI.cpp	/^Response *CGI::prepareResponse(){$/;"	f	class:CGI	typeref:typename:Response *
 print	src/http/HTTP.cpp	/^void HTTP::print() const {$/;"	f	class:HTTP	typeref:typename:void
 print	src/request/Request.cpp	/^void Request::print() const {$/;"	f	class:Request	typeref:typename:void
 print	src/response/Response.cpp	/^void Response::print() const {$/;"	f	class:Response	typeref:typename:void
@@ -316,8 +401,9 @@ print	src/server/Listener.cpp	/^void Listener::print() const {$/;"	f	class:Liste
 print	src/server/Location.cpp	/^void Location::print() const {$/;"	f	class:Location	typeref:typename:void
 print	src/server/Server.cpp	/^void Server::print() const {$/;"	f	class:Server	typeref:typename:void
 printHeaders	src/request/Request.cpp	/^void Request::printHeaders() const {$/;"	f	class:Request	typeref:typename:void
-query_string	cgi-bin/basic.py	/^query_string = os.environ.get("QUERY_STRING", "")$/;"	v
 query_string	www/cgi-bin/basic.py	/^query_string = os.environ.get("QUERY_STRING", "")$/;"	v
+query_string	www/cgi-bin/cookie_handler.cgi	/^query_string = os.environ.get('QUERY_STRING', '')$/;"	v
+query_string	www/cgi-bin/hangs.py	/^query_string = os.environ.get("QUERY_STRING", "")$/;"	v
 re	Makefile	/^re:: all$/;"	t
 re	Makefile	/^re:: fclean$/;"	t
 readClientData	src/server/Listener.cpp	/^void Listener::readClientData(const size_t &clientIndex) {$/;"	f	class:Listener	typeref:typename:void
@@ -328,20 +414,26 @@ removeTrailing	src/server/Location.cpp	/^void Location::removeTrailing(std::stri
 requestLine	src/request/Request.cpp	/^enum requestLine { HTTP_METHOD, URI, HTTP_VERSION };$/;"	g	file:
 requestType	src/request/Request.hpp	/^enum requestType { GET, POST, DELETE, UNKNOWN };$/;"	g
 respond	src/server/Listener.cpp	/^void Listener::respond(Client &client) {$/;"	f	class:Listener	typeref:typename:void
+responseReady	src/CGI/CGI.cpp	/^bool CGI::responseReady(){$/;"	f	class:CGI	typeref:typename:bool
 returnIndexFile	src/server/Server.cpp	/^Response *Server::returnIndexFile(const std::string &resource) {$/;"	f	class:Server	typeref:typename:Response *
-returnPythonCGI	src/server/Server.cpp	/^Response *Server::returnPythonCGI(Request &req) {$/;"	f	class:Server	typeref:typename:Response *
 returnRedirection	src/server/Server.cpp	/^Response *Server::returnRedirection(const Request &req, int statusCode) {$/;"	f	class:Server	typeref:typename:Response *
 returnResponse	src/server/Server.cpp	/^Response* Server::returnResponse(const int& statusCode) {$/;"	f	class:Server	typeref:typename:Response *
 second file auto index	www/autoindex/2.html	/^<h1> second file auto index <\/h1>$/;"	h
+sendCGIResponse	src/server/Listener.cpp	/^void Listener::sendCGIResponse(int i){$/;"	f	class:Listener	typeref:typename:void
+sendCGITimeout	src/server/Listener.cpp	/^void Listener::sendCGITimeout(int i){$/;"	f	class:Listener	typeref:typename:void
 sendRequestToServer	src/server/Listener.cpp	/^Response *Listener::sendRequestToServer(Request &req) {$/;"	f	class:Listener	typeref:typename:Response *
-separatePyCGI	src/server/Server.cpp	/^  std::vector<std::string> Server::separatePyCGI(std::string all){$/;"	f	class:Server	typeref:typename:std::vector<std::string>
+separateHeader	src/CGI/CGI.cpp	/^std::map<std::string, std::string> CGI::separateHeader(std::string headers){$/;"	f	class:CGI	typeref:typename:std::map<std::string,std::string>
+separatePyCGI	src/CGI/CGI.cpp	/^ std::vector<std::string> CGI::separatePyCGI(std::string all){$/;"	f	class:CGI	typeref:typename:std::vector<std::string>
 serverName	src/server/Server.cpp	/^const std::string &Server::serverName() const { return this->_serverName; }$/;"	f	class:Server	typeref:typename:const std::string &
 setAllowedMethods	src/server/Location.cpp	/^void Location::setAllowedMethods(const std::vector<std::string> &s) {$/;"	f	class:Location	typeref:typename:void
 setBody	src/request/Request.cpp	/^void Request::setBody(const std::string &s) { this->_body = s; }$/;"	f	class:Request	typeref:typename:void
 setBody	src/response/Response.cpp	/^void Response::setBody(const std::string &s) { this->_body = s; }$/;"	f	class:Response	typeref:typename:void
+setCGI	src/response/Response.hpp	/^  void setCGI(CGI * entry) {this->_cgi = entry;}$/;"	f	class:Response	typeref:typename:void
+setEnv	src/CGI/CGI.cpp	/^void CGI::setEnv(){$/;"	f	class:CGI	typeref:typename:void
 setErrorPageFile	src/response/Response.cpp	/^void Response::setErrorPageFile(const int &key, const std::string &value) {$/;"	f	class:Response	typeref:typename:void
 setExtension	src/response/Response.cpp	/^void Response::setExtension(const std::string &e) { this->_extension = e; }$/;"	f	class:Response	typeref:typename:void
 setHeaders	src/request/Request.cpp	/^void Request::setHeaders(const std::map<std::string, std::string> &s) {$/;"	f	class:Request	typeref:typename:void
+setHeadersEnvVar	src/CGI/CGI.cpp	/^void CGI::setHeadersEnvVar(const std::map<std::string, std::string> &headers){$/;"	f	class:CGI	typeref:typename:void
 setHttpVersion	src/request/Request.cpp	/^void Request::setHttpVersion(const std::string &s) { this->_httpVersion = s; }$/;"	f	class:Request	typeref:typename:void
 setIndex	src/server/Location.cpp	/^void Location::setIndex(const std::string &s) { this->_index = s; }$/;"	f	class:Location	typeref:typename:void
 setLocation	src/request/Request.cpp	/^void Request::setLocation(const std::string &s) { this->_location = s; }$/;"	f	class:Request	typeref:typename:void
@@ -358,19 +450,24 @@ setRoot	src/server/Location.cpp	/^void Location::setRoot(const std::string &s) {
 setSocketFd	src/client/Client.cpp	/^void Client::setSocketFd(const int &fd) { this->_fd = fd; }$/;"	f	class:Client	typeref:typename:void
 setUri	src/request/Request.cpp	/^void Request::setUri(const std::string &s) { this->_uri = s; }$/;"	f	class:Request	typeref:typename:void
 setUri	src/server/Location.cpp	/^void Location::setUri(const std::string &s) { this->_uri = s; }$/;"	f	class:Location	typeref:typename:void
+set_cookie	www/cgi-bin/cookie_handler.cgi	/^def set_cookie():$/;"	f
 start	src/http/HTTP.cpp	/^void HTTP::start() {$/;"	f	class:HTTP	typeref:typename:void
+startCGI	src/CGI/CGI.cpp	/^void CGI::startCGI(){$/;"	f	class:CGI	typeref:typename:void
+startTimer	src/response/Response.cpp	/^void Response::startTimer(){$/;"	f	class:Response	typeref:typename:void
 statusCode	include/redirection.hpp	/^  int statusCode;$/;"	m	struct:__anonee006ae60108	typeref:typename:int
 test	Makefile	/^test: $(TESTNAME)$/;"	t
 third file auto index	www/autoindex/3.html	/^<h1> third file auto index <\/h1>$/;"	h
+this is my error page	www/cgi-bin/error.html	/^<h1> this is my error page <\/h1>$/;"	h
 this is my error page	www/error.html	/^<h1> this is my error page <\/h1>$/;"	h
 this is the index file of a subdirectory of an autoindexed resource	www/autoindex/subdir/index.html	/^<h1> this is the index file of a subdirectory of an autoindexed resource <\/h1>$/;"	h
 this is the test index file	www/test/index.html	/^<h1> this is the test index file <\/h1>$/;"	h
 utils	src/utils/utils.hpp	/^namespace utils {$/;"	n
 value	include/ErrorPage.hpp	/^    std::string value;$/;"	m	struct:__anon85ebed550108	typeref:typename:std::string
+~CGI	src/CGI/CGI.hpp	/^	~CGI() {}$/;"	f	class:CGI
 ~Client	src/client/Client.cpp	/^Client::~Client() {}$/;"	f	class:Client
 ~HTTP	src/http/HTTP.cpp	/^HTTP::~HTTP() {$/;"	f	class:HTTP
 ~Listener	src/server/Listener.cpp	/^Listener::~Listener() {}$/;"	f	class:Listener
 ~Location	src/server/Location.cpp	/^Location::~Location() {}$/;"	f	class:Location
 ~Request	src/request/Request.cpp	/^Request::~Request() {}$/;"	f	class:Request
-~Response	src/response/Response.cpp	/^Response::~Response() {}$/;"	f	class:Response
+~Response	src/response/Response.cpp	/^Response::~Response(){$/;"	f	class:Response
 ~Server	src/server/Server.cpp	/^Server::~Server() {}$/;"	f	class:Server

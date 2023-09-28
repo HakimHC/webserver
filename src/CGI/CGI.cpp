@@ -13,7 +13,6 @@
 
 #include "defaults.hpp"
 #include "logging.hpp"
-#include "utils.hpp"
 
 CGI::CGI(Request &req): _collecting(true),_failed(false), _result(""),
   _writing(true){
