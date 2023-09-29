@@ -241,7 +241,7 @@ Response *Server::	handleGetRequest(Request &req) {
      		req.getUri()[req.getUri().size() - 1] != '/')
     	return this->returnRedirection(req, DIRECTORY_REDIRECT);
   	else if (Server::isDirectory(
-               req.getResource().substr(0, req.getResource().size() - 1))) {
+               req.getResource().substr(0, req.getResource().size()))) {
     	std::string index;
     	std::string noindex = req.getResource();
     	if (this->_locations.find(req.getLocation()) != this->_locations.end())
