@@ -115,7 +115,7 @@ void Listener::_listen() {
         Client& client = this->_clients[i];
         const Response* r = client.getResponse();
         std::string logging = r->getData().substr(0, r->getData().find("\r\n"));
-        LOG_INFO(logging);
+        std::cout << " => " << logging << std::endl;
         send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
         client.setResponse(NULL);
         delete r;

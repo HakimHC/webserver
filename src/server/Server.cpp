@@ -198,6 +198,9 @@ Response* Server::returnResponse(const int& statusCode) {
 }
 
 Response *Server::generateResponse(Request &req) {
+
+  LOG_INFO(req.getMethod() << " " << req.getUri());
+
   std::string uri = req.getUri();
   std::string location = uri.substr(0, uri.find("/", 1));
   req.setLocation(location);
