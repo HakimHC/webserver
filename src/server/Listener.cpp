@@ -116,7 +116,9 @@ void Listener::_listen() {
         const Response* r = client.getResponse();
         std::string logging = r->getData().substr(0, r->getData().find("\r\n"));
         std::cout << " => " << logging << std::endl;
-        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        ssize_t ret = send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        if (ret <= 0)
+          perror("send");
         client.setResponse(NULL);
         delete r;
         this->closeConnection(client);
@@ -204,7 +206,9 @@ void Listener::sendCGIResponse(int i){
 		const Response* r = client.getResponse();
 		/* log("CGI Response ready sending"); */
 		r->print();
-        send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        ssize_t ret = send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+        if (ret <= 0)
+          perror("send");
         client.setResponse(NULL);
         delete r;
         this->closeConnection(client);
@@ -215,8 +219,10 @@ void Listener::sendCGITimeout(int i){
 	const Response* r = new Response(504);
 	/* log("Timeout"); */
 	r->print();
-	send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
-	client.setResponse(NULL);
+	ssize_t ret = send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
+  if (ret <= 0)
+    perror("send");
+  client.setResponse(NULL);
 	delete r;
 	const Response* w = client.getResponse();
 	delete w;
