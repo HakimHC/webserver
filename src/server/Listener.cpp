@@ -226,5 +226,6 @@ void Listener::sendCGITimeout(int i){
 	delete r;
 	const Response* w = client.getResponse();
 	delete w;
+	client.setResponse(NULL);
 	this->closeConnection(client);
 }
