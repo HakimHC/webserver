@@ -9,7 +9,7 @@ class Response;
 class CGI {
 	public:
 	CGI() {}
-	~CGI() {}
+	~CGI();
 	CGI(Request &req);
 	//Response *returnPythonCGI(Request &req);
 	static bool isPythonCGIReq(Request &req);
@@ -54,6 +54,7 @@ class CGI {
 		unsigned int	_envSize;
 		unsigned int	_sendingBufferSize;
 		bool			_writing;
+		int				_exitstatus;
 		
 };
 

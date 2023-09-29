@@ -224,9 +224,9 @@ void Listener::sendCGITimeout(int i){
 	log("Timeout");
 	r->print();
 	send(client.getSocketfd(), r->getData().data(), r->getData().size(), 0);
-	client.setResponse(NULL);
 	delete r;
 	const Response* w = client.getResponse();
 	delete w;
+	client.setResponse(NULL);
 	this->closeConnection(client);
 }

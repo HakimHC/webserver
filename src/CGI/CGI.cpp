@@ -5,6 +5,7 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <poll.h>
+#include <signal.h>
 
 #include <iostream>
 #include <sstream>
@@ -70,7 +71,7 @@ void CGI::startCGI(){
 
 bool CGI::responseReady(){
 	char	buffer[1 << 12];
-	int		status, ret;
+	int		ret;
 	
 	log("Checking if response is ready");
 	bzero(buffer, 1 << 12 * sizeof(char));
@@ -87,10 +88,10 @@ bool CGI::responseReady(){
             }
         }
     }
-	else if(_writing == true && _unsentBody.size()==0){
+	if(_writing == true && _unsentBody.size()==0){
 		_writing = false;
 	}	
-	else if ((ret = poll(&_pfd, 1, 0)) > 0 && _writing == false) {
+	if ((ret = poll(&_pfd, 1, 0)) > 0 && _writing == false) {
         if (_pfd.revents & POLLIN) {
             ssize_t n = read(_pip[0], buffer, sizeof(buffer) - 1);
             if (n > 0) {
@@ -103,9 +104,10 @@ bool CGI::responseReady(){
         }
     }
 	if (_collecting == false){
-		waitpid(_id,&status, 0);
+		waitpid(_id,&_exitstatus, 0);
 		close(_pip[0]);
 		close(_pipOut[1]);
+		_id = 0;
 		return true;
 	}
 	return false;
@@ -203,3 +205,13 @@ std::map<std::string, std::string> CGI::separateHeader(std::string headers){
 	return headersMap;
 }
 
+CGI::~CGI(){
+		log("here lines");
+		if (_id != 0){
+			kill(_id, SIGKILL);
+			waitpid(_id,&_exitstatus, 0);
+			close(_pip[0]);
+			close(_pipOut[1]);
+			_id = 0;
+		}
+}
