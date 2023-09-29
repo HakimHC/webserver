@@ -29,6 +29,9 @@ void HTTP::addServer(Server server) {
 }
 
 HTTP::HTTP(std::string file) {
+  if (Server::isDirectory(file))
+    throw(std::runtime_error("Error argument is a directory"));
+
   std::ifstream inputFile(file);
 
   if (!inputFile.is_open()) {
